@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#efe1c1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="ألعاب الجمعات">
+<title>ألعاب الجمعات</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Noto+Naskh+Arabic:wght@400;700&family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#efe1c1;--card:#f9efd7;--card2:#f3e4c2;--line:#2b1d12;--txt:#2b1d12;--mut:#7a6247;--acc:#b8392b;--red:#b8392b;--grn:#2c7a6b;--yel:#c9861f;--sh:4px 4px 0 #2b1d12}
+html,body{min-height:100%}
+body{font-family:'Noto Naskh Arabic','Tajawal',serif;color:var(--txt);overflow-x:hidden;transition:background-color .2s;
+ background-color:var(--bg);
+ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .22 0 0 0 0 .1 0 0 0 .13 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),radial-gradient(ellipse at center,transparent 55%,rgba(90,55,20,.22) 100%);
+ background-attachment:fixed}
+body.boom{background-color:#8e2a1e}
+.screen{display:none;min-height:100vh;padding:calc(14px + env(safe-area-inset-top)) 16px 140px;max-width:520px;margin:0 auto}
+.screen.on{display:block;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.disp,h1,.top h1,.game .n,.bigcard .txt,.bigcard .nm,.bigcard .huge,.timer,.pname,.secret .t2,.pair .a,.pair .b,.box h2,button{font-family:'Lalezar','Tajawal',sans-serif;font-weight:400;letter-spacing:0}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:10px;border-bottom:3px double var(--line)}
+.top h1{font-size:25px;margin:0;text-align:right;flex:1}
+.back{background:var(--card);color:var(--txt);width:44px;height:44px;padding:0;font-size:20px;border-radius:10px;flex:none}
+.help{font-size:22px}
+h1{font-size:40px;text-align:center;margin:8px 0 0;line-height:1.2;color:var(--red);text-shadow:2px 2px 0 var(--yel)}
+.badge{display:block;width:max-content;margin:6px auto 4px;border:2px solid var(--line);border-radius:999px;padding:2px 14px;font-size:13px;background:var(--yel);color:var(--txt);font-weight:700}
+.sub{color:var(--mut);text-align:center;margin-bottom:16px;line-height:1.8;font-size:15px}
+.box{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:14px;margin-bottom:16px;box-shadow:var(--sh)}
+.box h2{font-size:20px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.row{display:flex;gap:10px}
+input[type=text]{flex:1;min-width:0;background:#fffaf0;border:2px solid var(--line);color:var(--txt);border-radius:10px;padding:11px 12px;font:inherit;font-size:16px;outline:none}
+input[type=text]:focus{box-shadow:0 0 0 3px var(--yel)}
+button{touch-action:manipulation;cursor:pointer;border:2px solid var(--line);border-radius:12px;color:#fdf6e6;background:var(--red);padding:11px 16px;font-size:18px;box-shadow:var(--sh);transition:transform .08s,box-shadow .08s}
+button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--line)}
+button:disabled{opacity:.75}
+.ghost{background:var(--card);color:var(--txt)}
+.red{background:var(--red)}.grn{background:var(--grn)}.yel{background:var(--yel);color:var(--txt)}
+.players{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.pl{background:#fffaf0;border:2px solid var(--line);border-radius:999px;padding:4px 12px;display:flex;align-items:center;gap:8px;font-weight:700}
+.pl b{color:var(--red);cursor:pointer;font-size:20px;line-height:1}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:#fffaf0;color:var(--txt);border:2px solid var(--line);border-radius:999px;padding:6px 12px;font-size:15px;box-shadow:2px 2px 0 var(--line)}
+.chip.sel{background:var(--yel)}
+.small{font-size:14px;padding:4px 12px;border-radius:9px;box-shadow:2px 2px 0 var(--line)}
+.stepper{display:flex;align-items:center;gap:14px}
+.stepper button{width:42px;height:42px;padding:0;font-size:24px}
+.stepper span{font-family:'Lalezar';font-size:28px;min-width:22px;text-align:center}
+.toggle{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed #b49a74}
+.toggle:last-child{border:0}
+.toggle small{display:block;color:var(--mut);font-size:13px;font-weight:400}
+.sw{width:54px;height:30px;border-radius:99px;background:#d9c7a3;border:2px solid var(--line);position:relative;flex:none;cursor:pointer}
+.sw::after{content:"";position:absolute;top:2px;right:2px;width:22px;height:22px;border-radius:50%;background:#fffaf0;border:2px solid var(--line);transition:.2s}
+.sw.on{background:var(--grn)}.sw.on::after{right:26px}
+.bottom{position:fixed;bottom:0;left:0;right:0;padding:14px 16px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(rgba(239,225,193,0),var(--bg) 40%);z-index:5}
+.bottom>*{max-width:488px;margin:0 auto}
+.bottom button{width:100%;display:block;padding:14px;font-size:21px;border-radius:14px}
+.err{color:var(--red);text-align:center;min-height:22px;font-size:15px;margin:4px 0;font-weight:700}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.game{background:var(--card);color:var(--txt);border-radius:14px;padding:12px;text-align:right;display:flex;flex-direction:column;gap:2px;min-height:118px;position:relative}
+.game:nth-child(4n+1){background:#f6e3b8}.game:nth-child(4n+2){background:#efd2b4}.game:nth-child(4n+3){background:#dbe3c4}.game:nth-child(4n){background:#d6e4dc}
+.game .e{font-size:30px}.game .n{font-size:20px}.game .d{font-family:'Noto Naskh Arabic',serif;font-size:12.5px;color:var(--mut);line-height:1.5}
+.who{text-align:center;color:var(--mut);margin-bottom:0}
+.pname{text-align:center;font-size:38px;margin-bottom:12px;color:var(--red)}
+.stage{position:relative;height:56vh;min-height:330px;border-radius:18px;overflow:hidden;background:var(--card);border:2px solid var(--line);box-shadow:var(--sh)}
+.secret{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:0 20px 28px;text-align:center}
+.secret .emo{font-size:56px}
+.secret .t1{color:var(--mut);margin-top:6px;font-size:16px}
+.secret .t2{font-size:38px;margin-top:2px}
+.bad{color:var(--red)}.good{color:var(--grn)}
+.cover{position:absolute;inset:8px;border:2px solid var(--line);border-radius:12px;color:#fdf6e6;display:flex;flex-direction:column;align-items:center;justify-content:center;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;
+ background:repeating-linear-gradient(45deg,rgba(255,255,255,.08) 0 10px,transparent 10px 20px),repeating-linear-gradient(-45deg,rgba(255,255,255,.08) 0 10px,transparent 10px 20px),var(--red);box-shadow:0 0 0 6px var(--card),0 0 0 8px var(--line)}
+.cover.anim{transition:transform .3s ease}
+.cover .arrow{font-size:42px;animation:bob 1.2s infinite}
+.cover .lbl{font-family:'Lalezar';font-size:26px;margin-top:6px}
+.cover .hint{opacity:.9;margin-top:2px;font-size:14px}
+.cover .q{font-family:'Lalezar';font-size:110px;line-height:1;width:150px;height:150px;border-radius:50%;border:3px solid #fdf6e6;display:flex;align-items:center;justify-content:center;margin-bottom:14px;background:rgba(0,0,0,.12)}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes shake{0%,100%{transform:translate(0) rotate(0)}25%{transform:translate(-5px,2px) rotate(-4deg)}75%{transform:translate(5px,-2px) rotate(4deg)}}
+.prog{text-align:center;color:var(--mut);margin-top:12px;font-weight:700}
+.bigcard{background:var(--card);border:2px solid var(--line);border-radius:18px;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 18px;text-align:center;gap:10px;box-shadow:var(--sh);position:relative;outline:2px dashed #b49a74;outline-offset:-10px}
+.bigcard .lab{color:var(--mut);font-size:15px}
+.bigcard .txt{font-size:30px;line-height:1.45}
+.bigcard .nm{font-size:34px;color:var(--red)}
+.bigcard .huge{font-size:110px;color:var(--red);line-height:1;text-shadow:3px 3px 0 var(--yel)}
+.or{font-family:'Lalezar';color:var(--txt);background:var(--yel);border:2px solid var(--line);border-radius:999px;padding:0 16px;font-size:20px}
+.pair{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
+.pair .a{font-size:34px;color:var(--red)}.pair .b{font-size:34px;color:var(--grn)}
+.pair .v{font-size:18px;color:var(--mut)}
+.timer{direction:ltr;font-size:64px;font-variant-numeric:tabular-nums;line-height:1}
+.timer.low{color:var(--red)}
+.score{display:flex;justify-content:space-between;padding:7px 4px;border-bottom:1px dashed #b49a74;font-weight:700}
+.score:last-child{border:0}
+.score small{font-family:'Noto Naskh Arabic',serif;font-size:12px;font-weight:400}
+.score b{font-family:'Lalezar';font-size:20px;font-weight:400}
+.steps li{margin:0 22px 10px 0;line-height:1.7}
+.hidden{display:none!important}
+.hold{user-select:none;-webkit-user-select:none;touch-action:none;-webkit-touch-callout:none}
+.rolelist div{display:flex;justify-content:space-between;padding:8px 2px;border-bottom:1px dashed #b49a74;font-weight:700}
+.opts{display:grid;gap:10px;width:100%;margin-top:6px}
+.opts button{background:#fffaf0;color:var(--txt);padding:11px;font-size:20px}
+.opts button.ok{background:var(--grn);color:#fdf6e6}.opts button.no{background:var(--red);color:#fdf6e6}
+.forb{display:flex;flex-direction:column;gap:6px;margin-top:2px}
+.forb span{background:#fffaf0;color:var(--red);border:2px solid var(--red);border-radius:8px;padding:2px 16px;font-weight:700;font-size:19px}
+.forb span::before{content:"🚫 "}
+.lcats{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.lcats span{background:#fffaf0;border:2px solid var(--line);border-radius:8px;padding:2px 12px;font-weight:700}
+.bomb{font-size:110px;line-height:1}
+.bomb.tick{animation:shake .25s infinite}
+.bars{width:100%;display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.bar{display:flex;align-items:center;gap:8px;font-weight:700}
+.bar .nmx{width:74px;text-align:right;flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar .tr{flex:1;height:26px;border:2px solid var(--line);border-radius:8px;background:#fffaf0;overflow:hidden}
+.bar .fl{height:100%;background:var(--yel);transition:width .5s}
+.bar.lead .fl{background:var(--red)}
+.bar .c{font-family:'Lalezar';width:22px}
+.win{font-family:'Lalezar';font-size:34px;line-height:1.3}
+.desc{font-size:15px;color:var(--mut);line-height:1.6;max-width:300px}
+.secret .desc{margin-top:4px}
+.recbtns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;width:100%;margin-top:6px}
+.recbtns button{padding:12px 4px;font-size:16px;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.2}
+.recbtns button span{font-size:26px}
+.recbtns button.rec{background:var(--red);animation:pulse 1s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 6px rgba(184,57,43,.25),var(--sh)}}
+.step{font-family:'Lalezar';font-size:15px;background:var(--yel);border:2px solid var(--line);border-radius:999px;padding:0 12px}
+.install{font-size:13px;color:var(--mut);text-align:center;margin-top:20px;line-height:1.8}
+.rules{list-style:none;counter-reset:r}
+.rules li{counter-increment:r;position:relative;padding:8px 40px 8px 0;line-height:1.75;border-bottom:1px dashed #b49a74}
+.rules li:last-child{border:0}
+.rules li::before{content:counter(r);position:absolute;right:0;top:9px;width:28px;height:28px;border-radius:50%;background:var(--yel);border:2px solid var(--line);font-family:'Lalezar';display:flex;align-items:center;justify-content:center;font-size:16px}
+.introHead{text-align:center;margin:6px 0 16px}
+.introHead .e{font-size:64px;line-height:1.2}
+.introHead .n{font-family:'Lalezar';font-size:38px;color:var(--red)}
+.meta{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:6px}
+.meta span{border:2px solid var(--line);border-radius:999px;padding:1px 12px;font-size:13px;background:#fffaf0;font-weight:700}
+.modal{position:fixed;inset:0;background:rgba(43,29,18,.55);display:flex;align-items:flex-end;justify-content:center;z-index:20;padding:16px}
+.modal .box{max-width:488px;width:100%;max-height:82vh;overflow:auto;margin-bottom:calc(env(safe-area-inset-bottom))}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="home" class="screen on">
+  <span class="badge">★ منذ زمان الطيبين ★</span>
+  <h1>ألعاب الجمعات</h1>
+  <div class="sub">حطوا أساميكم مرة وحدة، واختاروا اللعبة.<br>كل لعبة لها شرح قبل لا تبدأ 📖</div>
+  <div class="box">
+    <h2>اللاعبين <span id="pc" style="color:var(--mut);font-size:14px"></span></h2>
+    <form class="row" id="addForm">
+      <input type="text" id="nameIn" placeholder="اكتب اسم اللاعب" maxlength="16" autocomplete="off">
+      <button type="submit">إضافة</button>
+    </form>
+    <div class="players" id="players"></div>
+  </div>
+  <div class="err" id="homeErr"></div>
+  <div class="grid" id="games"></div>
+  <div class="install">📲 عشان تصير تطبيق على جوالك: افتحها في Safari أو Chrome ← مشاركة ← "إضافة إلى الشاشة الرئيسية"</div>
+</div>
+
+<!-- INTRO / RULES -->
+<div id="intro" class="screen">
+  <div class="top"><button class="back" data-home>→</button><h1>طريقة اللعب</h1></div>
+  <div class="introHead"><div class="e" id="inE"></div><div class="n" id="inN"></div><div class="meta" id="inMeta"></div></div>
+  <div class="box"><h2>📖 الشرح</h2><ol class="rules" id="inRules"></ol></div>
+  <div class="bottom"><button id="inGo">يلا نبدأ ▶</button></div>
+</div>
+<div class="modal hidden" id="modal"><div class="box"><h2><span id="mT"></span><button class="ghost small" id="mClose">تمام ✓</button></h2><ol class="rules" id="mRules"></ol></div></div>
+
+<!-- IMPOSTER SETUP -->
+<div id="impSetup" class="screen">
+  <div class="top"><button class="back" data-home>→</button><h1>🕵️ الامبوستر</h1><button class="back help" data-help>؟</button></div>
+  <div class="box">
+    <h2>المواضيع <button class="ghost small" id="allBtn">الكل</button></h2>
+    <div class="chips" id="cats"></div>
+  </div>
+  <div class="box">
+    <div class="toggle"><b>عدد الامبوسترز</b>
+      <div class="stepper"><button class="ghost" id="impMinus">−</button><span id="impN">1</span><button class="ghost" id="impPlus">+</button></div></div>
+    <div class="toggle"><div><b>الامبوستر يعرف الموضوع</b><small>يشوف "حيوانات" بس بدون الكلمة</small></div><div class="sw" id="hintSw"></div></div>
+  </div>
+  <div class="box" style="color:var(--mut);font-size:14px;line-height:1.7">
+    الكلمات ما تتكرر لين تخلص كل كلمات الموضوع. كل واحد يسحب الشاشة ويشوف الكلمة، الامبوستر ما يعرفها. بعدين اللعبة تحدد مين يسأل مين.
+  </div>
+  <div class="err" id="impErr"></div>
+  <div class="bottom"><button id="impStart">ابدأ 🎮</button></div>
+</div>
+
+<!-- SHARED REVEAL -->
+<div id="reveal" class="screen">
+  <div class="top"><button class="back" id="revBack">→</button><h1 id="revTitle"></h1><button class="back help" data-help>؟</button></div>
+  <div class="who">عط الجوال لـ</div>
+  <div class="pname" id="rName"></div>
+  <div class="stage" id="stage">
+    <div class="secret" id="secret"></div>
+    <div class="cover" id="cover">
+      <div class="q">؟</div><div class="arrow">⬆️</div>
+      <div class="lbl">اسحب الشاشة لفوق</div>
+      <div class="hint">وخلك مخبي الجوال عن الباقين 👀</div>
+    </div>
+  </div>
+  <div class="prog" id="prog"></div>
+  <div class="bottom"><button id="nextBtn" class="hidden"></button></div>
+</div>
+
+<!-- IMPOSTER ASK -->
+<div id="impAsk" class="screen">
+  <div class="top"><button class="back" data-home>→</button><h1>🗣️ مين يسأل مين</h1><button class="back help" data-help>؟</button></div>
+  <div class="sub" id="askRound"></div>
+  <div class="bigcard">
+    <div class="pair"><span class="a" id="askA"></span><span class="v">يسأل 👉</span><span class="b" id="askB"></span></div>
+    <div class="lab" id="askCat"></div>
+  </div>
+  <div class="prog" id="askProg"></div>
+  <div class="bottom"><div class="row" id="askBtns"></div></div>
+</div>
+
+<!-- IMPOSTER VOTE / RESULT -->
+<div id="impRes" class="screen">
+  <div class="top"><button class="back" data-home>→</button><h1 id="voteTitle">🗳️ التصويت</h1><button class="back help" data-help>؟</button></div>
+  <div class="sub" id="voteSub"></div>
+  <div class="bigcard" id="voteCard"></div>
+  <div class="box hidden" id="voteScores" style="margin-top:16px"></div>
+  <div class="bottom"><div class="row" id="voteBtns"></div></div>
+</div>
+
+<!-- GENERIC GAME SCREEN -->
+<div id="gs" class="screen">
+  <div class="top"><button class="back" data-home>→</button><h1 id="gsTitle"></h1><button class="back help" data-help>؟</button></div>
+  <div class="sub" id="gsSub"></div>
+  <div class="bigcard" id="gsCard"></div>
+  <div class="box hidden" id="gsScores" style="margin-top:14px"></div>
+  <div class="bottom"><div class="row" id="gsBtns"></div></div>
+</div>
+
+<!-- TOPIC PICK for charades / guess -->
+<div id="topicPick" class="screen">
+  <div class="top"><button class="back" data-home>→</button><h1 id="tpTitle"></h1><button class="back help" data-help>؟</button></div>
+  <div class="box">
+    <h2>المواضيع <button class="ghost small" id="tpAll">الكل</button></h2>
+    <div class="chips" id="tpCats"></div>
+  </div>
+  <div class="err" id="tpErr"></div>
+  <div class="bottom"><button id="tpGo">ابدأ 🎮</button></div>
+</div>
+
+<!-- MAFIA SETUP -->
+<div id="mafSetup" class="screen">
+  <div class="top"><button class="back" data-home>→</button><h1>🔪 المافيا</h1><button class="back help" data-help>؟</button></div>
+  <div class="box">
+    <div class="toggle"><b>عدد المافيا</b><div class="stepper"><button class="ghost" id="mafMinus">−</button><span id="mafN">1</span><button class="ghost" id="mafPlus">+</button></div></div>
+    <div class="toggle"><div><b>دكتور 💉</b><small>كل ليلة ينقذ واحد</small></div><div class="sw" id="docSw"></div></div>
+    <div class="toggle"><div><b>شرطي 🕵️</b><small>كل ليلة يسأل عن واحد</small></div><div class="sw" id="copSw"></div></div>
+    <div class="toggle"><div><b>اللعبة تختار الراوي</b><small>واحد منكم يدير اللعبة وما يلعب</small></div><div class="sw" id="narSw"></div></div>
+  </div>
+  <div class="box" id="mafSummary" style="color:var(--mut);font-size:14px;line-height:1.7"></div>
+  <div class="err" id="mafErr"></div>
+  <div class="bottom"><button id="mafStart">وزّع الأدوار 🎭</button></div>
+</div>
+
+<!-- MAFIA NARRATOR -->
+<div id="mafNar" class="screen">
+  <div class="top"><button class="back" data-home>→</button><h1>🌙 الراوي</h1><button class="back help" data-help>؟</button></div>
+  <div class="box" style="text-align:center"><div style="color:var(--mut)">الراوي</div><div style="font-size:28px;font-weight:900;color:var(--yel)" id="narName"></div></div>
+  <div class="box">
+    <h2>الأدوار <span style="font-size:13px;color:var(--mut)">للراوي بس 🤫</span></h2>
+    <button class="ghost hold" id="holdRoles" style="width:100%">اضغط مطوّل عشان تشوف الأدوار</button>
+    <div class="rolelist hidden" id="roleList"></div>
+  </div>
+  <div class="box"><h2>خطوات الليل</h2><ol class="steps" id="narSteps"></ol></div>
+  <div class="bottom"><div class="row"><button class="ghost" data-go="mafSetup" style="flex:1">تعديل</button><button id="mafAgain" style="flex:2">جولة جديدة 🔄</button></div></div>
+</div>
+
+<script src="topics.js"></script>
+<script src="data.js"></script>
+<script>
+/* ===== HELPERS ===== */
+const $=id=>document.getElementById(id);
+const rnd=n=>Math.floor(Math.random()*n);
+const pick=a=>a[rnd(a.length)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+// يسحب عنصر ما انلعب قبل؛ ما يتكرر لين تخلص القائمة كلها (ويتذكر حتى لو سكرت التطبيق)
+const usedMem={};
+function draw(key,arr){
+  const ids=arr.map(x=>JSON.stringify(x));
+  let used=(usedMem[key]||LS.get('u_'+key,[])).filter(u=>ids.includes(u));
+  let free=ids.filter(u=>!used.includes(u));
+  if(!free.length){used=[];free=ids}
+  const k=pick(free);used.push(k);usedMem[key]=used;LS.set('u_'+key,used);
+  return arr[ids.indexOf(k)];
+}
+function el(tag,cls,txt){const d=document.createElement(tag);if(cls)d.className=cls;if(txt!==undefined)d.textContent=txt;return d}
+function btn(txt,cls,fn,flex){const b=el('button',cls,txt);b.style.flex=flex||1;b.onclick=fn;return b}
+function setBtns(id,list){const r=$(id);r.innerHTML='';list.forEach(b=>r.appendChild(b))}
+let timerId=null,bombT=null;
+function stopTimer(){if(timerId){clearInterval(timerId);timerId=null}if(bombT){clearTimeout(bombT);bombT=null}document.body.classList.remove('boom')}
+let wake=null;
+async function keepAwake(on){try{if(on&&!wake&&navigator.wakeLock){wake=await navigator.wakeLock.request('screen');wake.addEventListener('release',()=>{wake=null})}else if(!on&&wake){wake.release();wake=null}}catch(e){}}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&!$('home').classList.contains('on'))keepAwake(true)});
+const show=id=>{keepAwake(id!=='home');stopTimer();if(id!=='gs')stopRec();document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));window.scrollTo(0,0)};
+document.querySelectorAll('[data-home]').forEach(b=>b.onclick=()=>{renderHome();show('home')});
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>show(b.dataset.go));
+// صوت
+let AC=null;
+function beep(f=880,d=.08,v=.15){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(AC.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d);o.stop(AC.currentTime+d+.02)}catch(e){}}
+function buzz(ms){try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}}
+function countdownTimer(sec,elId,onEnd,onTick){
+  const end=Date.now()+sec*1000;let last=null;
+  const tick=()=>{const e=$(elId);if(!e){stopTimer();return}
+    const t=Math.max(0,Math.ceil((end-Date.now())/1000));if(onTick)onTick(t);
+    if(t!==last){last=t;e.textContent=t;e.classList.toggle('low',t<=10);if(t<=5&&t>0)beep(660)}
+    if(t<=0){stopTimer();beep(300,.6,.25);buzz(400);onEnd()}};
+  tick();timerId=setInterval(tick,250);
+}
+// ترتيب اللاعبين بالدور بدون تكرار
+function turnQueue(){let q=[];return()=>{if(!q.length)q=shuffle(S.players);return q.pop()}}
+
+let S={players:[],cats:Object.keys(TOPICS).slice(0,8),tcats:Object.keys(TOPICS),imps:1,hint:true,maf:1,doc:true,cop:true,nar:true};
+S=Object.assign(S,LS.get('jm_s',{}));
+S.cats=S.cats.filter(c=>TOPICS[c]);S.tcats=S.tcats.filter(c=>TOPICS[c]);
+const save=()=>LS.set('jm_s',S);
+
+/* ===== RULES ===== */
+const RULES={
+rev:["اللعبة تختار لاعبين: واحد يسجّل وواحد يخمّن، وتعطي اللي يسجّل كلمة سرية (اضغط مطوّل عشان تشوفها).","اللي يسجّل يضغط 🎙️ تسجيل ويقول الكلمة بصوت واضح، وبعدين ⏹️ وقف. يقدر يسمع صوته ▶️ طبيعي أو 🔁 معكوس.","بعدين يعطي الجوال للي يخمّن. هذا يسمع صوت الأول 🔁 معكوس (يطلع كلام غريب!).","اللي يخمّن يحاول يقلّد الصوت المعكوس بالضبط ويسجله 🎙️.","بعدين يضغط 🔁 على تسجيله، فينعكس تقليده ويرجع قريب من الكلمة الأصلية، ويحاول يخمّنها.","اكشفوا الكلمة: إذا خمّنها صح ياخذ نقطة، واللي يسجّل ياخذ نقطة بعد إذا كان صوته واضح وخمّنوها.","المايك يحتاج إذن: أول مرة الجوال بيسألك تسمح بالمايك، اضغط سماح."],
+imp:["كل واحد ياخذ الجوال بدوره ويسحب الشاشة لفوق عشان يشوف الكلمة السرية، وبعدين يخبيها ويعطي الجوال للي بعده.","الكل يشوف نفس الكلمة، إلا الامبوستر: يطلع له \"أنت الامبوستر\" (وإذا شغلت الخيار يشوف الموضوع بس).","بعد ما الكل يشوف، اللعبة تحدد مين يسأل مين. كل واحد يسأل اللي قدامه سؤال عن الكلمة، والثاني يجاوب.","السؤال والجواب لازم يكونون واضحين بما يكفي عشان تثبت إنك تعرف الكلمة، بس مو واضحين لدرجة إن الامبوستر يعرفها.","الامبوستر يحاول يجاري ويفهم الكلمة من كلامكم بدون ما ينكشف.","تقدرون تسوون جولة أسئلة ثانية، أو تروحون للتصويت.","التصويت سري: الجوال يدور على الكل، وكل واحد يختار اللي يشك إنه الامبوستر بدون ما أحد يشوف.","النقاط: كل واحد يصوت على الامبوستر ياخذ +١. وكل واحد يصوت على واحد بريء، الامبوستر ياخذ +١.","بعد التصويت، الامبوستر تطلع له ٦ خيارات من نفس الموضوع ويختار الكلمة: إذا جابها صح ياخذ +١، وإذا غلط ما يخسر شي.","النقاط تتجمع من جولة لجولة، وفيه زر تصفير.","وتحت كل كلمة فيه شرح بسيط عشان لو أحد ما يعرفها."],
+maf:["اللعبة توزع أدوار سرية: مافيا 🔪، دكتور 💉، شرطي 🕵️، والباقي مواطنين 👤. كل واحد يسحب الشاشة ويشوف دوره بالسر.","إذا شغلت \"اللعبة تختار الراوي\"، واحد منكم يصير الراوي: ما يلعب، بس يدير اللعبة، ويشوف كل الأدوار بالضغط المطوّل.","الليل: الكل يغمض. المافيا تفتح وتتفق بالإشارة على واحد تطلعه. بعدها الدكتور يختار واحد ينقذه، والشرطي يأشر على واحد والراوي يقول له مافيا ولا لا.","الصباح: الراوي يعلن مين طلع (إلا إذا الدكتور أنقذه). اللي يطلع ما يتكلم باقي اللعبة.","النهار: الكل يتناقش ويصوت على واحد يشكون إنه مافيا، واللي ياخذ أكثر أصوات يطلع ويكشف دوره.","المواطنين يفوزون إذا طلعت كل المافيا، والمافيا تفوز إذا صار عددها يساوي عدد الباقين."],
+tod:["اللعبة تختار الدور على مين، وتختار واحد ثاني هو اللي يسأله.","اللي عليه الدور يختار: صراحة 💬 (يجاوب على سؤال بصدق) ولا جرأة 🔥 (ينفذ تحدي).","إذا ما عجبكم السؤال، اضغطوا \"غيّر\"، أو اللي يسأل يقدر يسأل سؤال من عنده.","اللي يرفض يجاوب أو ينفذ، الجماعة تحط عليه عقاب يتفقون عليه 😄"],
+cha:["اختاروا المواضيع، واللعبة تختار الدور على مين.","اللي عليه الدور ياخذ الجوال ويضغط \"أنا جاهز\"، فتطلع له كلمة ويبدأ عداد دقيقة.","يمثّل الكلمة بحركات بس: ممنوع الكلام والأصوات والتأشير على الأشياء.","إذا أحد خمّنها صح اضغط \"جابوها ✅\" وتطلع كلمة جديدة، وإذا صعبة اضغط \"تخطي\".","كل كلمة صح بنقطة، وفي الأخير اللي عنده أكثر نقاط يفوز."],
+tab:["اللي عليه الدور يشوف كلمة، وتحتها ٣ كلمات ممنوعة.","عنده دقيقة يوصّف الكلمة للباقين عشان يخمنونها، بدون ما يقول الكلمة نفسها ولا الكلمات الممنوعة.","ممنوع يأشر أو يقول \"تبدأ بحرف كذا\" أو \"تتقافى مع\".","خلوا واحد جنبه يراقب: إذا قال كلمة ممنوعة اضغطوا \"قالها ❌\" وتنقص عليه نقطة.","\"جابوها ✅\" بنقطة، و\"تخطي\" بدون نقاط، واللي عنده أكثر نقاط يفوز."],
+bomb:["اللعبة تعطيكم مهمة، مثلاً: \"قول اسم حيوان\".","اضغطوا \"شغّل القنبلة\" والقنبلة تبدأ تتكتك. اللي ماسك الجوال يقول كلمة صح ويعطيه للي جنبه بسرعة.","ممنوع تكرار كلمة انقالت، وإذا الكلمة غلط ما يقدر يمرر لين يقول وحدة صح.","القنبلة تنفجر في وقت عشوائي (بين ١٥ و٤٥ ثانية)، والتكتكة تسرع كل ما قربت.","اللي تنفجر القنبلة وهو ماسكها يخسر الجولة، وتختارون اسمه عشان تنحسب عليه."],
+let:["كل واحد ياخذ ورقة وقلم ويرسم جدول فيه خانات: اسم، حيوان، نبات، جماد، بلاد، أكلة، مهنة.","اضغطوا \"طلّع الحرف\" فيطلع حرف عشوائي، ويبدأ عداد دقيقة.","كل واحد يكتب كلمة تبدأ بهذا الحرف في كل خانة.","أول واحد يخلص يضغط \"خلصت ✋\" ويوقف الكل، أو يخلص الوقت.","التصحيح: كلمة صح ما كتبها غيرك = ١٠ نقاط، كلمة صح كتبها غيرك = ٥، والفاضي أو الغلط = صفر."],
+triv:["اللعبة تختار الدور على مين، وتعطيه سؤال معلومات عامة وتحته ٤ خيارات.","اللي عليه الدور يختار الجواب بنفسه، والباقين ممنوع يساعدونه!","الجواب الصح يطلع أخضر وياخذ نقطة، والغلط يطلع أحمر.","تستمرون بالدور، واللي يوصل أول لعدد نقاط تتفقون عليه (مثلاً ١٠) يفوز."],
+g20:["اختاروا المواضيع، واللعبة تختار واحد يعرف الكلمة.","هذا الواحد يضغط مطوّل على الزر ويشوف الكلمة بالسر، والباقين يعرفون الموضوع بس.","الباقين يسألونه أسئلة جوابها \"إيه\" أو \"لا\" بس، مثلاً: \"ينوكل؟\" \"أكبر من السيارة؟\"","كل سؤال اضغطوا \"سؤال +1\". عندكم ٢٠ سؤال بس.","إذا خمنوها اضغطوا \"جابوها ✅\"، وإذا خلصت الأسئلة أو استسلموا تنكشف الكلمة."],
+hot:["اللعبة تختار واحد يقعد على الكرسي الساخن 🪑.","اضغطوا \"ابدأ الوقت\" وعندكم دقيقتين تسألونه أي شي، وهو لازم يجاوب بسرعة وبصراحة.","اللعبة تعطيكم سؤال تبدون فيه إذا ما عندكم فكرة.","يقدر يرفض سؤال واحد بس في دوره كله.","بعد ما يخلص الوقت ينتقل الكرسي للي بعده."],
+wyr:["اللعبة تختار واحد يقرأ السؤال بصوت عالي: \"لو خيروك بين كذا ولا كذا؟\"","كل واحد لازم يختار وحدة من الثنتين، وممنوع تقول \"ولا وحدة\".","كل واحد يبرر اختياره، والنقاش هو أحلى شي فيها 😄","اضغطوا \"اللي بعده\" للسؤال الجاي."],
+ml:["اللعبة تختار واحد يقرأ السؤال، مثلاً: \"مين أكثر واحد ممكن يتأخر على أي موعد؟\"","اضغطوا \"٣.. ٢.. ١\"، ولما يقول \"أشّروا\" الكل يأشر على واحد في نفس اللحظة.","اللي ياخذ أكثر أشارات لازم يبرر أو يدافع عن نفسه 😂","ممنوع تأشر على نفسك!"],
+nhie:["اللعبة تختار واحد يقرأ الجملة اللي تبدأ بـ \"ولا مرة…\".","اللي سوّى الشي هذا قبل يرفع يده (أو ينزل إصبع إذا تلعبون بالأصابع).","اللي رفع يده يقول القصة باختصار 😄","إذا تلعبون بالأصابع: كل واحد يبدأ بـ ١٠ أصابع، واللي يخلص أصابعه أول يخسر."]
+};
+/* ===== HOME ===== */
+const GAMES=[
+ {id:'imp',e:'🕵️',n:'الامبوستر',d:'واحد ما يعرف الكلمة… صيدوه!',min:3,t:'٥-١٠ دقايق'},
+ {id:'maf',e:'🔪',n:'المافيا',d:'أدوار سرية وراوي يدير الليل',min:5,t:'١٥+ دقيقة'},
+ {id:'tod',e:'🔥',n:'صراحة ولا جرأة',d:'اللعبة تختار الدور عليك',min:2,t:'مفتوح'},
+ {id:'cha',e:'🎭',n:'تمثيل بدون كلام',d:'مثّل أكثر كلمات في دقيقة',min:2,t:'دقيقة لكل دور'},
+ {id:'tab',e:'🚫',n:'الكلمة الممنوعة',d:'وصّف الكلمة بدون الكلمات الممنوعة',min:2,t:'دقيقة لكل دور'},
+ {id:'bomb',e:'💣',n:'القنبلة',d:'قول كلمة وعط الجوال قبل تنفجر!',min:2,t:'جولات سريعة'},
+ {id:'let',e:'🔤',n:'إنسان حيوان نبات',d:'حرف عشوائي ودقيقة وحدة',min:2,t:'دقيقة لكل حرف'},
+ {id:'triv',e:'🧠',n:'سين جيم',d:'أسئلة معلومات عامة بالنقاط',min:1,t:'مفتوح'},
+ {id:'g20',e:'❓',n:'خمن الشي',d:'٢٠ سؤال بـ إيه ولا لا',min:2,t:'٥ دقايق للجولة'},
+ {id:'rev',e:'🔄',n:'الكلام المعكوس',d:'سجّل كلمة، والثاني يسمعها معكوسة ويخمن',min:2,t:'دقيقتين للجولة'},
+ {id:'hot',e:'🪑',n:'الكرسي الساخن',d:'دقيقتين والكل يسألك',min:3,t:'دقيقتين لكل دور'},
+ {id:'wyr',e:'🤔',n:'لو خيروك',d:'اختار وحدة… وبرر!',min:2,t:'مفتوح'},
+ {id:'ml',e:'👉',n:'مين أكثر واحد',d:'على العد الكل يأشر',min:3,t:'مفتوح'},
+ {id:'nhie',e:'🙈',n:'ولا مرة',d:'اللي سواها يرفع يده',min:2,t:'مفتوح'}
+];
+function renderHome(){
+  $('players').innerHTML='';
+  S.players.forEach((p,i)=>{const d=el('div','pl');d.appendChild(el('span','',p));const x=el('b','','×');x.onclick=()=>{S.players.splice(i,1);renderHome()};d.appendChild(x);$('players').appendChild(d)});
+  $('pc').textContent=S.players.length?S.players.length+' لاعب':'';
+  $('games').innerHTML='';
+  GAMES.forEach(g=>{const b=el('button','game');b.append(el('span','e',g.e),el('span','n',g.n),el('span','d',g.d));b.onclick=()=>openGame(g);$('games').appendChild(b)});
+  save();
+}
+$('addForm').onsubmit=e=>{e.preventDefault();const v=$('nameIn').value.trim();if(!v)return;if(S.players.includes(v)){$('homeErr').textContent='الاسم موجود';return}$('homeErr').textContent='';S.players.push(v);$('nameIn').value='';renderHome();$('nameIn').focus()};
+let CUR=null;
+function openGame(g){
+  if(S.players.length<g.min){$('homeErr').textContent=g.n+' تبي '+g.min+' لاعبين على الأقل';return}
+  $('homeErr').textContent='';CUR=g;
+  $('inE').textContent=g.e;$('inN').textContent=g.n;
+  $('inMeta').innerHTML='';[ '👥 '+g.min+'+ لاعبين','⏱️ '+g.t].forEach(x=>$('inMeta').appendChild(el('span','',x)));
+  fillRules($('inRules'),g.id);show('intro');
+}
+function fillRules(ol,id){ol.innerHTML='';RULES[id].forEach(r=>ol.appendChild(el('li','',r)))}
+$('inGo').onclick=()=>launch(CUR);
+document.querySelectorAll('[data-help]').forEach(b=>b.onclick=()=>{if(!CUR)return;$('mT').textContent=CUR.e+' '+CUR.n;fillRules($('mRules'),CUR.id);$('modal').classList.remove('hidden')});
+$('mClose').onclick=()=>$('modal').classList.add('hidden');
+$('modal').onclick=e=>{if(e.target.id==='modal')$('modal').classList.add('hidden')};
+function launch(g){
+  ({imp:()=>{renderImp();show('impSetup')},maf:()=>{renderMaf();show('mafSetup')},tod:startTod,
+    cha:()=>openTopics('🎭 تمثيل بدون كلام',()=>startTimed('cha')),tab:()=>startTimed('tab'),
+    bomb:startBomb,let:startLetters,triv:startTriv,g20:()=>openTopics('❓ خمن الشي',startG20),hot:startHot,rev:()=>openTopics('🔄 الكلام المعكوس',startRev),
+    wyr:()=>startCard('wyr'),ml:()=>startCard('ml'),nhie:()=>startCard('nhie')})[g.id]();
+}
+function gs(title,sub){$('gsTitle').textContent=title;$('gsSub').textContent=sub||'';$('gsScores').classList.add('hidden');show('gs')}
+function card(){const c=$('gsCard');c.innerHTML='';return(cls,txt)=>{const d=el('div',cls,txt);c.appendChild(d);return d}}
+function scores(obj,title){
+  const b=$('gsScores');b.classList.remove('hidden');b.innerHTML='';b.appendChild(el('h2','',title||'النقاط 🏆'));
+  Object.entries(obj).sort((a,c)=>c[1]-a[1]).forEach(([n,s])=>{const d=el('div','score');d.append(el('span','',n),el('b','',s));b.appendChild(d)});
+}
+
+/* ===== TOPIC PICKER ===== */
+let tpNext;
+function openTopics(title,next){tpNext=next;$('tpTitle').textContent=title;renderTp();show('topicPick')}
+function renderTp(){
+  $('tpCats').innerHTML='';
+  Object.keys(TOPICS).forEach(c=>{const b=el('button','chip'+(S.tcats.includes(c)?' sel':''),c);b.onclick=()=>{S.tcats=S.tcats.includes(c)?S.tcats.filter(x=>x!==c):[...S.tcats,c];renderTp()};$('tpCats').appendChild(b)});
+  $('tpErr').textContent='';save();
+}
+$('tpAll').onclick=()=>{S.tcats=S.tcats.length===Object.keys(TOPICS).length?[]:Object.keys(TOPICS);renderTp()};
+$('tpGo').onclick=()=>{if(!S.tcats.length){$('tpErr').textContent='اختار موضوع واحد على الأقل';return}tpNext()};
+function topicWord(cats){const cat=draw('topics',cats);return[cat,draw('w_'+cat,TOPICS[cat])]}
+
+/* ===== SHARED REVEAL ===== */
+let R=null,seen=false,sy=null;
+function startReveal(title,items,doneLabel,onDone,backTo){
+  R={items,i:0,doneLabel,onDone};$('revTitle').textContent=title;$('revBack').onclick=()=>show(backTo);
+  showItem();show('reveal');
+}
+function showItem(){
+  const it=R.items[R.i];
+  $('rName').textContent=it.name;$('prog').textContent=(R.i+1)+' / '+R.items.length;
+  $('secret').innerHTML=it.html;
+  seen=false;$('nextBtn').classList.add('hidden');
+  $('nextBtn').textContent=R.i===R.items.length-1?R.doneLabel:'خبّه وعطه اللي بعده ←';
+  const c=$('cover');c.classList.remove('anim');c.style.transform='translateY(0)';
+}
+const cover=$('cover');
+cover.addEventListener('pointerdown',e=>{sy=e.clientY;cover.classList.remove('anim');try{cover.setPointerCapture(e.pointerId)}catch(_){}});
+cover.addEventListener('pointermove',e=>{if(sy===null)return;const h=$('stage').offsetHeight;let d=Math.min(0,e.clientY-sy);d=Math.max(d,-h*0.72);cover.style.transform='translateY('+d+'px)';if(d<-h*0.33&&!seen){seen=true;$('nextBtn').classList.remove('hidden')}});
+const endDrag=()=>{if(sy===null)return;sy=null;cover.classList.add('anim');cover.style.transform='translateY(0)'};
+cover.addEventListener('pointerup',endDrag);cover.addEventListener('pointercancel',endDrag);
+$('nextBtn').onclick=()=>{if(R.i<R.items.length-1){R.i++;showItem()}else R.onDone()};
+
+/* ===== IMPOSTER ===== */
+function impMax(){return Math.max(1,Math.floor((S.players.length-1)/2))}
+function renderImp(){
+  if(S.imps>impMax())S.imps=impMax();
+  $('cats').innerHTML='';
+  Object.keys(TOPICS).forEach(c=>{const b=el('button','chip'+(S.cats.includes(c)?' sel':''),c);b.onclick=()=>{S.cats=S.cats.includes(c)?S.cats.filter(x=>x!==c):[...S.cats,c];renderImp()};$('cats').appendChild(b)});
+  $('impN').textContent=S.imps;$('hintSw').classList.toggle('on',S.hint);$('impErr').textContent='';save();
+}
+$('allBtn').onclick=()=>{S.cats=S.cats.length===Object.keys(TOPICS).length?[]:Object.keys(TOPICS);renderImp()};
+$('impPlus').onclick=()=>{S.imps=Math.min(impMax(),S.imps+1);renderImp()};
+$('impMinus').onclick=()=>{S.imps=Math.max(1,S.imps-1);renderImp()};
+$('hintSw').onclick=()=>{S.hint=!S.hint;renderImp()};
+let G;
+function impRound(){
+  if(!S.cats.length){$('impErr').textContent='اختار موضوع واحد على الأقل';show('impSetup');return}
+  const [cat,word]=topicWord(S.cats);
+  const imps=shuffle(S.players.map((_,i)=>i)).slice(0,S.imps);
+  G={cat,word,imps,order:S.players.slice(),round:0,out:[]};
+  const items=G.order.map((n,i)=>({name:n,html:imps.includes(i)
+    ?'<div class="emo">🤫</div><div class="t2 bad">أنت الامبوستر!</div><div class="t1">'+(S.hint?'الموضوع: <b>'+esc(cat)+'</b>':'حاول تعرف الكلمة بدون ما ينكشف أمرك')+'</div>'
+    :'<div class="emo">✅</div><div class="t1">'+esc(cat)+'</div><div class="t2 good">'+esc(word)+'</div><div class="desc">'+esc(descOf(cat,word))+'</div>'}));
+  startReveal('🕵️ الامبوستر',items,'خلصنا، يلا نبدأ الأسئلة 🎉',newAskRound,'impSetup');
+}
+$('impStart').onclick=impRound;
+// مين يسأل مين: دائرة عشوائية، كل واحد يسأل مرة وينسأل مرة
+function newAskRound(){G.round++;const p=shuffle(G.order);G.pairs=p.map((a,i)=>[a,p[(i+1)%p.length]]);G.k=0;showAsk();show('impAsk')}
+function showAsk(){
+  const [a,b]=G.pairs[G.k];
+  $('askRound').textContent='الجولة '+G.round+' — اسأل سؤال عن الكلمة بدون ما تفضحها';
+  $('askA').textContent=a;$('askB').textContent=b;
+  $('askCat').textContent=S.hint?'الموضوع: '+G.cat:'';
+  $('askProg').textContent=(G.k+1)+' / '+G.pairs.length;
+  if(G.k<G.pairs.length-1)setBtns('askBtns',[btn('التصويت 🗳️','ghost',goVote),btn('اللي بعده ←','',()=>{G.k++;showAsk()},2)]);
+  else setBtns('askBtns',[btn('جولة أسئلة ثانية 🔁','ghost',newAskRound),btn('التصويت 🗳️','red',goVote)]);
+}
+/* --- تصويت حقيقي: كل واحد يصوت بالسر --- */
+let IMPSC=LS.get('impScores',{});
+function goVote(){startVoting(G.order,G.order)}
+function startVoting(voters,cands){G.voters=shuffle(voters);G.cands=cands;G.votes={};G.vi=0;show('impRes');$('voteScores').classList.add('hidden');voteTurn()}
+function voteTurn(){
+  $('voteTitle').textContent='🗳️ التصويت';const v=G.voters[G.vi];
+  $('voteSub').textContent='تصويت سري: '+(G.vi+1)+' من '+G.voters.length;
+  const c=$('voteCard');c.innerHTML='';const add=(k,t)=>{const d=el('div',k,t);c.appendChild(d);return d};
+  add('lab','عط الجوال لـ');add('nm',v);add('lab','وخل الباقين ما يشوفون الشاشة 🤫');
+  setBtns('voteBtns',[btn('أنا '+v+'، أبي أصوت','',()=>voteChoose(v))]);
+}
+function voteChoose(v){
+  const c=$('voteCard');c.innerHTML='';c.append(el('div','lab',v+'، مين تشك إنه الامبوستر؟'));
+  const o=el('div','opts');G.cands.filter(p=>p!==v).forEach(p=>o.appendChild(btn(p,'',()=>{G.votes[v]=p;beep(900,.08);voteDone(v)})));c.appendChild(o);
+  setBtns('voteBtns',[]);
+}
+function voteDone(v){
+  const c=$('voteCard');c.innerHTML='';c.append(el('div','win','تم التصويت ✓'),el('div','lab','صوتك سري. خبّ الشاشة'));
+  G.vi++;
+  if(G.vi<G.voters.length)setBtns('voteBtns',[btn('عط الجوال لـ '+G.voters[G.vi]+' ←','',voteTurn)]);
+  else setBtns('voteBtns',[btn('اكشف النتيجة 📊','red',voteTally)]);
+}
+// النقاط: اللي يصوت على الامبوستر +١، وكل صوت راح على بريء يعطي الامبوستر +١، والامبوستر +١ إذا خمّن الكلمة
+function impNames(){return G.imps.map(i=>G.order[i])}
+function voteTally(){
+  const imps=impNames(),t={};G.cands.forEach(p=>t[p]=0);Object.values(G.votes).forEach(p=>t[p]++);
+  const arr=Object.entries(t).sort((a,b)=>b[1]-a[1]),max=arr[0][1];
+  G.pts={};G.order.forEach(p=>G.pts[p]=0);G.why={};const why=(p,x)=>{(G.why[p]=G.why[p]||[]).push(x)};
+  Object.entries(G.votes).forEach(([v,target])=>{
+    if(imps.includes(v))return;                         // صوت الامبوستر ما يحسب
+    if(imps.includes(target)){G.pts[v]++;why(v,'صوّت صح')}
+    else imps.forEach(p=>{G.pts[p]++;why(p,v+' صوّت غلط')});
+  });
+  $('voteSub').textContent='';const c=$('voteCard');c.innerHTML='';c.append(el('div','lab','نتيجة التصويت'));
+  const bars=el('div','bars');arr.forEach(([p,n])=>{const b=el('div','bar'+(n===max&&n>0?' lead':''));b.append(el('span','nmx',p));const tr=el('div','tr'),fl=el('div','fl');fl.style.width=(G.voters.length?n/G.voters.length*100:0)+'%';tr.appendChild(fl);b.append(tr,el('span','c',n));bars.appendChild(b)});c.appendChild(bars);
+  const right=G.order.filter(p=>!imps.includes(p)&&imps.includes(G.votes[p])),wrong=G.order.filter(p=>!imps.includes(p)&&G.votes[p]&&!imps.includes(G.votes[p]));
+  c.append(el('div','lab','✅ صوّتوا صح (+١ لكل واحد):'),el('div','txt good',right.length?right.join('، '):'ولا أحد 😅'));
+  c.append(el('div','lab','❌ صوّتوا غلط (كل صوت غلط = +١ للامبوستر):'),el('div','txt bad',wrong.length?wrong.join('، '):'ولا أحد 👏'));
+  c.querySelectorAll('.txt').forEach(x=>x.style.fontSize='22px');
+  setBtns('voteBtns',[btn('الامبوستر يخمن الكلمة 🎯','',()=>impGuess(0))]);
+}
+// بعد التصويت: كل امبوستر يختار الكلمة من ٦ خيارات. صح = +١، غلط = ولا شي
+function impGuess(k){
+  const imps=impNames(),p=imps[k];
+  const c=$('voteCard');c.innerHTML='';$('voteTitle').textContent='🎯 دور الامبوستر';$('voteSub').textContent='';
+  c.append(el('div','lab','عط الجوال لـ'),el('div','nm',p),el('div','lab','أنت الامبوستر! وش كانت الكلمة؟ إذا جبتها صح تاخذ +١'));
+  const opts=shuffle([G.word,...shuffle(TOPICS[G.cat].filter(w=>w!==G.word)).slice(0,5)]);
+  const o=el('div','opts');o.style.gridTemplateColumns='1fr 1fr';
+  opts.forEach(w=>o.appendChild(btn(w,'',()=>{
+    o.querySelectorAll('button').forEach(x=>{x.disabled=true;if(x.textContent===G.word)x.className='ok'});
+    if(w===G.word){G.pts[p]++;(G.why[p]=G.why[p]||[]).push('خمّن الكلمة');beep(1200,.2);c.appendChild(el('div','win good','صح! +١ 🎉'))}
+    else{o.querySelectorAll('button').forEach(x=>{if(x.textContent===w)x.className='no'});beep(200,.3);c.appendChild(el('div','win bad','غلط، ما خسرت شي'))}
+    setBtns('voteBtns',[btn(k+1<imps.length?'الامبوستر الثاني يخمن ←':'شوف النتيجة 🏁','',()=>k+1<imps.length?impGuess(k+1):finishImp())]);
+  })));c.appendChild(o);setBtns('voteBtns',[]);
+}
+function finishImp(){
+  const imps=impNames();
+  G.order.forEach(p=>{IMPSC[p]=(IMPSC[p]||0)+G.pts[p]});LS.set('impScores',IMPSC);
+  $('voteTitle').textContent='🏁 نهاية الجولة';$('voteSub').textContent='';
+  const c=$('voteCard');c.innerHTML='';
+  c.append(el('div','lab','الامبوستر كان'),el('div','nm',imps.join(' و ')),el('div','lab','والكلمة'),el('div','txt good',G.word),el('div','desc',descOf(G.cat,G.word)));
+  const b=$('voteScores');b.classList.remove('hidden');b.innerHTML='';const h=el('h2','','النقاط 🏆');const rs=btn('تصفير','ghost small',()=>{IMPSC={};LS.set('impScores',IMPSC);b.classList.add('hidden')});rs.style.flex='none';h.appendChild(rs);b.appendChild(h);
+  G.order.slice().sort((a,c)=>IMPSC[c]-IMPSC[a]).forEach(n=>{const d=el('div','score');const l=el('span','',n);
+    if(G.pts[n]){const pl=el('small','good','+'+G.pts[n]);pl.style.cssText='direction:ltr;unicode-bidi:isolate;font-weight:700;margin:0 6px';l.appendChild(pl);l.appendChild(el('small','',G.why[n].join('، ')))}
+    d.append(l,el('b','',IMPSC[n]));b.appendChild(d)});
+  setBtns('voteBtns',[btn('تعديل','ghost',()=>show('impSetup')),btn('جولة جديدة 🔄','',impRound,2)]);
+}
+
+/* ===== TRUTH OR DARE ===== */
+let todQ;
+function startTod(){todQ=turnQueue();gs('🔥 صراحة ولا جرأة');todTurn()}
+function todTurn(){
+  const p=todQ(),ask=pick(S.players.filter(x=>x!==p));const add=card();
+  add('lab','الدور على');add('nm',p);const l=add('lab','والسؤال من ');l.appendChild(el('b','good',ask));add('txt','صراحة ولا جرأة؟');
+  setBtns('gsBtns',[btn('صراحة 💬','grn',()=>todShow(p,ask,0)),btn('جرأة 🔥','red',()=>todShow(p,ask,1))]);
+}
+function todShow(p,ask,isDare){
+  const add=card();add('lab',isDare?'جرأة 🔥':'صراحة 💬');add('nm',p).style.fontSize='22px';add('txt',isDare?draw('dare',DARE):draw('truth',TRUTH));
+  const l=add('lab','ما عجبك؟ ');l.appendChild(el('b','good',ask));l.append(' يقدر يسألك من عنده');
+  setBtns('gsBtns',[btn('غيّر 🔄','ghost',()=>todShow(p,ask,isDare)),btn('اللي بعده ←','',todTurn,2)]);
+}
+
+/* ===== CARD GAMES ===== */
+const CG={wyr:['🤔 لو خيروك','كل واحد يختار ويبرر اختياره',WYR],ml:['👉 مين أكثر واحد','على العد ٣ الكل يأشر على واحد. اللي ياخذ أكثر يبرر!',ML],nhie:['🙈 ولا مرة','اللي سواها يرفع يده ويقول القصة',NHIE]};
+let cgId,cgQ;
+function startCard(id){cgId=id;cgQ=turnQueue();gs(CG[id][0],CG[id][1]);cardNext()}
+function cardNext(){
+  const q=draw(cgId,CG[cgId][2]);const add=card();
+  add('lab','يقرأ السؤال: '+cgQ());
+  if(cgId==='wyr'){add('lab','لو خيروك بين');add('txt',q[0]);add('or','ولا');add('txt',q[1])}
+  else if(cgId==='ml'){add('lab','مين أكثر واحد ممكن…');add('txt',q+'؟')}
+  else{add('lab','ولا مرة…');add('txt',q)}
+  const b=[];if(cgId==='ml')b.push(btn('٣.. ٢.. ١ ⏱️','ghost',function(){this.disabled=true;const d=add('timer');let n=3;const t=()=>{d.textContent=n>0?n:'أشّروا! 👉';beep(n>0?600:1000,.15);if(n-->0)setTimeout(t,800)};t()}));
+  b.push(btn('اللي بعده ←','',cardNext,2));setBtns('gsBtns',b);
+}
+
+/* ===== TIMED TURN GAMES: تمثيل + الكلمة الممنوعة ===== */
+let TT;
+function startTimed(kind){
+  TT={kind,q:turnQueue(),scores:{}};S.players.forEach(p=>TT.scores[p]=0);
+  gs(kind==='cha'?'🎭 تمثيل بدون كلام':'🚫 الكلمة الممنوعة',kind==='cha'?'مثّل الكلمة بدون ما تتكلم، والكل يخمن':'وصّف الكلمة بدون ما تقول الكلمات الممنوعة ولا الكلمة نفسها');
+  ttTurn();
+}
+function ttTurn(){
+  TT.cur=TT.q();TT.got=0;const add=card();
+  add('lab','الدور على');add('nm',TT.cur);add('lab',TT.kind==='cha'?'عندك دقيقة تمثل فيها أكثر عدد كلمات':'عندك دقيقة. خل اللي جنبك يراقب الكلمات الممنوعة 👀');
+  scores(TT.scores);setBtns('gsBtns',[btn('أنا جاهز ▶️','',ttGo)]);
+}
+function ttWord(){
+  const add=card();add('timer').id='ttT';
+  if(TT.kind==='cha'){const [c,w]=topicWord(S.tcats);add('lab',c);add('txt',w).style.fontSize='34px';add('desc',descOf(c,w))}
+  else{const t=draw('taboo',TABOO);add('txt',t[0]).style.fontSize='34px';add('lab','ممنوع تقول:');const f=add('forb');t.slice(1).forEach(x=>f.appendChild(el('span','',x)))}
+  add('lab','نقاطك: '+TT.got);
+}
+function ttGo(){
+  $('gsScores').classList.add('hidden');let t=60;
+  const redraw=()=>{ttWord();$('ttT').textContent=t;$('ttT').classList.toggle('low',t<=10)};
+  redraw();
+  const bs=[btn('تخطي ⏭️','ghost',redraw)];
+  if(TT.kind==='tab')bs.push(btn('قالها ❌','red',()=>{TT.got--;beep(200,.3);buzz(150);redraw()}));
+  bs.push(btn('جابوها ✅','grn',()=>{TT.got++;beep(1200,.1);redraw()},TT.kind==='tab'?1.3:2));
+  setBtns('gsBtns',bs);
+  countdownTimer(60,'ttT',ttEnd,x=>{t=x});
+}
+function ttEnd(){
+  TT.scores[TT.cur]+=TT.got;const add=card();add('lab','خلص الوقت ⏰');add('nm',TT.cur);add('txt',TT.got+' نقطة');
+  scores(TT.scores);setBtns('gsBtns',[btn('اللي بعده ←','',ttTurn)]);
+}
+
+/* ===== BOMB ===== */
+let BM;
+function startBomb(){BM={lost:{}};S.players.forEach(p=>BM.lost[p]=0);gs('💣 القنبلة','قول كلمة صح وعط الجوال للي جنبك بسرعة! اللي تنفجر في يده يخسر');bombReady()}
+function bombReady(){
+  stopTimer();const add=card();add('bomb','💣');add('lab','المهمة');add('txt',draw('bomb',BOMB));add('lab','يبدأ: '+pick(S.players));
+  scores(BM.lost,'مرات الخسارة 💥');setBtns('gsBtns',[btn('شغّل القنبلة 🔥','red',bombGo)]);
+}
+function bombGo(){
+  $('gsScores').classList.add('hidden');$('gsCard').querySelector('.bomb').classList.add('tick');
+  const total=15000+rnd(30000),start=Date.now();
+  const tick=()=>{const left=total-(Date.now()-start);if(left<=0){bombBoom();return}const p=left/total;beep(p<.25?1200:900,.05,.12);bombT=setTimeout(tick,Math.max(150,p*900))};tick();
+  const pb=btn('⏳ مرّر الجوال بسرعة!','yel',()=>{});pb.disabled=true;setBtns('gsBtns',[pb]);
+}
+function bombBoom(){
+  bombT=null;document.body.classList.add('boom');beep(120,1,.35);buzz([300,100,500]);
+  const add=card();add('bomb','💥');add('txt','بووووم!');add('lab','مين كان الجوال في يده؟');
+  const o=add('opts');S.players.forEach(p=>o.appendChild(btn(p,'',()=>{BM.lost[p]++;document.body.classList.remove('boom');bombReady()})));
+  setBtns('gsBtns',[btn('جولة ثانية بدون تسجيل','ghost',()=>{document.body.classList.remove('boom');bombReady()})]);
+}
+
+/* ===== LETTERS ===== */
+function startLetters(){gs('🔤 إنسان حيوان نبات','كل واحد ياخذ ورقة وقلم ويكتب كلمة تبدأ بالحرف لكل خانة');letReady()}
+function letReady(){
+  const add=card();add('lab','اضغط عشان يطلع الحرف');add('huge','؟');const c=add('lcats');LETTER_CATS.forEach(x=>c.appendChild(el('span','',x)));
+  setBtns('gsBtns',[btn('طلّع الحرف 🎲','',letGo)]);
+}
+function letGo(){
+  const L=draw('letters',LETTERS);const add=card();add('lab','الحرف');add('huge',L);const c=add('lcats');LETTER_CATS.forEach(x=>c.appendChild(el('span','',x)));add('timer').id='letT';
+  setBtns('gsBtns',[btn('خلصت! ✋','red',()=>{stopTimer();letEnd(L)})]);
+  countdownTimer(60,'letT',()=>letEnd(L));
+}
+function letEnd(L){const add=card();add('txt','وقفوا الأقلام! ✋');add('lab','صححوا مع بعض: كلمة صح ما أحد كتبها = ١٠، صح ومكررة = ٥');add('huge',L);setBtns('gsBtns',[btn('حرف جديد 🎲','',letGo)])}
+
+/* ===== TRIVIA ===== */
+let TV;
+function startTriv(){TV={q:turnQueue(),scores:{}};S.players.forEach(p=>TV.scores[p]=0);gs('🧠 سين جيم','كل واحد يجاوب على سؤاله، والصح بنقطة');trivNext()}
+function trivNext(){
+  const p=TV.q(),Q=draw('triv',TRIVIA),right=Q[1];const add=card();
+  add('lab','السؤال لـ');add('nm',p);add('txt',Q[0]);const o=add('opts');
+  shuffle(Q.slice(1)).forEach(a=>{const b=btn(a,'',()=>{
+    o.querySelectorAll('button').forEach(x=>{x.disabled=true;if(x.textContent===right)x.className='ok'});
+    if(a===right){TV.scores[p]++;beep(1200,.15)}else{b.className='no';beep(200,.3)}
+    scores(TV.scores);setBtns('gsBtns',[btn('السؤال اللي بعده ←','',trivNext)]);
+  });o.appendChild(b)});
+  scores(TV.scores);setBtns('gsBtns',[btn('تخطي','ghost',trivNext)]);
+}
+
+/* ===== GUESS (20 QUESTIONS) ===== */
+let GQ;
+function startG20(){GQ={q:turnQueue()};gs('❓ خمن الشي','واحد يعرف الكلمة، والباقين عندهم ٢٠ سؤال جوابها إيه أو لا');g20Turn()}
+function g20Turn(){
+  const p=GQ.q(),[c,w]=topicWord(S.tcats);GQ.n=0;GQ.c=c;const add=card();
+  add('lab','اللي يعرف الكلمة');add('nm',p);add('lab','الموضوع: '+c);
+  const h=add('','');const hb=el('button','ghost hold','اضغط مطوّل عشان تشوف الكلمة 👀');hb.style.width='100%';h.appendChild(hb);const wd=add('hidden','');wd.append(el('div','txt good',w),el('div','desc',descOf(c,w)));
+  hb.addEventListener('pointerdown',e=>{e.preventDefault();wd.classList.remove('hidden')});['pointerup','pointerleave','pointercancel'].forEach(ev=>hb.addEventListener(ev,()=>wd.classList.add('hidden')));
+  hb.oncontextmenu=e=>e.preventDefault();
+  const cnt=add('timer','0 / 20');
+  setBtns('gsBtns',[btn('استسلموا 🏳️','ghost',()=>g20End(w,false)),btn('سؤال +1','',function(){if(GQ.n>=20)return;GQ.n++;cnt.textContent=GQ.n+' / 20';beep(800);if(GQ.n>=20){this.disabled=true;this.textContent='آخر سؤال!'}},1.3),btn('جابوها ✅','grn',()=>g20End(w,true))]);
+}
+function g20End(w,won){const add=card();add('txt',won?'جابوها في '+GQ.n+' سؤال 🎉':'ما جابوها 😅');add('lab','الكلمة كانت');add('nm',w);add('desc',descOf(GQ.c,w));setBtns('gsBtns',[btn('اللي بعده ←','',g20Turn)])}
+
+/* ===== HOT SEAT ===== */
+let HQ;
+function startHot(){HQ=turnQueue();gs('🪑 الكرسي الساخن','واحد يقعد على الكرسي، والكل يسأله أسئلة لمدة دقيقتين ولازم يجاوب بصراحة');hotReady()}
+function hotReady(){const add=card();const p=HQ();add('lab','على الكرسي الساخن');add('nm',p);add('lab','سؤال تبدون فيه:');add('txt',draw('truth',TRUTH)).style.fontSize='21px';setBtns('gsBtns',[btn('غيّر اللاعب','ghost',hotReady),btn('ابدأ الوقت ⏱️','',()=>{add('timer').id='hotT';countdownTimer(120,'hotT',()=>{const a=card();a('txt','خلص الوقت! 🔥');a('lab',p+' نجا من الكرسي الساخن');setBtns('gsBtns',[btn('اللي بعده ←','',hotReady)])});setBtns('gsBtns',[btn('وقف ⏹️','ghost',()=>{stopTimer();hotReady()})])},2)])}
+
+/* ===== الكلام المعكوس ===== */
+let RV,recState=null;
+function audioCtx(){AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();return AC}
+let curSrc=null;
+function toWav(buf){
+  const ch=buf.getChannelData(0),n=ch.length,sr=buf.sampleRate,ab=new ArrayBuffer(44+n*2),v=new DataView(ab);
+  const w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))};
+  w(0,'RIFF');v.setUint32(4,36+n*2,true);w(8,'WAVE');w(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);
+  v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,n*2,true);
+  for(let i=0;i<n;i++){const x=Math.max(-1,Math.min(1,ch[i]));v.setInt16(44+i*2,x<0?x*0x8000:x*0x7fff,true)}
+  return new Blob([ab],{type:'audio/wav'});
+}
+let curAudio=null;
+function stopPlay(){try{if(curSrc)curSrc.stop()}catch(e){}curSrc=null;if(curAudio){try{curAudio.pause();URL.revokeObjectURL(curAudio.src)}catch(e){}curAudio=null}}
+function playBuf(buf){if(!buf)return;stopPlay();
+  try{const a=new Audio(URL.createObjectURL(toWav(buf)));curAudio=a;const p=a.play();if(p&&p.catch)p.catch(()=>playWA(buf))}catch(e){playWA(buf)}}
+function playWA(buf){try{const a=audioCtx();const s=a.createBufferSource();s.buffer=buf;s.connect(a.destination);s.start();curSrc=s}catch(e){}}
+function reverseBuf(buf){const a=audioCtx();const r=a.createBuffer(buf.numberOfChannels,buf.length,buf.sampleRate);for(let ch=0;ch<buf.numberOfChannels;ch++){const d=new Float32Array(buf.getChannelData(ch));d.reverse();r.getChannelData(ch).set(d)}return r}
+async function recToggle(b,onDone){
+  if(recState){recState.rec.stop();return}
+  try{
+    if(!navigator.mediaDevices||!window.MediaRecorder)throw new Error('nosupport');
+    audioCtx();
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    const rec=new MediaRecorder(stream),chunks=[];
+    rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
+    rec.onstop=async()=>{
+      clearTimeout(recState&&recState.to);stream.getTracks().forEach(t=>t.stop());recState=null;
+      b.classList.remove('rec');b.innerHTML='<span>🎙️</span>سجّل من جديد';
+      try{const blob=new Blob(chunks,{type:rec.mimeType||'audio/webm'});const ab=await blob.arrayBuffer();const buf=await new Promise((res,rej)=>{const p=audioCtx().decodeAudioData(ab,res,rej);if(p&&p.then)p.then(res,rej)});onDone(buf)}
+      catch(e){micErr('ما قدرت أقرا التسجيل، جرب مرة ثانية')}
+    };
+    rec.start();recState={rec,to:setTimeout(()=>{if(recState)rec.stop()},10000)};
+    b.classList.add('rec');b.innerHTML='<span>⏹️</span>وقف';beep(1000,.06);
+  }catch(e){micErr(e&&e.message==='nosupport'?'جهازك ما يدعم التسجيل':'المايك ما اشتغل. اسمح للعبة تستخدم المايك، وافتحها من رابط GitHub Pages (المايك ما يشتغل داخل الشات)')}
+}
+function micErr(t){let e=$('micErr');if(e)e.textContent=t}
+function recRow(get,set){
+  const r=el('div','recbtns');
+  const bRec=el('button','');bRec.innerHTML='<span>🎙️</span>تسجيل';
+  const bRev=el('button','yel');bRev.innerHTML='<span>🔁</span>المعكوس';
+  const bNor=el('button','ghost');bNor.innerHTML='<span>▶️</span>الطبيعي';
+  const upd=()=>{bRev.disabled=bNor.disabled=!get()};
+  bRec.onclick=()=>recToggle(bRec,buf=>{set(buf);upd();beep(700,.06)});
+  bRev.onclick=()=>playBuf(reverseBuf(get()));bNor.onclick=()=>playBuf(get());
+  r.append(bRec,bRev,bNor);upd();return r;
+}
+function startRev(){RV={q:turnQueue(),scores:{}};S.players.forEach(p=>RV.scores[p]=0);gs('🔄 الكلام المعكوس','واحد يسجل كلمة، والثاني يسمعها معكوسة ويقلدها ويخمنها');revA()}
+function revA(){
+  stopRec();const A=RV.q(),B=pick(S.players.filter(p=>p!==A)),[c,w]=topicWord(S.tcats);
+  Object.assign(RV,{A,B,c,w,bufA:null,bufB:null});
+  const add=card();add('step','الخطوة ١ من ٢');add('lab','عط الجوال لـ');add('nm',A);add('lab','الموضوع: '+c);
+  const hb=el('button','ghost hold','اضغط مطوّل عشان تشوف كلمتك 👀');hb.style.width='100%';$('gsCard').appendChild(hb);
+  const wd=add('hidden','');wd.append(el('div','txt good',w),el('div','desc',descOf(c,w)));
+  hb.addEventListener('pointerdown',e=>{e.preventDefault();wd.classList.remove('hidden')});['pointerup','pointerleave','pointercancel'].forEach(ev=>hb.addEventListener(ev,()=>wd.classList.add('hidden')));hb.oncontextmenu=e=>e.preventDefault();
+  add('lab','سجّل نفسك وأنت تقول الكلمة بوضوح');
+  $('gsCard').appendChild(recRow(()=>RV.bufA,b=>{RV.bufA=b;nb.disabled=false}));add('err','').id='micErr';
+  scores(RV.scores);const nb=btn('خلصت، عط الجوال لـ '+B+' ←','',revB);nb.disabled=true;setBtns('gsBtns',[nb]);
+}
+function revB(){
+  stopRec();$('gsScores').classList.add('hidden');
+  const add=card();add('step','الخطوة ٢ من ٢');add('lab','دورك يا');add('nm',RV.B);add('lab','الموضوع: '+RV.c);
+  add('lab','١) اسمع صوت '+RV.A+' معكوس');
+  const r1=el('div','recbtns');r1.style.gridTemplateColumns='1fr 1fr';
+  const p1=el('button','yel');p1.innerHTML='<span>🔁</span>المعكوس';p1.onclick=()=>playBuf(reverseBuf(RV.bufA));
+  r1.append(p1);$('gsCard').appendChild(r1);
+  add('lab','٢) قلّد الصوت المعكوس وسجّله، وبعدين اسمع تقليدك معكوس');
+  $('gsCard').appendChild(recRow(()=>RV.bufB,b=>{RV.bufB=b}));add('err','').id='micErr';
+  setBtns('gsBtns',[btn('عرفتها! اكشف الكلمة 🔍','',revReveal)]);
+}
+function revReveal(){
+  stopRec();const add=card();add('lab','الكلمة كانت');add('txt good',RV.w);add('desc',descOf(RV.c,RV.w));add('lab',RV.B+'، خمّنتها صح؟');
+  const r=el('div','recbtns');const pa=el('button','ghost');pa.innerHTML='<span>▶️</span>صوت '+RV.A;pa.onclick=()=>playBuf(RV.bufA);r.appendChild(pa);
+  if(RV.bufB){const pb=el('button','yel');pb.innerHTML='<span>🔁</span>تقليد '+RV.B;pb.onclick=()=>playBuf(reverseBuf(RV.bufB));r.appendChild(pb)}
+  $('gsCard').appendChild(r);
+  setBtns('gsBtns',[btn('ما خمنها ❌','ghost',()=>{scores(RV.scores);revA()}),btn('خمنها ✅','grn',()=>{RV.scores[RV.B]++;RV.scores[RV.A]++;beep(1200,.15);scores(RV.scores);revA()},1.3)]);
+}
+function stopRec(){if(recState){try{recState.rec.onstop=null;recState.rec.stop();recState.rec.stream.getTracks().forEach(t=>t.stop())}catch(e){}clearTimeout(recState.to);recState=null}stopPlay()}
+
+/* ===== MAFIA ===== */
+function mafPlayers(){return S.players.length-(S.nar?1:0)}
+function mafMax(){return Math.max(1,Math.floor((mafPlayers()-1)/3))}
+function renderMaf(){
+  if(S.maf>mafMax())S.maf=mafMax();
+  $('mafN').textContent=S.maf;$('docSw').classList.toggle('on',S.doc);$('copSw').classList.toggle('on',S.cop);$('narSw').classList.toggle('on',S.nar);
+  const n=mafPlayers(),cit=n-S.maf-(S.doc?1:0)-(S.cop?1:0);
+  $('mafSummary').innerHTML='اللاعبين: <b>'+n+'</b>'+(S.nar?' + راوي':'')+'<br>🔪 مافيا: '+S.maf+(S.doc?' · 💉 دكتور: 1':'')+(S.cop?' · 🕵️ شرطي: 1':'')+' · 👤 مواطنين: '+Math.max(0,cit);
+  $('mafErr').textContent=cit<1?'العدد ما يكفي، قلل الأدوار أو زيد لاعبين':'';save();
+}
+$('mafPlus').onclick=()=>{S.maf=Math.min(mafMax(),S.maf+1);renderMaf()};
+$('mafMinus').onclick=()=>{S.maf=Math.max(1,S.maf-1);renderMaf()};
+$('docSw').onclick=()=>{S.doc=!S.doc;renderMaf()};$('copSw').onclick=()=>{S.cop=!S.cop;renderMaf()};$('narSw').onclick=()=>{S.nar=!S.nar;renderMaf()};
+const ROLES={maf:['🔪','مافيا','bad','كل ليلة تتفقون أنتم المافيا على واحد تطلعونه. لا تنكشف!'],doc:['💉','الدكتور','good','كل ليلة تختار واحد تنقذه (تقدر تنقذ نفسك)'],cop:['🕵️','الشرطي','good','كل ليلة تسأل الراوي عن واحد: مافيا ولا لا؟'],cit:['👤','مواطن','good','ساعد الكل تصيدون المافيا في النهار']};
+let M;
+function mafRound(){
+  renderMaf();if($('mafErr').textContent)return;
+  let ps=shuffle(S.players);let nar=null;if(S.nar)nar=ps.pop();
+  const roles=[];for(let i=0;i<S.maf;i++)roles.push('maf');if(S.doc)roles.push('doc');if(S.cop)roles.push('cop');while(roles.length<ps.length)roles.push('cit');
+  const rs=shuffle(roles);ps=S.players.filter(p=>p!==nar);
+  M={nar,assign:ps.map((p,i)=>[p,rs[i]])};
+  const items=M.assign.map(([p,r])=>{const R0=ROLES[r];let extra='';
+    if(r==='maf'&&S.maf>1)extra='<div class="t1">ربعك: <b>'+M.assign.filter(([q,rr])=>rr==='maf'&&q!==p).map(([q])=>esc(q)).join('، ')+'</b></div>';
+    return{name:p,html:'<div class="emo">'+R0[0]+'</div><div class="t2 '+R0[2]+'">'+R0[1]+'</div><div class="t1">'+R0[3]+'</div>'+extra}});
+  if(nar)items.push({name:nar,html:'<div class="emo">🎙️</div><div class="t2" style="color:var(--yel)">أنت الراوي</div><div class="t1">أنت تدير اللعبة وتشوف كل الأدوار</div>'});
+  startReveal('🔪 المافيا',items,'الراوي يستلم 🎙️',showNar,'mafSetup');
+}
+function showNar(){
+  $('narName').textContent=M.nar||'اختاروا واحد منكم (بدون ما يشوف الأدوار)';
+  const rl=$('roleList');rl.innerHTML='';rl.classList.add('hidden');
+  M.assign.forEach(([p,r])=>{const d=el('div');d.append(el('span','',p),el('span','',ROLES[r][0]+' '+ROLES[r][1]));rl.appendChild(d)});
+  const st=['الراوي يقول: "الكل يغمض عيونه" 😴','"المافيا تفتح عيونها" وتأشر على اللي بتطلعه، بعدين تغمض'];
+  if(S.doc)st.push('"الدكتور يفتح عيونه" ويأشر على اللي بينقذه، بعدين يغمض');
+  if(S.cop)st.push('"الشرطي يفتح عيونه" ويأشر على واحد، والراوي يرد بإبهام 👍 مافيا أو 👎 لا');
+  st.push('"الكل يفتح عيونه" والراوي يعلن مين طلع (إلا إذا الدكتور أنقذه)','النهار: نقاش وتصويت، واللي ياخذ أكثر أصوات يطلع ويكشف دوره','تتكرر لين تطلع المافيا كلها (المواطنين فازوا) أو المافيا تساوي الباقين (المافيا فازت)');
+  $('narSteps').innerHTML=st.map(s=>'<li>'+s+'</li>').join('');
+  show('mafNar');
+}
+const hr=$('holdRoles');hr.oncontextmenu=e=>e.preventDefault();
+hr.addEventListener('pointerdown',ev=>{ev.preventDefault();$('roleList').classList.remove('hidden')});
+['pointerup','pointerleave','pointercancel'].forEach(e=>hr.addEventListener(e,()=>$('roleList').classList.add('hidden')));
+$('mafStart').onclick=mafRound;$('mafAgain').onclick=mafRound;
+
+renderHome();
+// تطبيق (يشتغل بدون نت بعد أول فتحة)
+if('serviceWorker' in navigator&&window.isSecureContext&&location.protocol!=='file:'){try{navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}}
+</script>
+</body>
+</html>
