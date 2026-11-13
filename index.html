@@ -323,9 +323,12 @@ function countdownTimer(sec,elId,onEnd,onTick){
 // ترتيب اللاعبين بالدور بدون تكرار
 function turnQueue(){let q=[];return()=>{if(!q.length)q=shuffle(S.players);return q.pop()}}
 
-let S={players:[],cats:Object.keys(TOPICS).slice(0,8),tcats:Object.keys(TOPICS),imps:1,hint:true,maf:1,doc:true,cop:true,nar:true};
+let S={players:[],cats:Object.keys(TOPICS),tcats:Object.keys(TOPICS),imps:1,hint:true,maf:1,doc:true,cop:true,nar:true};
 S=Object.assign(S,LS.get('jm_s',{}));
-S.cats=S.cats.filter(c=>TOPICS[c]);S.tcats=S.tcats.filter(c=>TOPICS[c]);
+// المواضيع القديمة اندمجت: نحول الاختيارات القديمة للمواضيع الجديدة
+const OLD_TOPICS={'حيوانات 🦁':'حيوانات 🐾','طيور 🦅':'حيوانات 🐾','كائنات بحرية 🐠':'حيوانات 🐾','حشرات 🐜':'حيوانات 🐾','أكلات 🍛':'أكل وشرب 🍽️','حلويات 🍰':'أكل وشرب 🍽️','مشروبات 🥤':'أكل وشرب 🍽️','مطاعم وماركات أكل 🍔':'أكل وشرب 🍽️','نباتات 🌵':'نباتات وفواكه وخضار 🌿','فواكه وخضار 🍉':'نباتات وفواكه وخضار 🌿','دول 🌍':'دول ومدن 🌍','مدن 🏙️':'دول ومدن 🌍','سيارات 🚗':'سيارات ومواصلات 🚗','مواصلات 🚌':'سيارات ومواصلات 🚗','تواصل اجتماعي 📱':'تطبيقات ومواقع 📱','تطبيقات 📲':'تطبيقات ومواقع 📱','رياضات ⚽':'رياضة وكورة ⚽','أندية كورة ⚽':'رياضة وكورة ⚽','لاعبين كورة 🌟':'رياضة وكورة ⚽','ألعاب فيديو 🎮':'ألعاب 🎮','ألعاب شعبية وجمعات 🎲':'ألعاب 🎮','ملابس 👕':'ملابس وماركات 👕','ماركات 👜':'ملابس وماركات 👕','أغراض البيت 🏠':'أغراض وأجهزة 🏠','أجهزة إلكترونية 💻':'أغراض وأجهزة 🏠','أدوات وعدة 🔧':'أغراض وأجهزة 🏠','أدوات مدرسية ✏️':'أغراض وأجهزة 🏠'};
+const fixCats=a=>{const r=[...new Set(a.map(c=>OLD_TOPICS[c]||c).filter(c=>TOPICS[c]))];return r.length?r:Object.keys(TOPICS)};
+S.cats=fixCats(S.cats);S.tcats=fixCats(S.tcats);
 const save=()=>LS.set('jm_s',S);
 
 /* ===== RULES ===== */
