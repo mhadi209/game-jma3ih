@@ -245,7 +245,7 @@ function sjAsk(c, l, i) {
     card.appendChild(el('div', 'txt', q.q));
     if (hint && q.h) card.appendChild(el('div', 'hintx', '💡 ' + q.h));
     if (!revealed) {
-      const tm = el('div', 'timer'); tm.id = 'sjT'; card.appendChild(tm); countdownTimer(60, 'sjT', () => {});
+      const tm = el('div', 'timer'); tm.id = 'sjT'; card.appendChild(tm); countdownTimer(TIME('sj'), 'sjT', () => {});
       const life = el('div', 'life');
       const bs = btn('🔄 غيّر', 'ghost', () => { if (!t.life.swap) return; t.life.swap = 0; q = draw('sj_' + c + '_' + l, SJ[c][l]); render(); });
       const bd = btn('✖️٢ دبل', 'ghost', () => { if (!t.life.dbl) return; t.life.dbl = 0; dbl = true; render(); });
@@ -602,6 +602,18 @@ Object.assign(RULES, {
   teams: ['اختار كم فريق، واضغط قسّم: اللعبة توزع اللاعبين عشوائي وبالتساوي.', 'وزر "مين يبدأ؟" يختار واحد عشوائي يبدأ اللعبة.']
 });
 RULES.triv = RULES.triv;
+// نرد واحد يتدحرج على أي canvas (للودو)
+window.DIE = {
+  draw(cv, val) { const d = { sides: 6 }; renderDie(cv, 6, targetQ(d, val), i => i + 1); },
+  roll(cv, val, cb) {
+    const d = { sides: 6 }; let q = Qt.norm([Math.random(), Math.random(), Math.random(), Math.random()]); const tq = targetQ(d, val);
+    const ax = V.norm([Math.random() - .5, Math.random() - .5, Math.random() - .5]), t0 = performance.now(), T1 = window.__fast ? 5 : 650, T2 = window.__fast ? 5 : 400; let qe = q;
+    const f = now => { const t = now - t0; if (t < T1) { q = Qt.norm(Qt.mul(Qt.axis(ax, 22 * (1 - t / T1) * 0.016), q)); qe = q; } else { const u = Math.min(1, (t - T1) / T2); q = Qt.slerp(qe, tq, 1 - Math.pow(1 - u, 3)); }
+      renderDie(cv, 6, q, i => i + 1); if (t < T1 + T2) requestAnimationFrame(f); else cb && cb(); };
+    requestAnimationFrame(f);
+  }
+};
+window.UI = { mkScreen, stepper, chipSet, setBtns2, teamInputs, scoreHead, teamNames };
 window.__t = () => ({ DR, SG, FG, DICE, SHAPES, Qt, CP, CO });
 window.EXTRA = { drw: drawSetup, sj: sjSetup, feud: feudSetup, dice: diceScreen, cups: cupsScreen, bottle: bottleScreen, coin: coinScreen, teams: teamsScreen };
 // الرجوع من شاشة الكشف في الرسم

@@ -322,6 +322,9 @@ document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>show(b.dataset.g
 let AC=null;
 function beep(f=880,d=.08,v=.15){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(AC.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d);o.stop(AC.currentTime+d+.02)}catch(e){}}
 function buzz(ms){try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}}
+// أوقات الألعاب (تتعدل من ⚙️ الإعدادات)
+const DEF_T={cha:60,tab:60,hot:120,let:60,bombMin:15,bombMax:45,sj:60,five:5,chain:10,scr:30,flag:15,mil:30,buzz:20};
+const TIME=k=>{const v=S.times&&S.times[k];return v>0?v:DEF_T[k]};
 function countdownTimer(sec,elId,onEnd,onTick){
   const end=Date.now()+sec*1000;let last=null;
   const tick=()=>{const e=$(elId);if(!e){stopTimer();return}
@@ -596,14 +599,14 @@ function ttWord(){
   add('lab','نقاطك: '+TT.got);
 }
 function ttGo(){
-  $('gsScores').classList.add('hidden');let t=60;
+  $('gsScores').classList.add('hidden');let t=TIME(TT.kind);
   const redraw=()=>{ttWord();$('ttT').textContent=t;$('ttT').classList.toggle('low',t<=10)};
   redraw();
   const bs=[btn('تخطي ⏭️','ghost',redraw)];
   if(TT.kind==='tab')bs.push(btn('قالها ❌','red',()=>{TT.got--;beep(200,.3);buzz(150);redraw()}));
   bs.push(btn('جابوها ✅','grn',()=>{TT.got++;beep(1200,.1);redraw()},TT.kind==='tab'?1.3:2));
   setBtns('gsBtns',bs);
-  countdownTimer(60,'ttT',ttEnd,x=>{t=x});
+  countdownTimer(TIME(TT.kind),'ttT',ttEnd,x=>{t=x});
 }
 function ttEnd(){
   TT.scores[TT.cur]+=TT.got;const add=card();add('lab','خلص الوقت ⏰');add('nm',TT.cur);add('txt',TT.got+' نقطة');
@@ -619,7 +622,7 @@ function bombReady(){
 }
 function bombGo(){
   $('gsScores').classList.add('hidden');$('gsCard').querySelector('.bomb').classList.add('tick');
-  const total=15000+rnd(30000),start=Date.now();
+  const lo=Math.min(TIME('bombMin'),TIME('bombMax')),hi=Math.max(TIME('bombMin'),TIME('bombMax'));const total=(lo+Math.random()*(hi-lo))*1000,start=Date.now();
   const tick=()=>{const left=total-(Date.now()-start);if(left<=0){bombBoom();return}const p=left/total;beep(p<.25?1200:900,.05,.12);bombT=setTimeout(tick,Math.max(150,p*900))};tick();
   const pb=btn('⏳ مرّر الجوال بسرعة!','yel',()=>{});pb.disabled=true;setBtns('gsBtns',[pb]);
 }
@@ -639,7 +642,7 @@ function letReady(){
 function letGo(){
   const L=draw('letters',LETTERS);const add=card();add('lab','الحرف');add('huge',L);const c=add('lcats');LETTER_CATS.forEach(x=>c.appendChild(el('span','',x)));add('timer').id='letT';
   setBtns('gsBtns',[btn('خلصت! ✋','red',()=>{stopTimer();letEnd(L)})]);
-  countdownTimer(60,'letT',()=>letEnd(L));
+  countdownTimer(TIME('let'),'letT',()=>letEnd(L));
 }
 function letEnd(L){const add=card();add('txt','وقفوا الأقلام! ✋');add('lab','صححوا مع بعض: كلمة صح ما أحد كتبها = ١٠، صح ومكررة = ٥');add('huge',L);setBtns('gsBtns',[btn('حرف جديد 🎲','',letGo)])}
 
@@ -674,7 +677,7 @@ function g20End(w,won){const add=card();add('txt',won?'جابوها في '+GQ.n+
 /* ===== HOT SEAT ===== */
 let HQ;
 function startHot(){HQ=turnQueue();gs('🪑 الكرسي الساخن','واحد يقعد على الكرسي، والكل يسأله أسئلة لمدة دقيقتين ولازم يجاوب بصراحة');hotReady()}
-function hotReady(){const add=card();const p=HQ();add('lab','على الكرسي الساخن');add('nm',p);add('lab','سؤال تبدون فيه:');add('txt',draw('truth',TRUTH)).style.fontSize='21px';setBtns('gsBtns',[btn('غيّر اللاعب','ghost',hotReady),btn('ابدأ الوقت ⏱️','',()=>{add('timer').id='hotT';countdownTimer(120,'hotT',()=>{const a=card();a('txt','خلص الوقت! 🔥');a('lab',p+' نجا من الكرسي الساخن');setBtns('gsBtns',[btn('اللي بعده ←','',hotReady)])});setBtns('gsBtns',[btn('وقف ⏹️','ghost',()=>{stopTimer();hotReady()})])},2)])}
+function hotReady(){const add=card();const p=HQ();add('lab','على الكرسي الساخن');add('nm',p);add('lab','سؤال تبدون فيه:');add('txt',draw('truth',TRUTH)).style.fontSize='21px';setBtns('gsBtns',[btn('غيّر اللاعب','ghost',hotReady),btn('ابدأ الوقت ⏱️','',()=>{add('timer').id='hotT';countdownTimer(TIME('hot'),'hotT',()=>{const a=card();a('txt','خلص الوقت! 🔥');a('lab',p+' نجا من الكرسي الساخن');setBtns('gsBtns',[btn('اللي بعده ←','',hotReady)])});setBtns('gsBtns',[btn('وقف ⏹️','ghost',()=>{stopTimer();hotReady()})])},2)])}
 
 /* ===== الكلام المعكوس ===== */
 let RV,recState=null;
@@ -807,5 +810,9 @@ window.appBack=()=>{const m=$('modal');if(!m.classList.contains('hidden')){m.cla
 if('serviceWorker' in navigator&&window.isSecureContext&&location.protocol!=='file:'&&!/JamaatApp/.test(navigator.userAgent)){try{navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}}
 </script>
 <script src="extra.js"></script>
+<script src="data2.js"></script>
+<script src="games3.js"></script>
+<script src="board.js"></script>
+<script src="online.js"></script>
 </body>
 </html>
