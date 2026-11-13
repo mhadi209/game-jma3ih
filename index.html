@@ -29,7 +29,7 @@ body.boom{background-color:#8e2a1e}
 .top{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:10px;border-bottom:3px double var(--line)}
 .top h1{font-size:25px;margin:0;text-align:right;flex:1}
 .back{background:var(--card);color:var(--txt);width:44px;height:44px;padding:0;font-size:20px;border-radius:10px;flex:none}
-.help{font-size:22px}
+.help{width:auto;padding:0 12px;font-size:17px;font-family:'Lalezar','Tajawal',sans-serif;background:var(--yel)}
 h1{font-size:40px;text-align:center;margin:8px 0 0;line-height:1.2;color:var(--red);text-shadow:2px 2px 0 var(--yel)}
 .badge{display:block;width:max-content;margin:6px auto 4px;border:2px solid var(--line);border-radius:999px;padding:2px 14px;font-size:13px;background:var(--yel);color:var(--txt);font-weight:700}
 .sub{color:var(--mut);text-align:center;margin-bottom:16px;line-height:1.8;font-size:15px}
@@ -150,7 +150,7 @@ button:disabled{opacity:.75}
 <div id="home" class="screen on">
   <span class="badge">★ منذ زمان الطيبين ★</span>
   <h1>ألعاب الجمعات</h1>
-  <div class="sub">حطوا أساميكم مرة وحدة، واختاروا اللعبة.<br>كل لعبة لها شرح قبل لا تبدأ 📖</div>
+  <div class="sub">حطوا أساميكم مرة وحدة، واختاروا اللعبة.<br>داخل كل لعبة فيه زر 📖 شرح إذا تبي تعرف طريقة اللعب</div>
   <div class="box">
     <h2>اللاعبين <span id="pc" style="color:var(--mut);font-size:14px"></span></h2>
     <form class="row" id="addForm">
@@ -175,7 +175,7 @@ button:disabled{opacity:.75}
 
 <!-- IMPOSTER SETUP -->
 <div id="impSetup" class="screen">
-  <div class="top"><button class="back" data-home>→</button><h1>🕵️ الامبوستر</h1><button class="back help" data-help>؟</button></div>
+  <div class="top"><button class="back" data-home>→</button><h1>🕵️ الامبوستر</h1><button class="back help" data-help>📖 شرح</button></div>
   <div class="box">
     <h2>المواضيع <button class="ghost small" id="allBtn">الكل</button></h2>
     <div class="chips" id="cats"></div>
@@ -194,7 +194,7 @@ button:disabled{opacity:.75}
 
 <!-- SHARED REVEAL -->
 <div id="reveal" class="screen">
-  <div class="top"><button class="back" id="revBack">→</button><h1 id="revTitle"></h1><button class="back help" data-help>؟</button></div>
+  <div class="top"><button class="back" id="revBack">→</button><h1 id="revTitle"></h1><button class="back help" data-help>📖 شرح</button></div>
   <div class="who">عط الجوال لـ</div>
   <div class="pname" id="rName"></div>
   <div class="stage" id="stage">
@@ -211,7 +211,7 @@ button:disabled{opacity:.75}
 
 <!-- IMPOSTER ASK -->
 <div id="impAsk" class="screen">
-  <div class="top"><button class="back" data-home>→</button><h1>🗣️ مين يسأل مين</h1><button class="back help" data-help>؟</button></div>
+  <div class="top"><button class="back" data-home>→</button><h1>🗣️ مين يسأل مين</h1><button class="back help" data-help>📖 شرح</button></div>
   <div class="sub" id="askRound"></div>
   <div class="bigcard">
     <div class="pair"><span class="a" id="askA"></span><span class="v">يسأل 👉</span><span class="b" id="askB"></span></div>
@@ -223,7 +223,7 @@ button:disabled{opacity:.75}
 
 <!-- IMPOSTER VOTE / RESULT -->
 <div id="impRes" class="screen">
-  <div class="top"><button class="back" data-home>→</button><h1 id="voteTitle">🗳️ التصويت</h1><button class="back help" data-help>؟</button></div>
+  <div class="top"><button class="back" data-home>→</button><h1 id="voteTitle">🗳️ التصويت</h1><button class="back help" data-help>📖 شرح</button></div>
   <div class="sub" id="voteSub"></div>
   <div class="bigcard" id="voteCard"></div>
   <div class="box hidden" id="voteScores" style="margin-top:16px"></div>
@@ -232,7 +232,7 @@ button:disabled{opacity:.75}
 
 <!-- GENERIC GAME SCREEN -->
 <div id="gs" class="screen">
-  <div class="top"><button class="back" data-home>→</button><h1 id="gsTitle"></h1><button class="back help" data-help>؟</button></div>
+  <div class="top"><button class="back" data-home>→</button><h1 id="gsTitle"></h1><button class="back help" data-help>📖 شرح</button></div>
   <div class="sub" id="gsSub"></div>
   <div class="bigcard" id="gsCard"></div>
   <div class="box hidden" id="gsScores" style="margin-top:14px"></div>
@@ -241,7 +241,7 @@ button:disabled{opacity:.75}
 
 <!-- TOPIC PICK for charades / guess -->
 <div id="topicPick" class="screen">
-  <div class="top"><button class="back" data-home>→</button><h1 id="tpTitle"></h1><button class="back help" data-help>؟</button></div>
+  <div class="top"><button class="back" data-home>→</button><h1 id="tpTitle"></h1><button class="back help" data-help>📖 شرح</button></div>
   <div class="box">
     <h2>المواضيع <button class="ghost small" id="tpAll">الكل</button></h2>
     <div class="chips" id="tpCats"></div>
@@ -252,7 +252,7 @@ button:disabled{opacity:.75}
 
 <!-- MAFIA SETUP -->
 <div id="mafSetup" class="screen">
-  <div class="top"><button class="back" data-home>→</button><h1>🔪 المافيا</h1><button class="back help" data-help>؟</button></div>
+  <div class="top"><button class="back" data-home>→</button><h1>🔪 المافيا</h1><button class="back help" data-help>📖 شرح</button></div>
   <div class="box">
     <div class="toggle"><b>عدد المافيا</b><div class="stepper"><button class="ghost" id="mafMinus">−</button><span id="mafN">1</span><button class="ghost" id="mafPlus">+</button></div></div>
     <div class="toggle"><div><b>دكتور 💉</b><small>كل ليلة ينقذ واحد</small></div><div class="sw" id="docSw"></div></div>
@@ -266,7 +266,7 @@ button:disabled{opacity:.75}
 
 <!-- MAFIA NARRATOR -->
 <div id="mafNar" class="screen">
-  <div class="top"><button class="back" data-home>→</button><h1>🌙 الراوي</h1><button class="back help" data-help>؟</button></div>
+  <div class="top"><button class="back" data-home>→</button><h1>🌙 الراوي</h1><button class="back help" data-help>📖 شرح</button></div>
   <div class="box" style="text-align:center"><div style="color:var(--mut)">الراوي</div><div style="font-size:28px;font-weight:900;color:var(--yel)" id="narName"></div></div>
   <div class="box">
     <h2>الأدوار <span style="font-size:13px;color:var(--mut)">للراوي بس 🤫</span></h2>
@@ -380,7 +380,7 @@ function openGame(g){
   $('homeErr').textContent='';CUR=g;
   $('inE').textContent=g.e;$('inN').textContent=g.n;
   $('inMeta').innerHTML='';[ '👥 '+g.min+'+ لاعبين','⏱️ '+g.t].forEach(x=>$('inMeta').appendChild(el('span','',x)));
-  fillRules($('inRules'),g.id);show('intro');
+  launch(g);
 }
 function fillRules(ol,id){ol.innerHTML='';RULES[id].forEach(r=>ol.appendChild(el('li','',r)))}
 $('inGo').onclick=()=>launch(CUR);
