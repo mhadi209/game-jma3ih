@@ -1,0 +1,40 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'com.mhadi.jamaat'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.mhadi.jamaat"
+        minSdk 24
+        targetSdk 34
+        // رقم الإصدار يزيد مع كل بناء عشان التحديث ينزل فوق القديم
+        versionCode((System.getenv("BUILD_NUMBER") ?: "1").toInteger())
+        versionName(System.getenv("VERSION_NAME") ?: "1.0")
+    }
+
+    signingConfigs {
+        release {
+            storeFile file('jamaat.keystore')
+            storePassword 'jamaat2026'
+            keyAlias 'jamaat'
+            keyPassword 'jamaat2026'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'androidx.webkit:webkit:1.11.0'
+}

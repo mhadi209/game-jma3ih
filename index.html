@@ -784,7 +784,9 @@ $('mafStart').onclick=mafRound;$('mafAgain').onclick=mafRound;
 
 renderHome();
 // تطبيق (يشتغل بدون نت بعد أول فتحة)
-if('serviceWorker' in navigator&&window.isSecureContext&&location.protocol!=='file:'){try{navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}}
+// زر الرجوع في تطبيق الأندرويد: يرجع للرئيسية بدل ما يطلع من التطبيق
+window.appBack=()=>{const m=$('modal');if(!m.classList.contains('hidden')){m.classList.add('hidden');return true}if($('home').classList.contains('on'))return false;renderHome();show('home');return true};
+if('serviceWorker' in navigator&&window.isSecureContext&&location.protocol!=='file:'&&!/JamaatApp/.test(navigator.userAgent)){try{navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}}
 </script>
 </body>
 </html>
