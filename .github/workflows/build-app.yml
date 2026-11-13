@@ -26,7 +26,7 @@ jobs:
       - name: نسخ ملفات اللعبة داخل التطبيق
         run: |
           mkdir -p android/app/src/main/assets/www
-          cp -r index.html topics.js data.js manifest.webmanifest sw.js icons android/app/src/main/assets/www/
+          cp -r *.html *.js manifest.webmanifest icons android/app/src/main/assets/www/
 
       - name: بناء ملف APK
         working-directory: android
@@ -38,18 +38,18 @@ jobs:
       - name: تجهيز الملفات
         run: |
           mkdir out
-          cp android/app/build/outputs/apk/release/app-release.apk out/jamaat-games.apk
-          zip -r out/jamaat-games-web.zip index.html topics.js data.js manifest.webmanifest sw.js icons
+          cp android/app/build/outputs/apk/release/app-release.apk out/taqzeera.apk
+          zip -r out/taqzeera-web.zip *.html *.js manifest.webmanifest icons
 
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: v1.${{ github.run_number }}
-          name: ألعاب الجمعات v1.${{ github.run_number }}
+          name: تقزيرة v1.${{ github.run_number }}
           make_latest: true
           files: out/*
           body: |
             ## 📲 التحميل
-            - **أندرويد:** نزّل `jamaat-games.apk` وافتحه، واسمح بالتثبيت من مصادر غير معروفة إذا طلب منك.
-            - **نسخة الويب:** `jamaat-games-web.zip` (تفتح من المتصفح).
+            - **أندرويد:** نزّل `taqzeera.apk` وافتحه، واسمح بالتثبيت من مصادر غير معروفة إذا طلب منك.
+            - **نسخة الويب:** `taqzeera-web.zip` (تفتح من المتصفح).
 
-            14 لعبة: الامبوستر، المافيا، صراحة ولا جرأة، تمثيل، الكلمة الممنوعة، القنبلة، إنسان حيوان نبات، سين جيم، خمن الشي، الكلام المعكوس، الكرسي الساخن، لو خيروك، مين أكثر واحد، ولا مرة.
+            17 لعبة و5 أدوات: الامبوستر، ارسم وصيد الامبوستر، سين جيم، فاميلي فيود، المافيا، صراحة ولا جرأة، تمثيل، الكلمة الممنوعة، القنبلة، إنسان حيوان نبات، أسئلة سريعة، خمن الشي، الكلام المعكوس، الكرسي الساخن، لو خيروك، مين أكثر واحد، ولا مرة + النرد 3D، الأكواب، القارورة، العملة، تقسيم الفرق.
