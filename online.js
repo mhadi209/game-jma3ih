@@ -112,11 +112,13 @@ function status(t, k) { let s = $('onStatus'); if (!s) { s = el('div', 'status')
 
 /* ---------- عرض الشاشة (مشترك بين المضيف والضيوف) ---------- */
 let lastView = null, drawCtx = null;
+const ONL_R = {};
 function renderView(v, sendAct) {
   lastView = v; const b = on.body; b.innerHTML = ''; on.h.textContent = v.title || '🌐 أونلاين';
   if (v.status) { const s = el('div', 'status ' + (v.status[1] || 'ok'), v.status[0]); s.id = 'onStatus'; b.appendChild(s); }
   const c = el('div', 'bigcard'); b.appendChild(c);
   (v.items || []).forEach(it => {
+    if (ONL_R[it.t]) { ONL_R[it.t](it, c, sendAct); return; }
     if (it.t === 'img') { const i = el('img', 'drawThumb'); i.src = it.v; c.appendChild(i); return; }
     if (it.t === 'list') { const r = el('div', 'reslist'); it.v.forEach(([n, val, best]) => { const d = el('div', best ? 'best' : ''); d.append(el('span', '', n), el('b', '', val)); r.appendChild(d); }); c.appendChild(r); return; }
     if (it.t === 'plist') { const r = el('div', 'plist'); it.v.forEach(([n, k]) => r.appendChild(el('span', k || '', n))); c.appendChild(r); return; }
@@ -457,5 +459,6 @@ const homeBox = $('home').querySelector('.box'); $('home').insertBefore(box, hom
 // لو فتح الرابط فيه ?r=1234 ندخله على طول
 const m = location.search.match(/[?&]r=(\d{4})/);
 if (m) { CUR = { id: 'online', e: '🌐', n: 'أونلاين' }; setTimeout(() => guestJoin(m[1]), 0); }
+window.ONL = { register: (id, def) => { GAMES_ON[id] = def; }, renderers: ONL_R, P: id => P(id), active: () => active(), scoresList: () => scoresList(), host: () => H, liveSend: (id, msg) => Net.send(id, msg), push: () => push() };
 window.__on = () => ({ H, ROLE, ME, Net, lastView, hostStart, guestJoin, push });
 })();

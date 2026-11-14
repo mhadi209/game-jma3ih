@@ -98,10 +98,13 @@ body.dark .tbox.turn{color:#1c1611}
 .ball{position:absolute;bottom:22px;width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ffe28a,#d79a35 60%,#8a5a12);border:2px solid var(--line);z-index:1}
 .table{position:absolute;left:0;right:0;bottom:0;height:24px;border-radius:12px;background:#7a4a24;border:2px solid var(--line)}
 .bottlebox{position:relative;width:min(88vw,380px);height:min(88vw,380px);margin:4px auto 10px}
-.bottlebox .nm{position:absolute;transform:translate(-50%,-50%);background:var(--card);border:2px solid var(--line);border-radius:999px;padding:2px 10px;font-weight:700;font-size:14px;white-space:nowrap;box-shadow:2px 2px 0 var(--line);transition:.3s}
+.bottlebox .nm{position:absolute;z-index:2;transform:translate(-50%,-50%);background:var(--card);border:2px solid var(--line);border-radius:999px;padding:2px 10px;font-weight:700;font-size:14px;white-space:nowrap;box-shadow:2px 2px 0 var(--line);transition:.3s}
 .bottlebox .nm.hitA{background:var(--grn);color:#fff;transform:translate(-50%,-50%) scale(1.25)}
 .bottlebox .nm.hitB{background:var(--red);color:#fff;transform:translate(-50%,-50%) scale(1.25)}
-.bottle{position:absolute;left:50%;top:50%;width:46px;height:170px;margin:-85px 0 0 -23px;transition:transform 3.2s cubic-bezier(.12,.75,.15,1)}
+.bottle{position:absolute;left:50%;top:50%;width:52px;height:190px;margin:-95px 0 0 -26px;filter:drop-shadow(6px 8px 4px rgba(0,0,0,.4))}
+.woodtable{position:absolute;inset:6%;border-radius:50%;background:repeating-radial-gradient(circle at 50% 50%,#9a6236 0 6px,#8a5530 6px 9px,#a86c3d 9px 15px),radial-gradient(circle,#b07445,#6b3d1e);border:6px solid #4a2a12;box-shadow:inset 0 0 30px rgba(0,0,0,.45),0 8px 0 #2b1d12}
+.wheelWrap{position:relative;width:max-content;margin:6px auto}
+.wPtr{position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:16px solid transparent;border-right:16px solid transparent;border-top:34px solid var(--red);filter:drop-shadow(0 3px 0 #2b1d12)}
 .coin3d{width:170px;height:170px;margin:20px auto;perspective:800px}
 .coin3d .in{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform 2s cubic-bezier(.2,.7,.2,1)}
 .coin3d .f{position:absolute;inset:0;border-radius:50%;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;align-items:center;justify-content:center;font-family:'Lalezar';font-size:34px;color:#5a3b06;
@@ -391,24 +394,71 @@ const SHAPES = {};
   SHAPES[10] = polyFrom(tv, tf);
 })();
 const DCOL = { 4: '#c94a3b', 6: '#f3ead6', 8: '#2c7a6b', 10: '#d79a35', 12: '#5b4a9c', 20: '#1f4f8a' };
-function renderDie(cv, sides, q, label) {
-  const sh = SHAPES[sides], x = cv.getContext('2d'), W = cv.width, H = cv.height, R = W * 0.36;
-  x.clearRect(0, 0, W, H);
+const PIPS = { 1: [[0, 0]], 2: [[-.5, -.5], [.5, .5]], 3: [[-.5, -.5], [0, 0], [.5, .5]], 4: [[-.5, -.5], [.5, -.5], [-.5, .5], [.5, .5]], 5: [[-.5, -.5], [.5, -.5], [0, 0], [-.5, .5], [.5, .5]], 6: [[-.5, -.6], [-.5, 0], [-.5, .6], [.5, -.6], [.5, 0], [.5, .6]] };
+// يرسم النرد بمنظور حقيقي: إضاءة ولمعة، نقاط على D6، والأرقام مرسومة على سطح الوجه نفسه
+function renderDie(cv, sides, q, label, opt) {
+  opt = opt || {};
+  const sh = SHAPES[sides], x = cv.getContext('2d'), W = cv.width, H = cv.height;
+  const R = W * 0.3 * (opt.s || 1), cx = W / 2 + (opt.dx || 0) * W, cy = H * 0.47 + (opt.dy || 0) * H, F = 3.4;
+  const proj = p => { const k = F / (F - p[2]); return [cx + p[0] * R * k, cy - p[1] * R * k]; };
+  x.setTransform(1, 0, 0, 1, 0, 0); x.clearRect(0, 0, W, H);
+  // ظل على الأرض (يصغر لما النرد يطير)
+  const hgt = opt.h || 0;
+  x.fillStyle = 'rgba(0,0,0,' + (0.28 * (1 - hgt * 0.7)) + ')'; x.beginPath(); x.ellipse(W / 2 + (opt.dx || 0) * W + R * .12, H * 0.47 + R * 1.12, R * (0.85 - hgt * .3), R * (0.2 - hgt * .06), 0, 0, 7); x.fill();
   const pv = sh.v.map(p => Qt.rot(q, p));
-  const base = DCOL[sides], light = V.norm([-0.4, -0.6, 1]);
-  const vis = sh.faces.map((f, i) => ({ i, f, n: Qt.rot(q, f.n), c: Qt.rot(q, f.c) })).filter(o => o.n[2] > 0.02).sort((a, b) => a.c[2] - b.c[2]);
-  const P = p => [W / 2 + p[0] * R, H / 2 - p[1] * R];
-  // ظل
-  x.fillStyle = 'rgba(0,0,0,.18)'; x.beginPath(); x.ellipse(W / 2 + 6, H / 2 + R * 1.05, R * .8, R * .18, 0, 0, 7); x.fill();
-  vis.forEach(o => {
-    const sh2 = Math.max(.35, V.dot(o.n, light));
-    x.beginPath(); o.f.f.forEach((vi, k) => { const p = P(pv[vi]); k ? x.lineTo(p[0], p[1]) : x.moveTo(p[0], p[1]); }); x.closePath();
-    x.fillStyle = shade(base, sh2); x.fill(); x.strokeStyle = 'rgba(0,0,0,.55)'; x.lineWidth = W / 110; x.stroke();
-    const c = P(o.c), num = label(o.i), fs = W * (sides >= 12 ? .12 : sides === 10 ? .12 : .17) * (0.55 + 0.45 * o.n[2]);
-    x.font = 'bold ' + fs + 'px Lalezar, Tajawal, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillStyle = sides === 6 ? '#2b1d12' : '#fff'; x.globalAlpha = Math.min(1, o.n[2] * 1.6);
-    x.fillText(num + ((num === 6 || num === 9) && sides > 6 ? '.' : ''), c[0], c[1]); x.globalAlpha = 1;
+  const base = DCOL[sides], L = V.norm([-0.45, 0.65, 1]), Hh = V.norm(V.add(L, [0, 0, 1]));
+  const faces = sh.faces.map((f, i) => ({ i, f, n: Qt.rot(q, f.n), c: Qt.rot(q, f.c) }))
+    .filter(o => V.dot(o.n, V.sub([0, 0, F], o.c)) > 0).sort((a, b) => a.c[2] - b.c[2]);
+  faces.forEach(o => {
+    const lam = Math.max(0, V.dot(o.n, L)), spec = Math.pow(Math.max(0, V.dot(o.n, Hh)), 24);
+    const pts = o.f.f.map(vi => proj(pv[vi]));
+    x.beginPath(); pts.forEach((p, k) => k ? x.lineTo(p[0], p[1]) : x.moveTo(p[0], p[1])); x.closePath();
+    x.fillStyle = shade(base, 0.25 + 0.75 * lam); x.fill();
+    // لمعة
+    const pc = proj(o.c), gr = x.createRadialGradient(pc[0] - R * .15, pc[1] - R * .15, 0, pc[0], pc[1], R * .9);
+    gr.addColorStop(0, 'rgba(255,255,255,' + (0.55 * spec + 0.08) + ')'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+    x.fillStyle = gr; x.fill();
+    x.strokeStyle = 'rgba(0,0,0,.28)'; x.lineWidth = W / 160; x.lineJoin = 'round'; x.stroke();
+    const vis = Math.min(1, V.dot(o.n, V.norm(V.sub([0, 0, F], o.c))) * 1.8);
+    const num = label(o.i);
+    if (sides === 6) {
+      const v0 = pv[o.f.f[0]], v1 = pv[o.f.f[1]], v3 = pv[o.f.f[3]], U = V.mul(V.sub(v1, v0), .5), Wv = V.mul(V.sub(v3, v0), .5);
+      const Un = V.norm(U), Wn = V.norm(Wv), rr = V.len(U) * .17;
+      x.fillStyle = (num === 1 ? '#c0392b' : '#1d1d1d'); x.globalAlpha = vis;
+      (PIPS[num] || []).forEach(([a, b]) => {
+        const pc2 = V.add(o.c, V.add(V.mul(U, a), V.mul(Wv, b)));
+        x.beginPath(); for (let k = 0; k <= 14; k++) { const t = k / 14 * Math.PI * 2, p = proj(V.add(pc2, V.add(V.mul(Un, Math.cos(t) * rr), V.mul(Wn, Math.sin(t) * rr)))); k ? x.lineTo(p[0], p[1]) : x.moveTo(p[0], p[1]); }
+        x.fill();
+      });
+      x.globalAlpha = 1;
+    } else {
+      const v0 = pv[o.f.f[0]], up = V.norm(V.sub(v0, o.c)), right = V.norm(V.cross(up, o.n));
+      const ts = (sides >= 12 ? .3 : sides === 10 ? .28 : sides === 4 ? .34 : .42) * V.len(V.sub(v0, o.c));
+      const c0 = proj(V.add(o.c, V.mul(up, -ts * 0.05))), px = proj(V.add(o.c, V.mul(right, ts))), py = proj(V.sub(o.c, V.mul(up, ts)));
+      x.setTransform((px[0] - c0[0]) / 100, (px[1] - c0[1]) / 100, (py[0] - c0[0]) / 100, (py[1] - c0[1]) / 100, c0[0], c0[1]);
+      x.font = 'bold 120px Lalezar, Tajawal, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
+      x.globalAlpha = vis; x.fillStyle = 'rgba(0,0,0,.35)'; x.fillText(num, 4, 6); x.fillStyle = '#fff'; x.fillText(num, 0, 0);
+      if ((num === 6 || num === 9) && sides > 6) x.fillRect(-30, 52, 60, 9);
+      x.globalAlpha = 1; x.setTransform(1, 0, 0, 1, 0, 0);
+    }
   });
+}
+// حركة واقعية: النرد يلف حول محورين ويبطّي شوي شوي لين يوقف بالضبط على الرقم (بدون قفزة)، ويتنطط على الطاولة
+function animateRoll(list, done) {
+  const fast = window.__fast, T = fast ? 10 : 1500, t0 = performance.now();
+  list.forEach(d => { d.tq = targetQ(d, d.val); d.a1 = V.norm([Math.random() - .5, Math.random() - .5, Math.random() - .5]); d.a2 = V.norm([Math.random() - .5, Math.random() - .5, Math.random() - .5]); d.th1 = (2.5 + Math.random() * 1.5) * Math.PI * 2; d.th2 = (1 + Math.random()) * Math.PI * 2; d.bx = (Math.random() - .5) * .12; });
+  let hits = 0;
+  const f = now => {
+    const u = Math.max(0, Math.min(1, (now - t0) / T)), e = 1 - Math.pow(1 - u, 3);
+    list.forEach(d => {
+      const q = Qt.mul(Qt.axis(d.a1, d.th1 * (1 - e)), Qt.mul(Qt.axis(d.a2, d.th2 * (1 - e)), d.tq)); d.q = Qt.norm(q);
+      const h = Math.abs(Math.sin(u * Math.PI * 3.2)) * Math.pow(1 - u, 2) * 0.9;
+      renderDie(d.cv, d.sides, d.q, i => i + 1, { dy: -h * 0.16, h, dx: d.bx * (1 - e), s: 1 + h * 0.06 });
+    });
+    const nh = Math.floor(u * 3.2); if (nh > hits && u < .95) { hits = nh; beep(260 + Math.random() * 120, .05, .12); }
+    if (u < 1) requestAnimationFrame(f); else done && done();
+  };
+  requestAnimationFrame(f);
 }
 function shade(hex, k) { const n = parseInt(hex.slice(1), 16); const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255; const f = v => Math.round(Math.min(255, v * (0.55 + 0.6 * k))); return 'rgb(' + f(r) + ',' + f(g) + ',' + f(b) + ')'; }
 const dcS = mkScreen('dice', '🎲 النرد');
@@ -431,25 +481,12 @@ function diceScreen() {
   setBtns2(dcS.row, [btn('ارمي 🎲', '', rollDice)]);
   show('dice');
 }
-function targetQ(d, val) { const f = SHAPES[d.sides].faces[val - 1]; let q = Qt.fromTo(f.n, [0, 0, 1]); q = Qt.mul(Qt.axis([0, 0, 1], (Math.random() - .5) * 0.8), q); q = Qt.mul(Qt.axis([1, -1, 0], d.sides === 4 ? 0.2 : 0.32), q); return Qt.norm(q); }
+function targetQ(d, val) { const sh = SHAPES[d.sides], f = sh.faces[val - 1]; let q = Qt.fromTo(f.n, [0, 0, 1]); const up = Qt.rot(q, V.norm(V.sub(sh.v[f.f[0]], f.c))); q = Qt.mul(Qt.axis([0, 0, 1], Math.atan2(up[0], up[1]) + (Math.random() - .5) * 0.35), q); q = Qt.mul(Qt.axis([1, -1, 0], d.sides === 4 ? 0.2 : 0.32), q); return Qt.norm(q); }
 let rolling = false;
 function rollDice() {
   if (rolling) return; rolling = true; $('dTot').textContent = '';
-  const T1 = 900, T2 = 550, t0 = performance.now();
-  DICE.forEach(d => { d.qe = d.q; d.val = 1 + rnd(d.sides); d.tq = targetQ(d, d.val); d.ax = V.norm([Math.random() - .5, Math.random() - .5, Math.random() - .5]); d.sp = 18 + Math.random() * 10; d.q0 = d.q; });
-  let lastTick = 0;
-  const frame = now => {
-    const t = now - t0;
-    DICE.forEach(d => {
-      if (t < T1) { const k = 1 - t / T1; d.q = Qt.norm(Qt.mul(Qt.axis(d.ax, d.sp * k * 0.016), d.q)); d.qe = d.q; }
-      else { const u = Math.min(1, (t - T1) / T2), e = 1 - Math.pow(1 - u, 3); d.q = Qt.slerp(d.qe, d.tq, e); }
-      renderDie(d.cv, d.sides, d.q, fi => fi + 1);
-    });
-    if (t - lastTick > 90 && t < T1) { beep(300 + Math.random() * 300, .03, .06); lastTick = t; }
-    if (t < T1 + T2) requestAnimationFrame(frame);
-    else { rolling = false; buzz(60); const vals = DICE.map(d => d.val); $('dTot').textContent = vals.length > 1 ? vals.join(' + ') + ' = ' + vals.reduce((a, b) => a + b) : vals[0]; }
-  };
-  requestAnimationFrame(frame);
+  DICE.forEach(d => { d.val = 1 + rnd(d.sides); });
+  animateRoll(DICE, () => { rolling = false; buzz(60); const vals = DICE.map(d => d.val); $('dTot').textContent = vals.length > 1 ? vals.join(' + ') + ' = ' + vals.reduce((a, b) => a + b) : vals[0]; });
 }
 
 /* =================================================================
@@ -515,28 +552,105 @@ async function cupPick(i) {
 /* =================================================================
    🍾 لف القارورة
    ================================================================= */
-const btS = mkScreen('bottle', '🍾 لف القارورة');
-const BOTTLE_SVG = '<svg viewBox="0 0 46 170"><rect x="17" y="0" width="12" height="14" rx="3" fill="#c9861f" stroke="#2b1d12" stroke-width="3"/><path d="M17 14 L17 46 Q4 60 4 80 L4 160 Q4 168 12 168 L34 168 Q42 168 42 160 L42 80 Q42 60 29 46 L29 14 Z" fill="#2c7a6b" stroke="#2b1d12" stroke-width="4"/><rect x="8" y="95" width="30" height="40" rx="4" fill="#f3ead6" stroke="#2b1d12" stroke-width="3"/><path d="M12 70 Q10 100 12 150" stroke="rgba(255,255,255,.45)" stroke-width="5" fill="none"/></svg>';
-let BT = { ang: 0 };
+const btS = mkScreen('bottle', '🍾 لف الغرشة');
+const BOTTLE_SVG = `<svg viewBox="0 0 60 220" xmlns="http://www.w3.org/2000/svg"><defs>
+<linearGradient id="gl" x1="0" x2="1"><stop offset="0" stop-color="#0d4d2c"/><stop offset=".22" stop-color="#2f9e62"/><stop offset=".42" stop-color="#7fe0a8"/><stop offset=".55" stop-color="#2c8a56"/><stop offset="1" stop-color="#0b3d23"/></linearGradient>
+<linearGradient id="cap" x1="0" x2="1"><stop offset="0" stop-color="#8a6416"/><stop offset=".45" stop-color="#f6d77a"/><stop offset="1" stop-color="#8a6416"/></linearGradient>
+<linearGradient id="lb" x1="0" x2="1"><stop offset="0" stop-color="#d9c08f"/><stop offset=".5" stop-color="#fff4d6"/><stop offset="1" stop-color="#c9ad78"/></linearGradient></defs>
+<rect x="22" y="2" width="16" height="16" rx="3" fill="url(#cap)" stroke="#3a2a08" stroke-width="1.5"/>
+<path d="M23 18 L23 62 Q8 80 8 104 L8 206 Q8 216 18 216 L42 216 Q52 216 52 206 L52 104 Q52 80 37 62 L37 18 Z" fill="url(#gl)" stroke="#06301a" stroke-width="2" opacity=".96"/>
+<rect x="8" y="120" width="44" height="52" fill="url(#lb)" stroke="#6b5326" stroke-width="1"/>
+<text x="30" y="150" font-size="13" text-anchor="middle" fill="#7a1f15" font-family="Lalezar,Tajawal">تقزيرة</text>
+<path d="M15 96 Q13 150 15 204" stroke="rgba(255,255,255,.55)" stroke-width="4" fill="none" stroke-linecap="round"/>
+<path d="M27 24 L27 58" stroke="rgba(255,255,255,.5)" stroke-width="2.5" stroke-linecap="round"/>
+<ellipse cx="30" cy="212" rx="18" ry="3" fill="rgba(0,0,0,.25)"/></svg>`;
+let BT = { ang: 0, spinning: false };
 function bottleScreen() {
   const b = btS.body; b.innerHTML = '';
   const box = el('div', 'bottlebox'); const n = S.players.length;
-  S.players.forEach((p, i) => { const a = i / n * 2 * Math.PI - Math.PI / 2; const d = el('div', 'nm', p); d.style.left = (50 + 43 * Math.cos(a)) + '%'; d.style.top = (50 + 43 * Math.sin(a)) + '%'; box.appendChild(d); });
+  const table = el('div', 'woodtable'); box.appendChild(table);
+  S.players.forEach((p, i) => { const a = i / n * 2 * Math.PI - Math.PI / 2; const d = el('div', 'nm', p); d.style.left = (50 + 42 * Math.cos(a)) + '%'; d.style.top = (50 + 42 * Math.sin(a)) + '%'; box.appendChild(d); });
   const bt = el('div', 'bottle'); bt.innerHTML = BOTTLE_SVG; bt.style.transform = 'rotate(' + BT.ang + 'deg)'; box.appendChild(bt);
-  const res = el('div', 'sub', 'رأس القارورة 🟢 يجاوب · وتحتها 🔴 يسأل'); res.id = 'btRes';
+  const res = el('div', 'sub', 'رأس الغرشة 🟢 يجاوب · وتحتها 🔴 يسأل'); res.id = 'btRes';
   b.append(box, res);
+  const idx = a => Math.round((((a % 360) + 360) % 360) / 360 * n) % n;
   setBtns2(btS.row, [btn('لف 🔄', '', () => {
-    const add = 1080 + rnd(1440) + Math.random() * 360; BT.ang += add; bt.style.transform = 'rotate(' + BT.ang + 'deg)';
-    box.querySelectorAll('.nm').forEach(x => x.className = 'nm'); $('btRes').textContent = '…'; beep(600, .05);
-    setTimeout(() => {
-      const top = ((BT.ang % 360) + 360) % 360; // 0 = لفوق
-      const idx = a => { const k = Math.round(((a + 360) % 360) / 360 * n) % n; return k; };
-      const A = idx(top), B0 = idx(top + 180); const B = B0 === A ? (A + Math.floor(n / 2)) % n : B0;
+    if (BT.spinning) return; BT.spinning = true;
+    const from = BT.ang, add = 1440 + rnd(1440) + Math.random() * 360, T = window.__fast ? 10 : 4200, t0 = performance.now(); let last = idx(from);
+    box.querySelectorAll('.nm').forEach(x => x.className = 'nm'); $('btRes').textContent = '…';
+    const f = now => {
+      const u = Math.max(0, Math.min(1, (now - t0) / T)), e = 1 - Math.pow(1 - u, 4); BT.ang = from + add * e; bt.style.transform = 'rotate(' + BT.ang + 'deg)';
+      const k = idx(BT.ang); if (k !== last) { last = k; beep(900 + 300 * (1 - u), .02, .05); }
+      if (u < 1) return requestAnimationFrame(f);
+      BT.spinning = false;
+      const A = idx(BT.ang), B0 = idx(BT.ang + 180); const B = B0 === A ? (A + Math.floor(n / 2)) % n : B0;
       const nms = box.querySelectorAll('.nm'); nms[A].classList.add('hitA'); nms[B].classList.add('hitB');
-      $('btRes').innerHTML = ''; $('btRes').append(el('b', 'bad', S.players[B]), ' يسأل 👉 ', el('b', 'good', S.players[A])); beep(1000, .15); buzz(80);
-    }, 3300);
+      $('btRes').innerHTML = ''; $('btRes').append(el('b', 'bad', S.players[B]), ' يسأل 👉 ', el('b', 'good', S.players[A])); beep(1200, .15); buzz(80);
+    };
+    requestAnimationFrame(f);
   })]);
   show('bottle');
+}
+
+/* =================================================================
+   🎡 عجلة الحظ
+   ================================================================= */
+const whS = mkScreen('wheel', '🎡 عجلة الحظ');
+const WCOL = ['#c94a3b', '#e0a400', '#2c7a6b', '#1f6fd1', '#7b2cbf', '#e75a9c', '#00a6a6', '#ff6b35', '#5b8c2a', '#8a5a12'];
+let WH = { ang: 0, spinning: false };
+function wheelScreen() {
+  S.wheelItems = S.wheelItems && S.wheelItems.length ? S.wheelItems : (S.players.length ? S.players.slice() : ['خيار ١', 'خيار ٢', 'خيار ٣']);
+  const b = whS.body; b.innerHTML = '';
+  const wrap = el('div', 'wheelWrap'); const cv = el('canvas'); const sz = Math.min(window.innerWidth - 40, 400), dpr = window.devicePixelRatio || 1;
+  cv.width = sz * dpr; cv.height = sz * dpr; cv.style.width = sz + 'px'; cv.style.height = sz + 'px'; cv.id = 'whCv';
+  const ptr = el('div', 'wPtr'); wrap.append(cv, ptr); b.appendChild(wrap);
+  const res = el('div', 'total', ''); res.id = 'whRes'; b.appendChild(res);
+  const box = el('div', 'box'); box.appendChild(el('h2', '', 'الخيارات (' + S.wheelItems.length + ')'));
+  const form = el('div', 'row'); const inp = el('input'); inp.type = 'text'; inp.placeholder = 'أضف خيار…'; inp.maxLength = 20;
+  const add = () => { const v = inp.value.trim(); if (!v) return; S.wheelItems.push(v); inp.value = ''; save(); wheelScreen(); setTimeout(() => $('whIn') && $('whIn').focus(), 30); };
+  inp.id = 'whIn'; inp.onkeydown = e => { if (e.key === 'Enter') add(); }; form.append(inp, btn('إضافة', '', add)); box.appendChild(form);
+  const pl = el('div', 'players'); S.wheelItems.forEach((w, i) => { const d = el('div', 'pl'); d.appendChild(el('span', '', w)); const x = el('b', '', '×'); x.onclick = () => { S.wheelItems.splice(i, 1); save(); wheelScreen(); }; d.appendChild(x); pl.appendChild(d); }); box.appendChild(pl);
+  const r2 = el('div', 'row'); r2.style.marginTop = '10px';
+  r2.append(btn('👥 حط أسامي اللاعبين', 'ghost small', () => { S.wheelItems = S.players.slice(); save(); wheelScreen(); }), btn('🧹 امسح الكل', 'ghost small', () => { S.wheelItems = []; save(); wheelScreen(); }));
+  box.appendChild(r2);
+  const tg = el('div', 'toggle'); tg.innerHTML = '<div><b>شيل اللي يطلع</b><small>عشان ما يطلع نفس الشي مرتين</small></div>'; const sw = el('div', 'sw' + (S.wheelRemove ? ' on' : '')); sw.onclick = () => { S.wheelRemove = !S.wheelRemove; save(); sw.classList.toggle('on'); }; tg.appendChild(sw); box.appendChild(tg);
+  b.appendChild(box);
+  drawWheel(); setBtns2(whS.row, [btn('لف العجلة 🎡', '', spinWheel)]);
+  show('wheel');
+}
+function drawWheel(hi) {
+  const cv = $('whCv'); if (!cv) return; const x = cv.getContext('2d'), W = cv.width, R = W / 2 - W * .03, c = W / 2, it = S.wheelItems, n = Math.max(1, it.length), seg = Math.PI * 2 / n;
+  x.clearRect(0, 0, W, W);
+  x.save(); x.translate(c, c); x.rotate(WH.ang * Math.PI / 180);
+  x.beginPath(); x.arc(0, 0, R + W * .02, 0, 7); x.fillStyle = '#2b1d12'; x.fill();
+  it.forEach((w, i) => {
+    const a0 = -Math.PI / 2 + i * seg; x.beginPath(); x.moveTo(0, 0); x.arc(0, 0, R, a0, a0 + seg); x.closePath();
+    const g = x.createRadialGradient(0, 0, R * .1, 0, 0, R); const col = WCOL[i % WCOL.length]; g.addColorStop(0, shade(col, 1.2)); g.addColorStop(1, col);
+    x.fillStyle = g; x.fill(); x.strokeStyle = 'rgba(255,255,255,.7)'; x.lineWidth = W / 200; x.stroke();
+    if (hi === i) { x.fillStyle = 'rgba(255,255,255,.35)'; x.fill(); }
+    x.save(); x.rotate(a0 + seg / 2); x.textAlign = 'right'; x.textBaseline = 'middle'; x.fillStyle = '#fff';
+    const fs = Math.min(W * .06, W * 0.9 / Math.max(6, n)); x.font = 'bold ' + fs + 'px Lalezar, Tajawal'; x.shadowColor = 'rgba(0,0,0,.5)'; x.shadowBlur = 4;
+    x.fillText(w.length > 14 ? w.slice(0, 13) + '…' : w, R * .9, 0); x.restore();
+  });
+  for (let i = 0; i < n * 2; i++) { const a = i * Math.PI / n; x.beginPath(); x.arc(Math.cos(a) * (R + W * .01), Math.sin(a) * (R + W * .01), W * .008, 0, 7); x.fillStyle = '#f6d77a'; x.fill(); }
+  x.restore();
+  const g2 = x.createRadialGradient(c - W * .02, c - W * .02, 0, c, c, W * .09); g2.addColorStop(0, '#fff2b8'); g2.addColorStop(1, '#a8761a');
+  x.beginPath(); x.arc(c, c, W * .08, 0, 7); x.fillStyle = g2; x.fill(); x.lineWidth = W / 120; x.strokeStyle = '#2b1d12'; x.stroke();
+}
+function spinWheel() {
+  const it = S.wheelItems; if (it.length < 2 || WH.spinning) { buzz(80); return; } WH.spinning = true; $('whRes').textContent = '';
+  const n = it.length, from = WH.ang, add = 1800 + rnd(1440) + Math.random() * 360, T = window.__fast ? 10 : 5000, t0 = performance.now();
+  const at = a => { const r = ((-(a % 360) + 360) % 360) / 360 * n; return Math.floor(r) % n; };
+  let last = at(from);
+  const f = now => {
+    const u = Math.max(0, Math.min(1, (now - t0) / T)), e = 1 - Math.pow(1 - u, 4); WH.ang = from + add * e; drawWheel();
+    const k = at(WH.ang); if (k !== last) { last = k; beep(1000 + 400 * (1 - u), .02, .05); }
+    if (u < 1) return requestAnimationFrame(f);
+    WH.spinning = false; const w = at(WH.ang); drawWheel(w); WH.last = it[w];
+    $('whRes').textContent = '🎉 ' + it[w]; beep(1200, .25); buzz(100);
+    if (S.wheelRemove) setTimeout(() => { S.wheelItems.splice(w, 1); save(); wheelScreen(); $('whRes').textContent = '🎉 ' + WH.last; }, 1500);
+  };
+  requestAnimationFrame(f);
 }
 
 /* =================================================================
@@ -588,34 +702,30 @@ add({ id: 'drw', e: '🎨', n: 'ارسم وصيد الامبوستر', d: 'كل 
 add({ id: 'feud', e: '👨‍👩‍👧', n: 'فاميلي فيود', d: 'سألنا ١٠٠ شخص… خمنوا الأجوبة', min: 0, t: '٢٠ دقيقة' }, 4);
 add({ id: 'dice', e: '🎲', n: 'النرد', d: 'من D4 لين D20، 3D', min: 0, tool: 1 });
 add({ id: 'cups', e: '🥤', n: 'وين الكورة؟', d: 'تابع الكوب اللي تحته الكورة', min: 0, tool: 1 });
-add({ id: 'bottle', e: '🍾', n: 'لف القارورة', d: 'مين يسأل مين؟', min: 2, tool: 1 });
+add({ id: 'bottle', e: '🍾', n: 'لف الغرشة', d: 'مين يسأل مين؟', min: 2, tool: 1 });
 add({ id: 'coin', e: '🪙', n: 'ملك ولا كتابة', d: 'اقلب العملة', min: 0, tool: 1 });
 add({ id: 'teams', e: '👥', n: 'تقسيم الفرق', d: 'قسّم الجماعة ومين يبدأ', min: 2, tool: 1 });
+add({ id: 'wheel', e: '🎡', n: 'عجلة الحظ', d: 'اكتب الخيارات ولف العجلة', min: 0, tool: 1 });
 Object.assign(RULES, {
   drw: ['كل واحد يسحب الشاشة ويشوف الكلمة، إلا الامبوستر ما يعرفها (وإذا شغلتوا الخيار يشوف الموضوع بس).', 'بعدين الجوال يدور: كل واحد يرسم **خط واحد بس** على نفس الورقة (تحط إصبعك وترسم وترفعه). كل لاعب له لون.', 'ارسم شي يثبت إنك تعرف الكلمة، بس لا تكون واضح وايد عشان الامبوستر ما يعرفها!', 'الامبوستر يحاول يرسم شي يمشي مع رسمتكم بدون ما ينكشف.', 'إذا غلطت، اضغط ↩️ تراجع وارسم من جديد قبل لا تعطي الجوال.', 'بعد آخر جولة، أو إذا ضغطتوا 🗳️ وقفوا، يبدأ التصويت السري ونفس نقاط الامبوستر: اللي يصوت صح +١، وكل صوت غلط +١ للامبوستر، والامبوستر +١ إذا خمّن الكلمة.'].map(x => x.replace(/\*\*/g, '')),
   sj: ['تنقسمون فريقين، وتختارون لين ٦ مواضيع (أو اضغطوا 🎲 عشوائي).', 'كل موضوع فيه ٦ أسئلة: ٢ بـ ٢٠٠ (مقدور عليها)، ٢ بـ ٤٠٠ (صعبة)، ٢ بـ ٦٠٠ (صعبة وايد).', 'الفريق اللي عليه الدور يختار سؤال من اللوحة، ويقراه واحد بصوت عالي. عندهم دقيقة يفكرون.', 'وسائل المساعدة (كل فريق مرة وحدة باللعبة): 🔄 غيّر السؤال بسؤال ثاني من نفس الموضوع والنقاط، ✖️٢ دبل يضاعف نقاط السؤال إذا جاوبتوا صح، 💡 تلميح.', 'اضغطوا "اكشف الجواب" واختاروا مين جاوب صح. إذا الفريق الثاني جاوب صح ياخذ النقاط (بدون الدبل).', 'الدور ينتقل بعد كل سؤال، واللي عنده نقاط أكثر في الأخير يفوز. الأسئلة ما تتكرر لين تخلص.'],
   feud: ['تنقسمون فريقين. كل جولة فيها سؤال "سألنا ١٠٠ شخص" ووراه ٦ أجوبة مخفية بنقاطها.', 'بالبداية واحد من كل فريق يتواجهون، واللي يجاوب الجواب الأعلى يختار فريقه يلعب. اضغطوا على اسم الفريق اللي بيلعب.', 'الفريق يقول أجوبة: إذا الجواب موجود اضغطوا على مربعه ينكشف وتنضاف نقاطه، وإذا مو موجود اضغطوا ✖ غلط.', 'إذا كشفوا كل الأجوبة ياخذون نقاط الجولة. وإذا وصلوا ٣ أغلاط، الفريق الثاني عنده فرصة وحدة يسرق كل النقاط بجواب صح.', 'آخر جولة نقاطها دبل! واللي يجمع أكثر في الأخير يفوز.'],
   dice: ['اختار نوع النرد: D4 أو D6 أو D8 أو D10 أو D12 أو D20، وكم نرد تبي (لين ٤).', 'اضغط "ارمي" أو اضغط على النرد نفسه، ويطلع المجموع تحت.'],
   cups: ['تشوف الكورة تحت كوب، بعدين الأكواب تتلخبط.', 'تابع الكوب بعيونك، ولما يوقفون اضغط على الكوب اللي تظن الكورة تحته.', 'كل ما جبتها صح تزيد سلسلتك. تقدر تزيد عدد الأكواب والصعوبة.'],
-  bottle: ['حطوا الجوال على الطاولة بالنص، والأسامي حوله بنفس ترتيب قعدتكم تقريباً.', 'اضغطوا لف: رأس القارورة 🟢 يأشر على اللي يجاوب، وتحتها 🔴 على اللي يسأل. تنفع مع صراحة ولا جرأة!'],
+  bottle: ['حطوا الجوال على الطاولة بالنص، والأسامي حوله بنفس ترتيب قعدتكم تقريباً.', 'اضغطوا لف: رأس الغرشة 🟢 يأشر على اللي يجاوب، وتحتها 🔴 على اللي يسأل. تنفع مع صراحة ولا جرأة!'],
   coin: ['اضغط اقلب، والعملة تطير وتطيح على ملك أو كتابة. تنفع لما تختلفون على شي!'],
+  wheel: ['اكتب الخيارات اللي تبيها (أسامي، مطاعم، عقابات… أي شي)، أو اضغط "حط أسامي اللاعبين".', 'اضغط لف العجلة، والسهم فوق يأشر على اللي طلع.', 'إذا شغلت "شيل اللي يطلع"، الخيار يختفي بعد ما يطلع عشان ما يتكرر.'],
   teams: ['اختار كم فريق، واضغط قسّم: اللعبة توزع اللاعبين عشوائي وبالتساوي.', 'وزر "مين يبدأ؟" يختار واحد عشوائي يبدأ اللعبة.']
 });
 RULES.triv = RULES.triv;
 // نرد واحد يتدحرج على أي canvas (للودو)
 window.DIE = {
   draw(cv, val) { const d = { sides: 6 }; renderDie(cv, 6, targetQ(d, val), i => i + 1); },
-  roll(cv, val, cb) {
-    const d = { sides: 6 }; let q = Qt.norm([Math.random(), Math.random(), Math.random(), Math.random()]); const tq = targetQ(d, val);
-    const ax = V.norm([Math.random() - .5, Math.random() - .5, Math.random() - .5]), t0 = performance.now(), T1 = window.__fast ? 5 : 650, T2 = window.__fast ? 5 : 400; let qe = q;
-    const f = now => { const t = now - t0; if (t < T1) { q = Qt.norm(Qt.mul(Qt.axis(ax, 22 * (1 - t / T1) * 0.016), q)); qe = q; } else { const u = Math.min(1, (t - T1) / T2); q = Qt.slerp(qe, tq, 1 - Math.pow(1 - u, 3)); }
-      renderDie(cv, 6, q, i => i + 1); if (t < T1 + T2) requestAnimationFrame(f); else cb && cb(); };
-    requestAnimationFrame(f);
-  }
+  roll(cv, val, cb) { const d = { cv, sides: 6, val }; animateRoll([d], cb); }
 };
 window.UI = { mkScreen, stepper, chipSet, setBtns2, teamInputs, scoreHead, teamNames };
-window.__t = () => ({ DR, SG, FG, DICE, SHAPES, Qt, CP, CO });
-window.EXTRA = { drw: drawSetup, sj: sjSetup, feud: feudSetup, dice: diceScreen, cups: cupsScreen, bottle: bottleScreen, coin: coinScreen, teams: teamsScreen };
+window.__t = () => ({ DR, SG, FG, DICE, SHAPES, Qt, CP, CO, BT, WH });
+window.EXTRA = { drw: drawSetup, sj: sjSetup, feud: feudSetup, dice: diceScreen, cups: cupsScreen, bottle: bottleScreen, coin: coinScreen, teams: teamsScreen, wheel: wheelScreen };
 // الرجوع من شاشة الكشف في الرسم
 renderHome();
 })();

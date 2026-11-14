@@ -2,6 +2,7 @@
 (function () {
 'use strict';
 const { mkScreen, setBtns2 } = window.UI;
+function shade(hex, k) { const n = parseInt(hex.slice(1), 16); const f = v => Math.round(Math.max(0, Math.min(255, v * k))); return 'rgb(' + f((n >> 16) & 255) + ',' + f((n >> 8) & 255) + ',' + f(n & 255) + ')'; }
 const css = document.createElement('style');
 css.textContent = `
 .seats{display:flex;flex-direction:column;gap:8px}
@@ -13,10 +14,10 @@ css.textContent = `
 .ludoWrap svg{width:100%;height:auto;display:block;filter:drop-shadow(4px 4px 0 rgba(0,0,0,.35));border-radius:14px}
 .ludoBar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:10px 0}
 .ludoBar .who{font-family:'Lalezar';font-size:24px}
-.ludoBar canvas{width:86px;height:86px;cursor:pointer;flex:none}
+.ludoBar canvas{width:100px;height:100px;cursor:pointer;flex:none}
 .tok{cursor:pointer;transition:transform .15s}
 .tok.can{animation:bob2 .7s infinite}
-@keyframes bob2{50%{transform:translateY(-.18px)}}
+@keyframes bob2{50%{transform:translateY(-.12px)}}
 /* أونو */
 .unoTable{background:radial-gradient(ellipse at center,#2f7a52,#1b4d33 75%);border:3px solid var(--line);border-radius:22px;padding:12px;box-shadow:var(--sh);color:#fff}
 .opps{display:flex;justify-content:space-around;gap:6px;flex-wrap:wrap;margin-bottom:8px}
@@ -100,29 +101,45 @@ function ludoStart(on) {
 const cur = () => LD.seats[LD.ti];
 function cellOf(c, s) { if (s < 0) return null; if (s <= 50) return TRACK[(START[c] + s) % 52]; if (s <= 55) return HOMECOL[c](s - 51); return null; }
 function ludoSVG() {
-  let g = '<svg viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg"><defs>';
-  LC.forEach((c, i) => g += `<radialGradient id="tg${i}" cx="35%" cy="30%"><stop offset="0" stop-color="#fff"/><stop offset=".35" stop-color="${c}"/><stop offset="1" stop-color="#000" stop-opacity=".9"/></radialGradient>`);
-  g += '</defs><rect width="15" height="15" rx=".5" fill="#fffdf7" stroke="#2b1d12" stroke-width=".12"/>';
+  const D = (c, l) => `<linearGradient id="${c}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${l[0]}"/><stop offset="1" stop-color="${l[1]}"/></linearGradient>`;
+  const LG = [['#ff5a5f', '#b3121d'], ['#3ccf7c', '#157a40'], ['#ffd34d', '#d49a00'], ['#4a9bff', '#174fa6']];
+  let g = '<svg viewBox="-0.4 -0.4 15.8 15.8" xmlns="http://www.w3.org/2000/svg"><defs>';
+  LG.forEach((l, i) => { g += D('qg' + i, l); g += `<linearGradient id="pg${i}" x1="0" x2="1"><stop offset="0" stop-color="${shade(LC[i], 0.55)}"/><stop offset=".35" stop-color="${shade(LC[i], 1.25)}"/><stop offset=".6" stop-color="${LC[i]}"/><stop offset="1" stop-color="${shade(LC[i], 0.35)}"/></linearGradient><radialGradient id="ph${i}" cx="35%" cy="30%"><stop offset="0" stop-color="#fff"/><stop offset=".3" stop-color="${shade(LC[i], 1.25)}"/><stop offset="1" stop-color="${shade(LC[i], 0.4)}"/></radialGradient>`; });
+  g += '<linearGradient id="wood" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#a8703f"/><stop offset=".5" stop-color="#7a4a24"/><stop offset="1" stop-color="#5a3317"/></linearGradient>';
+  g += '<radialGradient id="yd"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#e9e2d2"/></radialGradient></defs>';
+  g += '<rect x="-0.4" y="-0.4" width="15.8" height="15.8" rx=".7" fill="url(#wood)"/><rect x="-0.05" y="-0.05" width="15.1" height="15.1" rx=".35" fill="#fffdf6" stroke="#3a220f" stroke-width=".08"/>';
   [[0, 0], [0, 9], [9, 9], [9, 0]].forEach(([r, c], i) => {
-    g += `<rect x="${c + .15}" y="${r + .15}" width="5.7" height="5.7" rx=".6" fill="${LC[i]}" stroke="#2b1d12" stroke-width=".1"/>`;
-    g += `<rect x="${c + 1}" y="${r + 1}" width="4" height="4" rx=".5" fill="#fff" stroke="#2b1d12" stroke-width=".08"/>`;
-    YARD[i].forEach(([yr, yc]) => g += `<circle cx="${yc}" cy="${yr}" r=".62" fill="${LCL[i]}" stroke="${LC[i]}" stroke-width=".1"/>`);
+    g += `<rect x="${c + .1}" y="${r + .1}" width="5.8" height="5.8" rx=".55" fill="url(#qg${i})" stroke="rgba(0,0,0,.35)" stroke-width=".06"/>`;
+    g += `<rect x="${c + .85}" y="${r + .85}" width="4.3" height="4.3" rx=".9" fill="url(#yd)" stroke="rgba(0,0,0,.25)" stroke-width=".06"/>`;
+    YARD[i].forEach(([yr, yc]) => g += `<circle cx="${yc}" cy="${yr}" r=".66" fill="${LCL[i]}" stroke="${LC[i]}" stroke-width=".12"/><circle cx="${yc}" cy="${yr}" r=".4" fill="none" stroke="rgba(255,255,255,.8)" stroke-width=".05"/>`);
   });
+  const STAR = (cx, cy, r, col) => { let p = ''; for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + k * Math.PI / 5, rr = k % 2 ? r * .45 : r; p += (cx + Math.cos(a) * rr).toFixed(3) + ',' + (cy + Math.sin(a) * rr).toFixed(3) + ' '; } return `<polygon points="${p}" fill="${col}"/>`; };
   TRACK.forEach(([r, c], idx) => {
-    let fill = '#fff'; const si = START.indexOf(idx); if (si >= 0) fill = LC[si];
-    g += `<rect x="${c + .04}" y="${r + .04}" width=".92" height=".92" rx=".12" fill="${fill}" stroke="#2b1d12" stroke-width=".05"/>`;
-    if (SAFE.includes(idx) && si < 0) g += `<text x="${c + .5}" y="${r + .72}" font-size=".7" text-anchor="middle" fill="#bbb">★</text>`;
-    if (si >= 0) g += `<text x="${c + .5}" y="${r + .72}" font-size=".6" text-anchor="middle" fill="#fff">➤</text>`;
+    const si = START.indexOf(idx);
+    g += `<rect x="${c + .05}" y="${r + .05}" width=".9" height=".9" rx=".14" fill="${si >= 0 ? `url(#qg${si})` : '#fff'}" stroke="#cbbf9f" stroke-width=".05"/>`;
+    if (SAFE.includes(idx) && si < 0) g += STAR(c + .5, r + .5, .32, '#c9b98f');
+    if (si >= 0) g += STAR(c + .5, r + .5, .3, '#fff');
   });
-  for (let i = 0; i < 4; i++) for (let k = 0; k < 5; k++) { const [r, c] = HOMECOL[i](k); g += `<rect x="${c + .04}" y="${r + .04}" width=".92" height=".92" rx=".12" fill="${LC[i]}" stroke="#2b1d12" stroke-width=".05"/>`; }
-  g += `<polygon points="6,6 7.5,7.5 6,9" fill="${LC[0]}" stroke="#2b1d12" stroke-width=".06"/><polygon points="6,6 9,6 7.5,7.5" fill="${LC[1]}" stroke="#2b1d12" stroke-width=".06"/><polygon points="9,6 9,9 7.5,7.5" fill="${LC[2]}" stroke="#2b1d12" stroke-width=".06"/><polygon points="6,9 9,9 7.5,7.5" fill="${LC[3]}" stroke="#2b1d12" stroke-width=".06"/>`;
+  for (let i = 0; i < 4; i++) for (let k = 0; k < 5; k++) { const [r, c] = HOMECOL[i](k); g += `<rect x="${c + .05}" y="${r + .05}" width=".9" height=".9" rx=".14" fill="url(#qg${i})" stroke="rgba(0,0,0,.2)" stroke-width=".05"/>`; }
+  g += `<polygon points="6,6 7.5,7.5 6,9" fill="url(#qg0)"/><polygon points="6,6 9,6 7.5,7.5" fill="url(#qg1)"/><polygon points="9,6 9,9 7.5,7.5" fill="url(#qg2)"/><polygon points="6,9 9,9 7.5,7.5" fill="url(#qg3)"/>`;
+  g += '<rect x="6" y="6" width="3" height="3" fill="none" stroke="rgba(0,0,0,.3)" stroke-width=".06"/><circle cx="7.5" cy="7.5" r=".55" fill="#fffdf6" stroke="rgba(0,0,0,.3)" stroke-width=".06"/><text x="7.5" y="7.78" font-size=".7" text-anchor="middle">🏠</text>';
   g += '<g id="toks"></g></svg>';
   return g;
+}
+// بيدق 3D: قاعدة + جسم + راس، بتدرج ولمعة
+function pawn(c, x, y, s, glow) {
+  const k = s || 1;
+  return `<g transform="translate(${x},${y}) scale(${k})">` + (glow ? `<ellipse cx="0" cy=".3" rx=".46" ry=".18" fill="#ffd54a" opacity=".85"><animate attributeName="opacity" values=".9;.3;.9" dur="1s" repeatCount="indefinite"/></ellipse>` : '') +
+    `<ellipse cx=".05" cy=".33" rx=".33" ry=".1" fill="rgba(0,0,0,.35)"/>` +
+    `<path d="M-.3 .28 Q-.3 .16 -.18 .12 Q-.08 .02 -.1 -.12 L.1 -.12 Q.08 .02 .18 .12 Q.3 .16 .3 .28 Z" fill="url(#pg${c})" stroke="rgba(0,0,0,.55)" stroke-width=".035"/>` +
+    `<ellipse cx="0" cy=".28" rx=".3" ry=".08" fill="url(#pg${c})" stroke="rgba(0,0,0,.55)" stroke-width=".03"/>` +
+    `<ellipse cx="0" cy="-.12" rx=".14" ry=".05" fill="${shade(LC[c], .7)}"/>` +
+    `<circle cx="0" cy="-.26" r=".17" fill="url(#ph${c})" stroke="rgba(0,0,0,.55)" stroke-width=".035"/></g>`;
 }
 function ludoDrawUI() {
   const b = ldP.body; b.innerHTML = '';
   const bar = el('div', 'ludoBar'); const who = el('div', 'who', ''); who.id = 'ldWho';
-  const cv = el('canvas'); cv.id = 'ldDie'; const dpr = window.devicePixelRatio || 1; cv.width = 86 * dpr; cv.height = 86 * dpr; cv.onclick = ludoRoll;
+  const cv = el('canvas'); cv.id = 'ldDie'; const dpr = window.devicePixelRatio || 1; cv.width = 100 * dpr; cv.height = 100 * dpr; cv.onclick = ludoRoll;
   bar.append(who, cv);
   const wrap = el('div', 'ludoWrap'); wrap.innerHTML = ludoSVG();
   const msg = el('div', 'sub', ''); msg.id = 'ldMsg';
@@ -135,11 +152,13 @@ function ludoTokens(movable) {
   const gEl = document.getElementById('toks'); if (!gEl) return; let g = '';
   const occ = {};
   LD.seats.forEach(c => LD.pl[c].tok.forEach((s, t) => { let pos; if (s < 0) pos = YARD[c][t]; else if (s >= 56) pos = FIN[c]; else { const [r, cc] = cellOf(c, s); pos = [r + .5, cc + .5]; } const key = pos.join(','); (occ[key] = occ[key] || []).push([c, t, pos]); }));
+  const items = [];
   Object.values(occ).forEach(list => list.forEach(([c, t, pos], k) => {
-    const off = list.length > 1 ? (k - (list.length - 1) / 2) * .22 : 0;
+    const off = list.length > 1 ? (k - (list.length - 1) / 2) * .24 : 0;
     const can = movable && c === cur() && movable.includes(t);
-    g += `<g class="tok${can ? ' can' : ''}" data-c="${c}" data-t="${t}"><circle cx="${pos[1] + off}" cy="${pos[0] + off * .3}" r=".38" fill="url(#tg${c})" stroke="${can ? '#ffd54a' : '#2b1d12'}" stroke-width="${can ? .12 : .07}"/><circle cx="${pos[1] + off - .1}" cy="${pos[0] + off * .3 - .12}" r=".1" fill="#fff" opacity=".7"/></g>`;
+    items.push({ y: pos[0] + off * .3, svg: `<g class="tok${can ? ' can' : ''}" data-c="${c}" data-t="${t}">` + pawn(c, pos[1] + off, pos[0] + off * .3 - .05, list.length > 2 ? .75 : .95, can) + `<rect x="${pos[1] + off - .45}" y="${pos[0] - .55}" width=".9" height="1.05" fill="transparent"/></g>` });
   }));
+  items.sort((a, b) => a.y - b.y).forEach(i => g += i.svg);
   gEl.innerHTML = g;
   gEl.querySelectorAll('.tok').forEach(t => t.addEventListener('click', () => { const c = +t.dataset.c, k = +t.dataset.t; if (LD.waitPick && c === cur() && LD.movable.includes(k)) ludoMove(k); }));
 }
