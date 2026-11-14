@@ -396,7 +396,7 @@ $('addForm').onsubmit=e=>{e.preventDefault();const v=$('nameIn').value.trim();if
 let CUR=null;
 function openGame(g){
   if(S.players.length<g.min){$('homeErr').textContent=g.n+' تبي '+g.min+' لاعبين على الأقل';return}
-  $('homeErr').textContent='';CUR=g;
+  $('homeErr').textContent='';CUR=g;window.SFX&&SFX.open();
   $('inE').textContent=g.e;$('inN').textContent=g.n;
   $('inMeta').innerHTML='';[ '👥 '+g.min+'+ لاعبين','⏱️ '+g.t].forEach(x=>$('inMeta').appendChild(el('span','',x)));
   launch(g);
@@ -448,7 +448,7 @@ function showItem(){
 }
 const cover=$('cover');
 cover.addEventListener('pointerdown',e=>{sy=e.clientY;cover.classList.remove('anim');try{cover.setPointerCapture(e.pointerId)}catch(_){}});
-cover.addEventListener('pointermove',e=>{if(sy===null)return;const h=$('stage').offsetHeight;let d=Math.min(0,e.clientY-sy);d=Math.max(d,-h*0.72);cover.style.transform='translateY('+d+'px)';if(d<-h*0.33&&!seen){seen=true;$('nextBtn').classList.remove('hidden')}});
+cover.addEventListener('pointermove',e=>{if(sy===null)return;const h=$('stage').offsetHeight;let d=Math.min(0,e.clientY-sy);d=Math.max(d,-h*0.72);cover.style.transform='translateY('+d+'px)';if(d<-h*0.33&&!seen){seen=true;$('nextBtn').classList.remove('hidden');window.SFX&&SFX.whoosh()}});
 const endDrag=()=>{if(sy===null)return;sy=null;cover.classList.add('anim');cover.style.transform='translateY(0)'};
 cover.addEventListener('pointerup',endDrag);cover.addEventListener('pointercancel',endDrag);
 $('nextBtn').onclick=()=>{if(R.i<R.items.length-1){R.i++;showItem()}else R.onDone()};
@@ -628,7 +628,7 @@ function bombReady(){
 function bombGo(){
   $('gsScores').classList.add('hidden');$('gsCard').querySelector('.bomb').classList.add('tick');
   const lo=Math.min(TIME('bombMin'),TIME('bombMax')),hi=Math.max(TIME('bombMin'),TIME('bombMax'));const total=(lo+Math.random()*(hi-lo))*1000,start=Date.now();
-  const tick=()=>{const left=total-(Date.now()-start);if(left<=0){bombBoom();return}const p=left/total;beep(p<.25?1200:900,.05,.12);bombT=setTimeout(tick,Math.max(150,p*900))};tick();
+  const tick=()=>{const left=total-(Date.now()-start);if(left<=0){bombBoom();return}const p=left/total;window.SFX?SFX.fuse(p<.25):beep(900,.05);bombT=setTimeout(tick,Math.max(150,p*900))};tick();
   const pb=btn('⏳ مرّر الجوال بسرعة!','yel',()=>{});pb.disabled=true;setBtns('gsBtns',[pb]);
 }
 function bombBoom(){
@@ -825,6 +825,7 @@ if('serviceWorker' in navigator&&window.isSecureContext&&location.protocol!=='fi
 <script src="liars.js"></script>
 <script src="sudoku.js"></script>
 <script src="scrabble.js"></script>
+<script src="sfx.js"></script>
 <script src="online2.js"></script>
 </body>
 </html>

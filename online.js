@@ -17,6 +17,7 @@ css.textContent = `
 .plist span{background:var(--paper);border:2px solid var(--line);border-radius:999px;padding:4px 12px;font-weight:700}
 .plist span.off{opacity:.4;text-decoration:line-through}
 .plist span.ok{background:var(--grn);color:#fff}
+.kickBox{width:100%;border:2px dashed var(--red);border-radius:14px;padding:8px;margin-bottom:8px}.plist span.kickable{cursor:pointer}.plist span .kx{margin-inline-start:6px;color:var(--red);font-size:12px}.plist span.arm{background:var(--red);color:#fff}.plist span.arm .kx{color:#fff}
 .ogames{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .ogames button{background:var(--card);color:var(--txt);text-align:right;display:flex;flex-direction:column;gap:2px;padding:10px}
 .ogames button b{font-family:'Lalezar';font-weight:400;font-size:18px}
@@ -52,6 +53,7 @@ const Net = {
       ch.onmessage = e => { const m = e.data; if (m.to !== 'host') return; if (!known.has(m.from)) { known.add(m.from); } if (m.msg.t === 'bye') { known.delete(m.from); return h.leave(m.from); } h.msg(m.from, m.msg); };
       Net.send = (pid, msg) => ch.postMessage({ to: pid, msg });
       Net.close = () => { ch.postMessage({ to: '*', msg: { t: 'closed' } }); ch.close(); };
+      Net.drop = () => { };
       return code;
     }
     await loadPeer();
@@ -67,6 +69,7 @@ const Net = {
       });
       peer.on('disconnected', () => { try { peer.reconnect(); } catch (e) { } });
       Net.send = (pid, msg) => { const c = conns[pid]; if (c && c.open) c.send(msg); };
+      Net.drop = pid => { const c = conns[pid]; if (c) { try { c.close(); } catch (e) { } delete conns[pid]; } };
       Net.close = () => { Object.values(conns).forEach(c => { try { c.send({ t: 'closed' }); c.close(); } catch (e) { } }); peer.destroy(); };
     });
   },
@@ -75,7 +78,7 @@ const Net = {
       const ch = new BroadcastChannel('tqz-' + code), me = rid(); Net._ch = ch;
       ch.onmessage = e => { const m = e.data; if (m.to === me || m.to === '*') h.msg(m.msg); };
       Net.toHost = msg => ch.postMessage({ to: 'host', from: me, msg });
-      Net.close = () => { Net.toHost({ t: 'bye' }); ch.close(); };
+      Net.close = () => { try { Net.toHost({ t: 'bye' }); ch.close(); } catch (e) { } Net.toHost = () => { }; };
       setTimeout(() => h.open(), 30); return;
     }
     await loadPeer();
@@ -91,7 +94,7 @@ const Net = {
         conn.on('close', () => h.close());
         conn.on('error', e => fail(e));
       });
-      Net.close = () => { try { peer.destroy(); } catch (e) { } };
+      Net.close = () => { try { Net._conn && Net._conn.open && Net._conn.send({ t: 'bye' }); } catch (e) { } setTimeout(() => { try { peer.destroy(); } catch (e) { } }, 120); };
     });
   }
 };
@@ -99,7 +102,7 @@ const Net = {
 /* ---------- شاشة الأونلاين ---------- */
 const on = mkScreen('online', '🌐 أونلاين');
 on.el.querySelector('.help').onclick = () => { CUR = { id: 'online', e: '🌐', n: 'أونلاين' }; openHelp(); };
-RULES.online = ['أنت تسوي غرفة، ويطلع لك كود ورابط.', 'ترسل الرابط لربعك (واتساب مثلاً)، يفتحونه من المتصفح ويكتبون أساميهم، بدون ما ينزلون شي.', 'لما يدخلون، تختار اللعبة من جوالك (أنت المضيف)، وكل واحد يشوف شاشته على جواله.', 'لازم نت عند الكل. إذا ما اتصل أحد، جربوا تكونون على نفس الواي فاي.', 'خل التطبيق مفتوح على جوالك (لا تطلع منه) لين تخلصون، لأن جوالك هو اللي يدير الغرفة.'];
+RULES.online = ['أنت تسوي غرفة، ويطلع لك كود ورابط.', 'ترسل الرابط لربعك (واتساب مثلاً)، يفتحونه من المتصفح ويكتبون أساميهم، بدون ما ينزلون شي.', 'لما يدخلون، تختار اللعبة من جوالك (أنت المضيف)، وكل واحد يشوف شاشته على جواله.', 'لازم نت عند الكل. إذا ما اتصل أحد، جربوا تكونون على نفس الواي فاي.', 'خل التطبيق مفتوح على جوالك (لا تطلع منه) لين تخلصون، لأن جوالك هو اللي يدير الغرفة.', 'إذا أحد انقطع عنه النت أو حدّث الصفحة، يرجع لمكانه بروحه وما يتكرر اسمه.', 'تبي تطلّع أحد؟ في الغرفة اضغط على اسمه مرتين ✖، أو وانتم تلعبون اضغط زر 👥.'];
 let ROLE = null;   // 'host' | 'guest'
 let ME = null;     // pid
 let tagEl = null;
@@ -107,7 +110,7 @@ function setTag(t) { if (!tagEl) { tagEl = el('div', 'onlTag'); on.el.insertBefo
 on.back.onclick = () => { if (ROLE && !confirmLeave()) return; leaveRoom(); renderHome(); show('home'); };
 let leaveArmed = 0;
 function confirmLeave() { const now = Date.now(); if (now - leaveArmed < 2500) return true; leaveArmed = now; status('اضغط → مرة ثانية عشان تطلع من الغرفة', 'bad'); return false; }
-function leaveRoom() { try { Net.close && Net.close(); } catch (e) { } ROLE = null; ME = null; H = null; setTag(''); }
+function leaveRoom() { GJ = null; clearInterval(gwT); clearInterval(hbT); try { Net.close && Net.close(); } catch (e) { } ROLE = null; ME = null; H = null; setTag(''); }
 function status(t, k) { let s = $('onStatus'); if (!s) { s = el('div', 'status'); s.id = 'onStatus'; on.body.prepend(s); } s.className = 'status ' + (k || 'ok'); s.textContent = t; if (!t) s.remove(); }
 
 /* ---------- عرض الشاشة (مشترك بين المضيف والضيوف) ---------- */
@@ -115,7 +118,7 @@ let lastView = null, drawCtx = null;
 const ONL_R = {};
 function renderView(v, sendAct) {
   const keep = {}; let foc = null; b0q().forEach(i => { if (i.dataset.k && !i.disabled) { keep[i.dataset.k] = i.value; if (document.activeElement === i) foc = [i.dataset.k, i.selectionStart]; } });
-  lastView = v; const b = on.body; b.innerHTML = ''; on.h.textContent = v.title || '🌐 أونلاين';
+  viewSounds(v); lastView = v; const b = on.body; b.innerHTML = ''; on.h.textContent = v.title || '🌐 أونلاين';
   if (v.status) { const s = el('div', 'status ' + (v.status[1] || 'ok'), v.status[0]); s.id = 'onStatus'; b.appendChild(s); }
   const c = el('div', 'bigcard'); b.appendChild(c);
   (v.items || []).forEach(it => {
@@ -145,9 +148,24 @@ function renderView(v, sendAct) {
   if (v.buzz) { const bz = el('button', 'bigBuzz', v.buzz.label || '🔔'); bz.disabled = !!v.buzz.dis; bz.addEventListener('pointerdown', e => { e.preventDefault(); if (bz.disabled) return; bz.disabled = true; buzz(120); sendAct({ a: 'buzz' }); }); c.appendChild(bz); }
   if (v.scores) { const r = el('div', 'reslist'); r.style.marginTop = '8px'; const mx = Math.max(...v.scores.map(x => x[1])); v.scores.forEach(([n, s]) => { const d = el('div', s === mx && s > 0 ? 'best' : ''); d.append(el('span', '', n), el('b', '', s)); r.appendChild(d); }); c.appendChild(el('div', 'lab', 'النقاط 🏆')); c.appendChild(r); }
   setBtns2(on.row, (v.btns || []).map(bb => btn(bb.label, bb.cls || '', () => sendAct({ a: 'btn', v: bb.id }), bb.flex || 1)));
-  if (v.beep) beep(v.beep, .12);
+  if (v.beep && window.SFX) { if (v.beep <= 150) SFX.boom(); else if (v.beep >= 1300) SFX.bell(); else SFX.select(); } else if (v.beep) beep(v.beep, .12);
   b.querySelectorAll('input[data-k]').forEach(i => { if (!i.disabled && keep[i.dataset.k] !== undefined && !i.value) i.value = keep[i.dataset.k]; if (foc && foc[0] === i.dataset.k && !i.disabled) { i.focus({ preventScroll: true }); try { i.setSelectionRange(foc[1], foc[1]); } catch (e) { } } });
 }
+// أصوات تلقائية لما يتغير شي مهم في الشاشة (دورك، الليل، الصبح…)
+let lastSig = '';
+const VSND = [[/أكل قطعة/, 'capture'], [/وصلت البيت/, 'home'], [/💥 [^"]* طلع \(/, 'wrong'], [/🌙 الليلة/, 'night'], [/☀️ صباح/, 'day'], [/دورك/, 'turn']];
+function viewSounds(v) {
+  if (!window.SFX) return; let sig = ''; try { sig = JSON.stringify(v.items || []) + (v.title || ''); } catch (e) { }
+  for (const [re, snd] of VSND) if (snd && re.test(sig) && !re.test(lastSig)) { SFX[snd](); break; }
+  if (v.title !== (lastView && lastView.title) && lastView) SFX.open();
+  lastSig = sig;
+}
+ONL_R.kickl = (it, c, send) => {
+  const bx = el('div', 'kickBox'); bx.appendChild(el('div', 'lab', '👥 اللاعبين — اضغط على الاسم مرتين عشان تطلّعه'));
+  const pl = el('div', 'plist'); if (!it.v.length) pl.appendChild(el('div', 'lab', 'ما فيه أحد غيرك'));
+  it.v.forEach(([id, n, onl]) => { const sp = el('span', (onl ? '' : 'off') + ' kickable', n + (onl ? '' : ' (طلع)')); const x = el('b', 'kx', '✖'); sp.appendChild(x); let armed = 0; sp.onclick = () => { if (Date.now() - armed < 3000) { send({ a: 'kick', v: id }); return; } armed = Date.now(); sp.classList.add('arm'); x.textContent = 'اطرده؟ ✖'; }; pl.appendChild(sp); });
+  bx.appendChild(pl); c.appendChild(bx);
+};
 function b0q() { return [...on.body.querySelectorAll('input[data-k]')]; }
 function paintCv() {
   const D = drawCtx; if (!D) return; const x = D.cv.getContext('2d'), W = D.cv.width, H2 = D.cv.height;
@@ -163,7 +181,8 @@ const PCOL = ['#d7263d', '#1b6ca8', '#2e8b57', '#f29e0c', '#7b2cbf', '#e75a9c', 
 function hostStart() {
   const code = String(1000 + rnd(9000));
   ROLE = 'host'; ME = 'host';
-  H = { code, players: [{ id: 'host', name: S.myName || S.players[0] || 'المضيف', on: true, score: 0 }], game: null };
+  H = { code, n: 0, players: [{ id: 'host', conn: 'host', name: S.myName || S.players[0] || 'المضيف', on: true, score: 0 }], game: null };
+  clearInterval(hbT); hbT = setInterval(heartbeat, 4000);
   status('جاري تجهيز الغرفة…', 'ok'); show('online');
   Net.host(code, { msg: hostMsg, leave: hostLeave }).then(() => { setTag('🌐 غرفة ' + code); hostLobby(); }).catch(e => {
     if (e && e.message === 'taken') return hostStart();
@@ -172,20 +191,51 @@ function hostStart() {
 }
 const P = id => H.players.find(p => p.id === id);
 const active = () => H.players.filter(p => p.on);
-function hostMsg(pid, m) {
+const byConn = c => H.players.find(p => p.conn === c);
+const sendTo = (p, msg) => { if (p && p.conn && p.id !== 'host') Net.send(p.conn, msg); };
+let hbT = null, hbLast = 0;
+function heartbeat() {
+  if (!H || ROLE !== 'host') { clearInterval(hbT); return; }
+  const now = Date.now();
+  // إذا جوال المضيف كان نايم (الشاشة مسكرة) لا نطلّع أحد ظلم
+  if (hbLast && now - hbLast > 9000) H.players.forEach(p => p.seen = now);
+  hbLast = now;
+  H.players.forEach(p => { if (p.id === 'host' || !p.on) return; sendTo(p, { t: 'ping' }); if (p.hb && now - (p.seen || now) > 16000) hostLeave(p.conn); });
+}
+function hostMsg(conn, m) {
   if (!H) return;
   if (m.t === 'hello') {
     let name = String(m.name || 'لاعب').slice(0, 16).trim() || 'لاعب';
-    let p = H.players.find(x => x.name === name && !x.on);
-    if (p) { p.id = pid; p.on = true; }
-    else { while (H.players.some(x => x.name === name)) name += '٢'; p = { id: pid, name, on: true, score: 0 }; H.players.push(p); }
-    Net.send(pid, { t: 'welcome', name: p.name, code: H.code }); beep(1000, .08);
+    const cid = m.cid ? String(m.cid).slice(0, 40) : null;
+    // نفس الجهاز رجع (حدّث الصفحة أو انقطع) ← ياخذ مكانه القديم بدل ما ينضاف مرة ثانية
+    let p = (cid && H.players.find(x => x.cid === cid)) || H.players.find(x => x.name === name && !x.on && x.id !== 'host');
+    if (p) {
+      if (p.on && p.conn !== conn) { Net.send(p.conn, { t: 'replaced' }); try { Net.drop(p.conn); } catch (e) { } }
+      p.conn = conn; p.on = true; if (cid) p.cid = cid;
+      if (name !== p.name && !H.players.some(x => x !== p && x.name === name)) p.name = name;
+    } else {
+      while (H.players.some(x => x.name === name)) name += '٢';
+      p = { id: 'p' + (++H.n), conn, cid, name, on: true, score: 0 }; H.players.push(p);
+    }
+    p.hb = !!m.hb; p.seen = Date.now();
+    Net.send(conn, { t: 'welcome', name: p.name, code: H.code }); if (window.SFX) SFX.join(); else beep(1000, .08);
     if (H.game && H.game.join) H.game.join(p);
     return push();
   }
-  if (m.t === 'act') return hostAct(pid, m);
+  const p = byConn(conn); if (!p) { if (m.t !== 'bye' && m.t !== 'pong') Net.send(conn, { t: 'kicked', why: 'gone' }); return; }
+  p.seen = Date.now();
+  if (m.t === 'pong') { if (!p.on) { p.on = true; if (H.game && H.game.join) H.game.join(p); push(); } return; }
+  if (m.t === 'bye') return hostLeave(conn);
+  if (m.t === 'act') return hostAct(p.id, m);
 }
-function hostLeave(pid) { const p = P(pid); if (p) { p.on = false; if (H.game && H.game.leave) H.game.leave(p); push(); } }
+function hostLeave(conn) { const p = byConn(conn); if (p && p.on) { p.on = false; if (H.game && H.game.leave) H.game.leave(p); if (window.SFX) SFX.leave(); push(); } }
+function hostKick(id) {
+  const p = P(id); if (!p || id === 'host') return;
+  if (p.on) { sendTo(p, { t: 'kicked' }); setTimeout(() => { try { Net.drop(p.conn); } catch (e) { } }, 300); }
+  p.on = false; if (H.game && H.game.leave) H.game.leave(p);
+  H.players.splice(H.players.indexOf(p), 1); p.conn = null;
+  push();
+}
 function hostAct(pid, m) {
   const p = P(pid); if (!p) return;
   if (m.a === 'btn' && String(m.v).startsWith('h:') && pid !== 'host') return;
@@ -198,13 +248,13 @@ function push() {
   H.players.forEach(p => {
     if (!p.on) return;
     const v = viewFor(p);
-    if (p.id === 'host') renderView(v, a => hostAct('host', a)); else Net.send(p.id, { t: 'view', v });
+    if (p.id === 'host') renderView(v, a => hostAct('host', a)); else sendTo(p, { t: 'view', v });
   });
 }
 const scoresList = () => H.players.map(p => [p.name + (p.on ? '' : ' (طلع)'), p.score]).sort((a, b) => b[1] - a[1]);
 function joinUrl() { const base = /github\.io/.test(location.host) ? location.origin + location.pathname : PUBLIC_URL; return base + '?r=' + H.code; }
 function viewFor(p) {
-  if (H.game) { const v = H.game.view(p); if (p.id === 'host') { v.btns = (v.btns || []).concat(H.game.hostBtns ? H.game.hostBtns() : []); v.btns.push({ id: 'h:lobby', label: '🏠 الغرفة', cls: 'ghost' }); } return v; }
+  if (H.game) { const v = H.game.view(p); if (p.id === 'host') { v.btns = (v.btns || []).concat(H.game.hostBtns ? H.game.hostBtns() : []); v.btns.push({ id: 'h:ppl', label: H.ppl ? '✖' : '👥', cls: 'ghost', flex: .5 }, { id: 'h:lobby', label: '🏠 الغرفة', cls: 'ghost' }); if (H.ppl) v.items = [{ t: 'kickl', v: H.players.filter(x => x.id !== 'host').map(x => [x.id, x.name, x.on]) }].concat(v.items || []); } return v; }
   if (p.id !== 'host') return { title: '🌐 غرفة ' + H.code, items: [{ t: 'win good', v: 'دخلت الغرفة ✅' }, { t: 'lab', v: 'انتظر ' + H.players[0].name + ' يختار اللعبة…' }, { t: 'plist', v: active().map(x => [x.name, x.id === p.id ? 'ok' : '']) }], scores: H.players.some(x => x.score) ? scoresList() : null };
   return { title: '🌐 غرفتك', items: [] , lobby: true };
 }
@@ -221,7 +271,14 @@ function hostLobby() {
   r.append(cp, wa); c.appendChild(r);
   const nm = el('div', 'row'); nm.style.marginTop = '10px'; const ni = el('input'); ni.type = 'text'; ni.value = H.players[0].name; ni.maxLength = 16; ni.placeholder = 'اسمك'; ni.oninput = () => { H.players[0].name = ni.value.trim() || 'المضيف'; S.myName = H.players[0].name; save(); }; nm.append(el('b', '', 'اسمك: '), ni); c.appendChild(nm);
   b.appendChild(c);
-  const pb = el('div', 'box'); pb.append(el('h2', '', 'اللي دخلوا (' + active().length + ')')); const pl = el('div', 'plist'); H.players.forEach(p => pl.appendChild(el('span', p.on ? '' : 'off', p.name + (p.id === 'host' ? ' 👑' : '')))); pb.appendChild(pl);
+  const pb = el('div', 'box'); pb.append(el('h2', '', 'اللي دخلوا (' + active().length + ')')); const pl = el('div', 'plist');
+  H.players.forEach(p => {
+    const sp = el('span', (p.on ? '' : 'off') + (p.id === 'host' ? '' : ' kickable'), p.name + (p.id === 'host' ? ' 👑' : p.on ? '' : ' (طلع)'));
+    if (p.id !== 'host') { const x = el('b', 'kx', '✖'); sp.appendChild(x); let armed = 0; sp.onclick = () => { if (Date.now() - armed < 3000) { hostKick(p.id); return; } armed = Date.now(); sp.classList.add('arm'); x.textContent = 'اطرده؟ ✖'; setTimeout(() => { if (sp.isConnected) { sp.classList.remove('arm'); x.textContent = '✖'; } }, 3000); }; }
+    pl.appendChild(sp);
+  });
+  pb.appendChild(pl);
+  if (H.players.length > 1) pb.appendChild(el('div', 'lab', 'تبي تطلّع أحد؟ اضغط على اسمه مرتين ✖'));
   if (active().length < 2) pb.appendChild(el('div', 'lab', 'انتظر ربعك يدخلون من الرابط…'));
   b.appendChild(pb);
   const gb = el('div', 'box'); gb.appendChild(el('h2', '', 'اختار اللعبة'));
@@ -235,7 +292,7 @@ function hostLobby() {
 function resList2(arr) { const r = el('div', 'reslist'); arr.forEach(([n, v]) => { const d = el('div', ''); d.append(el('span', '', n), el('b', '', v)); r.appendChild(d); }); return r; }
 // لما تتغير قائمة اللاعبين واحنا في اللوبي نعيد الرسم
 const _push = push;
-function pushWrap() { if (H && !H.game && ROLE === 'host') { hostLobby(); H.players.forEach(p => { if (p.on && p.id !== 'host') Net.send(p.id, { t: 'view', v: viewFor(p) }); }); } else _push(); }
+function pushWrap() { if (H && !H.game && ROLE === 'host') { hostLobby(); H.players.forEach(p => { if (p.on && p.id !== 'host') sendTo(p, { t: 'view', v: viewFor(p) }); }); } else _push(); }
 
 /* =================================================================
    الألعاب الأونلاين (منطق المضيف)
@@ -321,7 +378,7 @@ function makeImp(drawMode) {
     if (G3.phase === 'guess') { if (m.a === 'opt' && isImp(id) && G3.guess[id] === undefined) { G3.guess[id] = m.v; if (m.v === G3.word) G3.pts[id] = (G3.pts[id] || 0) + 1; } if (m.v === 'h:end' || G3.imps.every(x => G3.guess[x] !== undefined || !P(x) || !P(x).on)) finish(); return; }
     if (G3.phase === 'end' && m.v === 'h:again') G3.start();
   };
-  function liveCanvas() { H.players.forEach(pp => { if (!pp.on) return; if (pp.id === 'host') { if (drawCtx && pp.id !== G3.turns[G3.ti].id) { drawCtx.strokes = G3.strokes.map(s => ({ c: s.c, pts: s.pts.slice() })); paintCv(); } } else if (pp.id !== G3.turns[G3.ti].id) Net.send(pp.id, { t: 'strokes', s: G3.strokes }); }); }
+  function liveCanvas() { H.players.forEach(pp => { if (!pp.on) return; if (pp.id === 'host') { if (drawCtx && pp.id !== G3.turns[G3.ti].id) { drawCtx.strokes = G3.strokes.map(s => ({ c: s.c, pts: s.pts.slice() })); paintCv(); } } else if (pp.id !== G3.turns[G3.ti].id) sendTo(pp, { t: 'strokes', s: G3.strokes }); }); }
   return G3;
 }
 function snapshot(strokes) {
@@ -417,9 +474,11 @@ const GAMES_ON = {
   buzz: { e: '🔔', n: 'الجرس', d: 'كل جوال صار زر جرس', min: 2, make: makeBuzz }
 };
 // نعدل push عشان اللوبي ينرسم صح
-push = function () { if (!H) return; if (!H.game && ROLE === 'host') { hostLobby(); H.players.forEach(p => { if (p.on && p.id !== 'host') Net.send(p.id, { t: 'view', v: viewFor(p) }); }); return; } H.players.forEach(p => { if (!p.on) return; const v = viewFor(p); if (p.id === 'host') renderView(JSON.parse(JSON.stringify(v)), a => hostAct('host', a)); else Net.send(p.id, { t: 'view', v }); }); };
+push = function () { if (!H) return; if (!H.game && ROLE === 'host') { hostLobby(); H.players.forEach(p => { if (p.on && p.id !== 'host') sendTo(p, { t: 'view', v: viewFor(p) }); }); return; } H.players.forEach(p => { if (!p.on) return; const v = viewFor(p); if (p.id === 'host') renderView(JSON.parse(JSON.stringify(v)), a => hostAct('host', a)); else sendTo(p, { t: 'view', v }); }); };
 const _hostAct = hostAct;
-hostAct = function (pid, m) { const p = P(pid); if (!p) return; if (m.a === 'btn' && String(m.v).startsWith('h:') && pid !== 'host') return; if (m.a === 'btn' && m.v === 'h:lobby') { H.game = null; return push(); }
+hostAct = function (pid, m) { const p = P(pid); if (!p) return; if (m.a === 'btn' && String(m.v).startsWith('h:') && pid !== 'host') return; if (m.a === 'btn' && m.v === 'h:lobby') { H.game = null; H.ppl = false; return push(); }
+  if (pid === 'host' && m.a === 'btn' && m.v === 'h:ppl') { H.ppl = !H.ppl; return push(); }
+  if (pid === 'host' && m.a === 'kick') { hostKick(m.v); return; }
   let r; if (H.game) r = H.game.act(p, m); else if (m.a === 'btn' && pid === 'host' && GAMES_ON[m.v]) { H.game = GAMES_ON[m.v].make(); H.game.start(); }
   if (r !== 'nopush') push(); };
 
@@ -437,21 +496,43 @@ function guestJoin(code) {
   setBtns2(on.row, [btn('ادخل 🚪', '', () => {
     const cd = ci.value.trim(), nm = ni.value.trim(); if (!/^\d{4}$/.test(cd)) { err.textContent = 'الكود ٤ أرقام'; return; } if (!nm) { err.textContent = 'اكتب اسمك'; return; }
     S.myName = nm; save(); err.textContent = ''; status('جاري الاتصال بالغرفة…', 'ok');
-    ROLE = 'guest';
-    Net.join(cd, {
-      open: () => { Net.toHost({ t: 'hello', name: nm }); },
-      msg: m => {
-        if (m.t === 'welcome') { ME = m.name; setTag('🌐 ' + m.name + ' · غرفة ' + m.code); status('', 'ok'); }
-        else if (m.t === 'view') renderView(m.v, a => Net.toHost(Object.assign({ t: 'act' }, a)));
-        else if (m.t === 'strokes' && drawCtx && !drawCtx.cur) { drawCtx.strokes = m.s; paintCv(); }
-        else if (m.t === 'closed') guestLost('المضيف سكّر الغرفة');
-      },
-      close: () => guestLost('انقطع الاتصال بالغرفة 😕')
-    }).catch(() => { ROLE = null; status('ما قدرت أدخل. تأكد من الكود وإن صاحب الغرفة فاتح التطبيق، وإن النت شغال.', 'bad'); });
+    GJ = { code: cd, name: nm, tries: 0, last: Date.now() };
+    ROLE = 'guest'; guestConnect(true);
   })]);
   show('online');
 }
-function guestLost(t) { if (ROLE !== 'guest') return; ROLE = null; setTag(''); on.body.innerHTML = ''; status(t, 'bad'); setBtns2(on.row, [btn('ادخل مرة ثانية 🔄', '', () => guestJoin(''))]); }
+let GJ = null, gwT = null;
+function myCid() { const st = useBC() ? sessionStorage : localStorage; let c = null; try { c = st.getItem('tqz_cid'); if (!c) { c = rid() + rid(); st.setItem('tqz_cid', c); } } catch (e) { c = c || rid(); } return c; }
+function guestConnect(first) {
+  if (ROLE !== 'guest' || !GJ) return;
+  const g = GJ; let opened = false;
+  Net.join(g.code, {
+    open: () => { opened = true; g.tries = 0; g.last = Date.now(); Net.toHost({ t: 'hello', name: g.name, cid: myCid(), hb: 1 }); },
+    msg: m => {
+      if (GJ !== g) return; g.last = Date.now();
+      if (m.t === 'welcome') { ME = m.name; setTag('🌐 ' + m.name + ' · غرفة ' + m.code); status('', 'ok'); }
+      else if (m.t === 'ping') Net.toHost({ t: 'pong' });
+      else if (m.t === 'view') renderView(m.v, a => Net.toHost(Object.assign({ t: 'act' }, a)));
+      else if (m.t === 'strokes' && drawCtx && !drawCtx.cur) { drawCtx.strokes = m.s; paintCv(); }
+      else if (m.t === 'closed') guestLost('المضيف سكّر الغرفة');
+      else if (m.t === 'kicked') guestLost(m.why === 'gone' ? 'طلعت من الغرفة. ادخل مرة ثانية 🔄' : 'المضيف طلّعك من الغرفة 👋');
+      else if (m.t === 'replaced') guestLost('دخلت الغرفة من صفحة ثانية، فهذي انقفلت ✋');
+    },
+    close: () => { if (GJ === g) guestRetry(); }
+  }).catch(() => { if (GJ !== g) return; if (first && !opened) { ROLE = null; GJ = null; status('ما قدرت أدخل. تأكد من الكود وإن صاحب الغرفة فاتح التطبيق، وإن النت شغال.', 'bad'); } else guestRetry(); });
+  clearInterval(gwT); gwT = setInterval(() => { if (ROLE !== 'guest' || GJ !== g) { clearInterval(gwT); return; } if (Date.now() - g.last > 20000) { g.last = Date.now(); guestRetry(); } }, 3000);
+}
+// انقطع؟ نحاول نرجعه بروحنا لنفس مكانه
+function guestRetry() {
+  if (ROLE !== 'guest' || !GJ) return;
+  const g = GJ; g.tries++;
+  if (g.tries > 12) return guestLost('انقطع الاتصال بالغرفة 😕 تأكد إن المضيف فاتح التطبيق');
+  status('انقطع الاتصال… أحاول أرجّعك 🔄 (' + g.tries + ')', 'bad');
+  try { Net.close && Net.close(); } catch (e) { }
+  setTimeout(() => { if (GJ === g && ROLE === 'guest') guestConnect(false); }, window.__fast ? 50 : (g.tries < 4 ? 2500 : 5000));
+}
+function guestLost(t) { if (ROLE !== 'guest') return; ROLE = null; GJ = null; clearInterval(gwT); try { Net.close && Net.close(); } catch (e) { } setTag(''); on.body.innerHTML = ''; status(t, 'bad'); setBtns2(on.row, [btn('ادخل مرة ثانية 🔄', '', () => guestJoin(''))]); }
+window.addEventListener('pagehide', () => { if (ROLE === 'guest') { try { Net.toHost({ t: 'bye' }); } catch (e) { } } });
 
 /* ---------- زر الأونلاين في الرئيسية ---------- */
 const box = el('div', 'onlineBox');
@@ -462,6 +543,6 @@ const homeBox = $('home').querySelector('.box'); $('home').insertBefore(box, hom
 // لو فتح الرابط فيه ?r=1234 ندخله على طول
 const m = location.search.match(/[?&]r=(\d{4})/);
 if (m) { CUR = { id: 'online', e: '🌐', n: 'أونلاين' }; setTimeout(() => guestJoin(m[1]), 0); }
-window.ONL = { register: (id, def) => { GAMES_ON[id] = def; }, renderers: ONL_R, P: id => P(id), active: () => active(), scoresList: () => scoresList(), host: () => H, liveSend: (id, msg) => Net.send(id, msg), push: () => push() };
-window.__on = () => ({ H, ROLE, ME, Net, lastView, hostStart, guestJoin, push });
+window.ONL = { register: (id, def) => { GAMES_ON[id] = def; }, renderers: ONL_R, P: id => P(id), active: () => active(), scoresList: () => scoresList(), host: () => H, liveSend: (id, msg) => sendTo(P(id), msg), kick: id => hostKick(id), push: () => push() };
+window.__on = () => ({ H, ROLE, ME, Net, lastView, hostStart, guestJoin, push, hostKick, heartbeat, GJ });
 })();

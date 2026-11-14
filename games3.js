@@ -106,6 +106,7 @@ function settingsScreen() {
   const b2 = el('div', 'box'); b2.appendChild(el('h2', '', '🧹 أشياء ثانية'));
   const clr = btn('صفّر الأسئلة اللي انلعبت (ترجع من جديد)', 'ghost', () => { Object.keys(localStorage).filter(k => k.startsWith('u_')).forEach(k => { try { localStorage.removeItem(k); } catch (e) { } }); clr.textContent = 'تم ✓'; });
   clr.style.width = '100%'; b2.appendChild(clr);
+  if (window.SFX_VOL_UI) b.appendChild(window.SFX_VOL_UI());
   b.append(box, b2); setBtns2(stS.row, []); show('settings');
 }
 
@@ -252,7 +253,7 @@ function cbPlay() {
       if (CB.cur.length !== CB.L) { buzz(80); return; }
       const r = score(CB.cur, CB.secret); CB.guesses.push({ w: CB.cur, r, by: who });
       const rank = { g: 3, y: 2, x: 1 }; [...CB.cur].forEach((ch, i) => { const n = norm(ch), cur = CB.keys[n], v = r[i]; if (!cur || rank[v] > rank[cur]) CB.keys[n] = v; });
-      CB.cur = ''; CB.justAdded = true; beep(800, .05);
+      CB.cur = ''; CB.justAdded = true; if (window.SFX) { const L = CB.L || 4; for (let i = 0; i < Math.min(L, 8); i++) setTimeout(() => SFX.flip(), i * 90); } else beep(800, .05);
       if (r.every(x => x === 'g')) { CB.done = 'win'; CB.winner = who; if (CB.sc[who] !== undefined) CB.sc[who] += CB.rows - CB.guesses.length + 1; }
       else if (CB.guesses.length >= CB.rows) { CB.done = 'lose'; if (CB.setter) CB.sc[CB.setter] += 3; }
       else CB.ti++;
@@ -597,7 +598,7 @@ function xoDraw(line) {
 }
 function xoMove(i, human) {
   if (XO.over || XO.b[i]) return; if (human && S.xoMode !== 'pvp' && XO.t === 'O') return;
-  XO.b[i] = XO.t; beep(XO.t === 'X' ? 700 : 900, .06);
+  XO.b[i] = XO.t; if (window.SFX) SFX.place(); else beep(700, .06);
   const w = winOf(XO.b);
   if (w) { XO.over = true; XO.sc[XO.t]++; XO.msg = '🎉 ' + xoName(XO.t) + ' فاز!'; beep(1200, .2); return xoDraw(w); }
   if (XO.b.every(x => x)) { XO.over = true; XO.sc['=']++; XO.msg = 'تعادل 🤝'; return xoDraw(); }

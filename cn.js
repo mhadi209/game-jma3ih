@@ -69,7 +69,7 @@ function cnDraw() {
   CN.words.forEach((w, i) => {
     const c = el('div', 'cnCard' + (CN.rev[i] || CN.over ? ' v-' + CN.key[i] : (showKey ? ' k-' + CN.key[i] : '')) + (sel === i ? ' sel' : ''), w);
     if (CN.rev[i] && CN.key[i] === 'x') c.appendChild(el('span', 'ic', '💀'));
-    c.onclick = () => { if (CN.over || CN.rev[i] || showKey) return; if (sel !== i) { sel = i; beep(700, .03); return cnDraw(); } sel = -1; const r = cnReveal(CN, i); beep(r === 'ok' ? 1100 : r === 'x' ? 120 : 300, r === 'x' ? .6 : .15); if (r !== 'ok') buzz(r === 'x' ? 400 : 100); cnDraw(); };
+    c.onclick = () => { if (CN.over || CN.rev[i] || showKey) return; if (sel !== i) { sel = i; beep(700, .03); return cnDraw(); } sel = -1; const r = cnReveal(CN, i); if (window.SFX) SFX[r === 'ok' ? 'correct' : r === 'x' ? 'boom' : 'wrong'](); else beep(1100, .15); if (r !== 'ok') buzz(r === 'x' ? 400 : 100); cnDraw(); };
     g.appendChild(c);
   });
   b.appendChild(g);

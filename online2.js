@@ -49,7 +49,7 @@ body.dark .ltab td.u{background:#1f3b31}body.dark .ltab td.d{background:#4a3f1f}
 document.head.appendChild(css);
 
 /* ---------- عرض مشترك ---------- */
-R.cd = (it, c) => { const d = el('div', 'cdown'); c.appendChild(d); const end = Date.now() + it.left * 1000; const tick = () => { if (!d.isConnected) return; const t = Math.max(0, Math.ceil((end - Date.now()) / 1000)); d.textContent = t; d.classList.toggle('low', t <= 5); if (t > 0) setTimeout(tick, 250); }; tick(); };
+R.cd = (it, c) => { const d = el('div', 'cdown'); c.appendChild(d); const end = Date.now() + it.left * 1000; let lt = null; const tick = () => { if (!d.isConnected) return; const t = Math.max(0, Math.ceil((end - Date.now()) / 1000)); d.textContent = t; d.classList.toggle('low', t <= 5); if (t !== lt) { if (lt !== null && t <= 5 && t > 0 && window.SFX) SFX.count(); if (lt !== null && t === 0 && window.SFX) SFX.timesUp(); lt = t; } if (t > 0) setTimeout(tick, 250); }; tick(); };
 R.qopt = (it, c, send) => { const g = el('div', 'qopt'); it.opts.forEach((o, i) => { const b = btn(o, (it.right !== undefined ? (i === it.right ? 'right' : 'dim') : '') + (it.mine === i ? ' right' : ''), () => { g.querySelectorAll('button').forEach(x => x.disabled = true); b.classList.add('right'); send({ a: 'opt', v: i }); }); b.disabled = it.dis || it.right !== undefined; g.appendChild(b); }); c.appendChild(g); };
 R.big = (it, c) => { const d = el('div', it.cls || 'flagBig', it.v); c.appendChild(d); };
 R.html = (it, c) => { const d = el('div', ''); d.innerHTML = it.v; c.appendChild(d); };
@@ -189,7 +189,8 @@ R.letin = (it, c, send) => {
   const go = btn('خلصت ✋', 'grn', () => { go.disabled = true; doSend(); });
   go.style.width = '100%'; go.style.marginTop = '8px'; c.append(f, go);
 };
-R.ltab = (it, c) => {
+let LT_SIG = '';
+R.ltab = (it, c) => { const sg = JSON.stringify(it.cells); if (sg !== LT_SIG) { LT_SIG = sg; if (window.SFX) SFX.reveal(); }
   const t = el('table', 'ltab'); const h = el('tr'); h.appendChild(el('th', '', '')); it.players.forEach(n => h.appendChild(el('th', '', n))); t.appendChild(h);
   it.cats.forEach((k, ci) => { const r = el('tr'); r.appendChild(el('th', '', k)); it.cells[ci].forEach(([w, s]) => { const d = el('td', s === 10 ? 'u' : s === 5 ? 'd' : 'z', (w || '—') + (w ? ' (' + s + ')' : '')); r.appendChild(d); }); t.appendChild(r); });
   const tr = el('tr'); tr.appendChild(el('th', '', 'المجموع')); it.tot.forEach(v => tr.appendChild(el('th', '', v))); t.appendChild(tr);
@@ -290,9 +291,9 @@ function makeChain() { const G = {}; const nrm = s => s.replace(/[أإآ]/g, 'ا
    ====================================================== */
 const nrmC = s => s.replace(/[أإآ]/g, 'ا').replace(/ى/g, 'ي').replace(/ؤ/g, 'و').replace(/ئ/g, 'ي').replace(/ة/g, 'ه');
 function scoreC(guess, secret) { const g = [...guess].map(nrmC), s = [...secret].map(nrmC), res = Array(g.length).fill('x'), left = {}; s.forEach((ch, i) => { if (g[i] === ch) res[i] = 'g'; else left[ch] = (left[ch] || 0) + 1; }); g.forEach((ch, i) => { if (res[i] !== 'g' && left[ch] > 0) { res[i] = 'y'; left[ch]--; } }); return res; }
-const CBC = { k: null, cur: '' };
+const CBC = { k: null, cur: '', rows: 0 };
 R.cbrace = (it, c, send) => {
-  const w = el('div', 'cbO'); w.style.width = '100%'; const ck = it.key + ':' + it.rows.length; if (CBC.k !== ck) { CBC.k = ck; CBC.cur = ''; } let cur = CBC.cur;
+  const w = el('div', 'cbO'); w.style.width = '100%'; const ck = it.key + ':' + it.rows.length; if (it.rows.length > CBC.rows && CBC.k && CBC.k.split(':')[0] === String(it.key) && window.SFX) for (let i = 0; i < it.L; i++) setTimeout(() => SFX.flip(), i * 90); CBC.rows = it.rows.length; if (CBC.k !== ck) { CBC.k = ck; CBC.cur = ''; } let cur = CBC.cur;
   const tl = el('div', 'tl' + (it.num ? '' : ' rtl')); tl.style.gridTemplateColumns = 'repeat(' + it.L + ',36px)';
   const draw2 = () => { tl.innerHTML = ''; it.rows.forEach(r => [...r.w].forEach((ch, i) => tl.appendChild(el('div', 'tt ' + r.r[i], ch)))); if (it.can) for (let i = 0; i < it.L; i++) tl.appendChild(el('div', 'tt', cur[i] || '')); };
   draw2(); w.appendChild(tl);
@@ -349,7 +350,8 @@ function makeSudoku() { const G = {};
 /* ======================================================
    ❌⭕ إكس أو
    ====================================================== */
-R.xo = (it, c, send) => { const g = el('div', 'xoO'); it.b.forEach((v, i) => { const b = btn(v || '', (v || '') + (it.w && it.w.includes(i) ? ' w' : ''), () => send({ a: 'opt', v: i })); b.disabled = !it.can || !!v; g.appendChild(b); }); c.appendChild(g); };
+let XO_N = 0;
+R.xo = (it, c, send) => { const n = it.b.filter(Boolean).length; if (n > XO_N && window.SFX) SFX.place(); XO_N = n; const g = el('div', 'xoO'); it.b.forEach((v, i) => { const b = btn(v || '', (v || '') + (it.w && it.w.includes(i) ? ' w' : ''), () => send({ a: 'opt', v: i })); b.disabled = !it.can || !!v; g.appendChild(b); }); c.appendChild(g); };
 function makeXO() { const G = {}; const L = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
   G.start = () => { const a = ids(); G.round = (G.round || 0) + 1; const pair = G.pair && on(G.pair[0]) && on(G.pair[1]) && G.round % 2 === 0 ? [G.pair[1], G.pair[0]] : shuffle(a).slice(0, 2); G.pair = pair; G.b = Array(9).fill(null); G.t = 'X'; G.w = null; G.res = null; };
   G.view = p => { const me = G.pair.indexOf(p.id), sym = me === 0 ? 'X' : me === 1 ? 'O' : null;
@@ -364,7 +366,9 @@ function makeXO() { const G = {}; const L = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0
 /* ======================================================
    🃏 أونو أونلاين
    ====================================================== */
+let UNO_TOP = '';
 R.unoT = (it, c, send) => {
+  const sig = JSON.stringify(it.top) + it.msg; if (sig !== UNO_TOP) { if (UNO_TOP && window.SFX) { SFX.flip(); if (/أونو/.test(it.msg)) SFX.uno(); } UNO_TOP = sig; }
   const U = window.UNOK, t = el('div', 'unoTable'); t.style.width = '100%';
   const ops = el('div', 'opps'); it.opps.forEach(o => { const d = el('div', 'opp' + (o.turn ? ' turn' : '')); d.append(el('div', '', o.name + ' · ' + o.n)); ops.appendChild(d); }); t.appendChild(ops);
   const ctr = el('div', 'center'); const dk = U.backEl(); if (it.canDraw) { dk.style.cursor = 'pointer'; dk.onclick = () => send({ a: 'btn', v: 'draw' }); } ctr.append(dk, U.cardEl(it.top, true)); t.appendChild(ctr);
@@ -409,6 +413,7 @@ function makeUno() { const G = {};
 /* ======================================================
    🎲 لودو أونلاين
    ====================================================== */
+let LUDO_MSG = '';
 R.ludoO = (it, c, send) => {
   const L = window.LUDO; const wrap = el('div', 'ludoWrap'); wrap.innerHTML = L.svg(); c.appendChild(wrap);
   const g = wrap.querySelector('#toks'); let s = ''; const occ = {};

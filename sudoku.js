@@ -140,7 +140,7 @@ function sdPut(k) {
   if (SD.noteMode && k) { SD.notes[i] ^= (1 << k); SD.cur[i] = 0; }
   else { SD.cur[i] = k; SD.notes[i] = 0; SD.lastPut = i;
     if (k && k !== SD.pz.sol[i]) { SD.err++; beep(200, .25); buzz(120); if (SD.err >= 3) { sdDraw(); return sdEnd(false, 'خلصت محاولاتك (٣ أغلاط)'); } }
-    else if (k) { beep(900, .05); const r = i / 9 | 0, c = i % 9; for (let t = 0; t < 9; t++) { SD.notes[r * 9 + t] &= ~(1 << k); SD.notes[t * 9 + c] &= ~(1 << k); } const br = (r / 3 | 0) * 3, bc = (c / 3 | 0) * 3; for (let y = 0; y < 3; y++) for (let x = 0; x < 3; x++) SD.notes[(br + y) * 9 + bc + x] &= ~(1 << k); }
+    else if (k) { if (window.SFX) SFX.place(); else beep(900, .05); const r = i / 9 | 0, c = i % 9; for (let t = 0; t < 9; t++) { SD.notes[r * 9 + t] &= ~(1 << k); SD.notes[t * 9 + c] &= ~(1 << k); } const br = (r / 3 | 0) * 3, bc = (c / 3 | 0) * 3; for (let y = 0; y < 3; y++) for (let x = 0; x < 3; x++) SD.notes[(br + y) * 9 + bc + x] &= ~(1 << k); }
   }
   sdDraw();
   if (SD.hooks) SD.hooks.progress(filledCount());

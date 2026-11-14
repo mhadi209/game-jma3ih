@@ -313,7 +313,7 @@ function feudDraw() {
     else t.textContent = i + 1;
     t.onclick = () => {
       if (FG.open[i] || FG.phase === 'pick' || FG.phase === 'end') return;
-      FG.open[i] = true; FG.bank += a.p; beep(1100, .12);
+      FG.open[i] = true; FG.bank += a.p; if (window.SFX) SFX.ding(); else beep(1100, .12);
       if (FG.phase === 'steal') { feudFinish(1 - FG.play); return; }
       if (FG.open.every(x => x)) { feudFinish(FG.play); return; }
       feudDraw();
@@ -447,7 +447,7 @@ function renderDie(cv, sides, q, label, opt) {
 function animateRoll(list, done) {
   const fast = window.__fast, T = fast ? 10 : 1500, t0 = performance.now();
   list.forEach(d => { d.tq = targetQ(d, d.val); d.a1 = V.norm([Math.random() - .5, Math.random() - .5, Math.random() - .5]); d.a2 = V.norm([Math.random() - .5, Math.random() - .5, Math.random() - .5]); d.th1 = (2.5 + Math.random() * 1.5) * Math.PI * 2; d.th2 = (1 + Math.random()) * Math.PI * 2; d.bx = (Math.random() - .5) * .12; });
-  let hits = 0;
+  let hits = 0; if (window.SFX) SFX.dice();
   const f = now => {
     const u = Math.max(0, Math.min(1, (now - t0) / T)), e = 1 - Math.pow(1 - u, 3);
     list.forEach(d => {
@@ -455,7 +455,7 @@ function animateRoll(list, done) {
       const h = Math.abs(Math.sin(u * Math.PI * 3.2)) * Math.pow(1 - u, 2) * 0.9;
       renderDie(d.cv, d.sides, d.q, i => i + 1, { dy: -h * 0.16, h, dx: d.bx * (1 - e), s: 1 + h * 0.06 });
     });
-    const nh = Math.floor(u * 3.2); if (nh > hits && u < .95) { hits = nh; beep(260 + Math.random() * 120, .05, .12); }
+    const nh = Math.floor(u * 3.2); if (nh > hits && u < .95) { hits = nh; if (window.SFX) SFX.diceHit(); }
     if (u < 1) requestAnimationFrame(f); else done && done();
   };
   requestAnimationFrame(f);
@@ -535,7 +535,7 @@ async function cupsGo() {
     A.style.zIndex = 3; B.style.zIndex = 2;
     const pa = A.animate([{ transform: 'translate(' + xa + 'px,0)' }, { transform: 'translate(' + mid + 'px,18px) scale(1.06)' }, { transform: 'translate(' + xb + 'px,0)' }], { duration: dur, easing: 'ease-in-out', fill: 'forwards' }).finished;
     const pb = B.animate([{ transform: 'translate(' + xb + 'px,0)' }, { transform: 'translate(' + mid + 'px,-18px) scale(.94)' }, { transform: 'translate(' + xa + 'px,0)' }], { duration: dur, easing: 'ease-in-out', fill: 'forwards' }).finished;
-    beep(500 + rnd(200), .03, .05);
+    if (window.SFX) SFX.swish();
     await Promise.all([pa, pb]); A.style.transform = 'translate(' + xb + 'px,0)'; B.style.transform = 'translate(' + xa + 'px,0)';
   }
   CP.busy = false; $('cpInfo').textContent = 'وين الكورة؟ اضغط على الكوب 👇';
@@ -577,7 +577,7 @@ function bottleScreen() {
   setBtns2(btS.row, [btn('لف 🔄', '', () => {
     if (BT.spinning) return; BT.spinning = true;
     const from = BT.ang, add = 1440 + rnd(1440) + Math.random() * 360, T = window.__fast ? 10 : 4200, t0 = performance.now(); let last = idx(from);
-    box.querySelectorAll('.nm').forEach(x => x.className = 'nm'); $('btRes').textContent = '…';
+    box.querySelectorAll('.nm').forEach(x => x.className = 'nm'); $('btRes').textContent = '…'; if (window.SFX) SFX.whoosh();
     const f = now => {
       const u = Math.max(0, Math.min(1, (now - t0) / T)), e = 1 - Math.pow(1 - u, 4); BT.ang = from + add * e; bt.style.transform = 'rotate(' + BT.ang + 'deg)';
       const k = idx(BT.ang); if (k !== last) { last = k; beep(900 + 300 * (1 - u), .02, .05); }
@@ -585,7 +585,7 @@ function bottleScreen() {
       BT.spinning = false;
       const A = idx(BT.ang), B0 = idx(BT.ang + 180); const B = B0 === A ? (A + Math.floor(n / 2)) % n : B0;
       const nms = box.querySelectorAll('.nm'); nms[A].classList.add('hitA'); nms[B].classList.add('hitB');
-      $('btRes').innerHTML = ''; $('btRes').append(el('b', 'bad', S.players[B]), ' يسأل 👉 ', el('b', 'good', S.players[A])); beep(1200, .15); buzz(80);
+      $('btRes').innerHTML = ''; $('btRes').append(el('b', 'bad', S.players[B]), ' يسأل 👉 ', el('b', 'good', S.players[A])); if (window.SFX) SFX.ding(); else beep(1200, .15); buzz(80);
     };
     requestAnimationFrame(f);
   })]);
@@ -638,7 +638,7 @@ function drawWheel(hi) {
   x.beginPath(); x.arc(c, c, W * .08, 0, 7); x.fillStyle = g2; x.fill(); x.lineWidth = W / 120; x.strokeStyle = '#2b1d12'; x.stroke();
 }
 function spinWheel() {
-  const it = S.wheelItems; if (it.length < 2 || WH.spinning) { buzz(80); return; } WH.spinning = true; $('whRes').textContent = '';
+  const it = S.wheelItems; if (it.length < 2 || WH.spinning) { buzz(80); return; } WH.spinning = true; $('whRes').textContent = ''; if (window.SFX) SFX.whoosh();
   const n = it.length, from = WH.ang, add = 1800 + rnd(1440) + Math.random() * 360, T = window.__fast ? 10 : 5000, t0 = performance.now();
   const at = a => { const r = ((-(a % 360) + 360) % 360) / 360 * n; return Math.floor(r) % n; };
   let last = at(from);
@@ -647,7 +647,7 @@ function spinWheel() {
     const k = at(WH.ang); if (k !== last) { last = k; beep(1000 + 400 * (1 - u), .02, .05); }
     if (u < 1) return requestAnimationFrame(f);
     WH.spinning = false; const w = at(WH.ang); drawWheel(w); WH.last = it[w];
-    $('whRes').textContent = '🎉 ' + it[w]; beep(1200, .25); buzz(100);
+    $('whRes').textContent = '🎉 ' + it[w]; if (window.SFX) SFX.cheer(); else beep(1200, .25); buzz(100);
     if (S.wheelRemove) setTimeout(() => { S.wheelItems.splice(w, 1); save(); wheelScreen(); $('whRes').textContent = '🎉 ' + WH.last; }, 1500);
   };
   requestAnimationFrame(f);
@@ -665,8 +665,8 @@ function coinScreen() {
   b.append(c, res, st);
   setBtns2(coS.row, [btn('اقلب 🪙', '', () => {
     const head = Math.random() < .5; const base = CO.rot - (CO.rot % 360) + 360 * (5 + rnd(3)); CO.rot = base + (head ? 0 : 180);
-    inn.style.transform = 'rotateY(' + CO.rot + 'deg)'; res.textContent = ''; beep(900, .05);
-    setTimeout(() => { if (head) CO.a++; else CO.b++; res.textContent = head ? '👑 ملك' : '✍️ كتابة'; st.textContent = 'ملك: ' + CO.a + ' · كتابة: ' + CO.b; beep(1200, .12); }, 2000);
+    inn.style.transform = 'rotateY(' + CO.rot + 'deg)'; res.textContent = ''; if (window.SFX) SFX.coinToss();
+    setTimeout(() => { if (head) CO.a++; else CO.b++; res.textContent = head ? '👑 ملك' : '✍️ كتابة'; st.textContent = 'ملك: ' + CO.a + ' · كتابة: ' + CO.b; if (window.SFX) SFX.coinLand(); }, 2000);
   })]);
   show('coin');
 }

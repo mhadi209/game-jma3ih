@@ -173,7 +173,7 @@ function ludoTurnStart() {
 function legal(c, v) { const P = LD.pl[c]; return P.tok.map((s, t) => { if (s >= 56) return -1; if (s < 0) return v === 6 ? t : -1; return s + v <= 56 ? t : -1; }).filter(t => t >= 0); }
 function ludoRoll() {
   if (!LD || LD.busy || LD.roll !== null || !$('ludo').classList.contains('on')) return; LD.busy = true;
-  const v = 1 + rnd(6); beep(500, .05);
+  const v = 1 + rnd(6);
   window.DIE.roll($('ldDie'), v, () => {
     LD.roll = v; const c = cur(), mv = legal(c, v); LD.movable = mv;
     if (v === 6) LD.sixes++; else LD.sixes = 0;
@@ -199,12 +199,13 @@ function ludoMove(t) {
   const steps = from < 0 ? 1 : v; let k = 0;
   const step = () => {
     if (from < 0) P.tok[t] = 0; else P.tok[t]++;
-    beep(600 + k * 40, .03, .06); ludoTokens(); k++;
+    if (window.SFX) SFX.step(); ludoTokens(); k++;
     if (k < steps) return setTimeout(step, 140 * SP());
     let extra = v === 6, msg = '';
     const s = P.tok[t];
     if (s <= 50) { const cell = (START[c] + s) % 52; if (!SAFE.includes(cell)) LD.seats.forEach(o => { if (o === c) return; LD.pl[o].tok.forEach((os, ot) => { if (os >= 0 && os <= 50 && (START[o] + os) % 52 === cell) { LD.pl[o].tok[ot] = -1; extra = true; msg = '💥 ' + P.name + ' أكل قطعة ' + LD.pl[o].name + '!'; beep(180, .4, .3); buzz(200); } }); }); }
-    if (s === 56) { extra = true; msg = '🏠 قطعة وصلت البيت!'; beep(1300, .2); }
+    if (s === 56) { extra = true; msg = '🏠 قطعة وصلت البيت!'; if (window.SFX) SFX.home(); }
+    if (msg && msg.indexOf('💥') >= 0 && window.SFX) SFX.capture();
     ludoTokens(); $('ldMsg').textContent = msg;
     if (P.tok.every(x => x >= 56)) { LD.winners.push(c); return ludoWin(c); }
     setTimeout(() => extra ? ludoAgain() : ludoNext(), msg ? 900 : 350);
@@ -290,14 +291,14 @@ function unoDraw() {
   if (UN.drew) setBtns2(unP.row, [btn('مرر الدور ⏭️', 'ghost', () => { UN.msg = p.name + ' سحب ومرر'; unoAdvance(1); })]);
   else setBtns2(unP.row, [btn(any ? 'اسحب ورقة 🃏' : 'ما عندك لعب، اسحب ورقة 🃏', any ? 'ghost' : '', unoHumanDraw)]);
 }
-function unoHumanDraw() { const p = UN.pl[UN.ti]; if (p.bot || UN.drew) return; drawCard(p); UN.drew = true; beep(500, .05); UN.msg = ''; if (!p.hand.some(playable)) { UN.msg = p.name + ' سحب ومرر'; unoDraw(); return setTimeout(() => unoAdvance(1), 700 * SP()); } unoDraw(); }
+function unoHumanDraw() { const p = UN.pl[UN.ti]; if (p.bot || UN.drew) return; drawCard(p); UN.drew = true; if (window.SFX) SFX.deal(1); UN.msg = ''; if (!p.hand.some(playable)) { UN.msg = p.name + ' سحب ومرر'; unoDraw(); return setTimeout(() => unoAdvance(1), 700 * SP()); } unoDraw(); }
 function unoPlay(i, chosen) {
   const p = UN.pl[UN.ti], card = p.hand[i];
   if (card.c === 'w' && !chosen) return unoPickColor(i);
   p.hand.splice(i, 1); const pc = { c: card.c, v: card.v }; if (card.c === 'w') pc.chosen = chosen; UN.pile.push(pc);
-  UN.color = card.c === 'w' ? chosen : card.c; beep(900, .06);
+  UN.color = card.c === 'w' ? chosen : card.c; if (window.SFX) { SFX.flip(); if (/\+|skip|rev/.test(card.v)) SFX.pop(); }
   UN.msg = p.name + ' لعب ' + sym(card.v) + (card.c === 'w' ? ' واختار ' + UC[chosen] : '');
-  if (p.hand.length === 1) { UN.msg += ' — أونو! 📢'; beep(1300, .15); buzz(80); }
+  if (p.hand.length === 1) { UN.msg += ' — أونو! 📢'; if (window.SFX) SFX.uno(); buzz(80); }
   if (!p.hand.length) return unoWin(p);
   let skip = 1;
   if (card.v === 'skip') { skip = 2; UN.msg += ' · ' + UN.pl[nextIdx()].name + ' انحرم من دوره'; }

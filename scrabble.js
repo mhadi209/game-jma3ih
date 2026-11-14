@@ -230,7 +230,7 @@ function boardUI(g, me, canPlay, onSubmit, opts) {
         if (!canPlay || exMode) return;
         if (pp) { pend.splice(pend.indexOf(pp), 1); drawAll(); return; }
         if (t || sel < 0) return;
-        pend.push({ i, r: sel }); sel = -1; beep(700, .03); drawAll();
+        pend.push({ i, r: sel }); sel = -1; if (window.SFX) SFX.place(); else beep(700, .03); drawAll();
       };
       bd.appendChild(c);
     }
@@ -294,7 +294,7 @@ function scTurn() {
   const p = SC.pl[SC.turn];
   if (!p.bot && humanN() > 1 && lastHuman !== SC.turn) return scPassScreen(p);
   scDraw();
-  if (p.bot) setTimeout(() => { if (!$('scrabble').classList.contains('on')) return; botPlay(SC); beep(800, .05); scTurn(); }, window.__fast ? 10 : 900);
+  if (p.bot) setTimeout(() => { if (!$('scrabble').classList.contains('on')) return; botPlay(SC); if (window.SFX) SFX.deal(2); scTurn(); }, window.__fast ? 10 : 900);
 }
 function scPassScreen(p) { const b = xP.body; b.innerHTML = ''; const c = el('div', 'bigcard'); c.append(el('div', 'lab', 'عط الجوال لـ'), el('div', 'nm', p.name), el('div', 'lab', SC.msg || '')); b.appendChild(c); setBtns2(xP.row, [btn('أنا ' + p.name + ' ✋', '', () => { lastHuman = SC.turn; scDraw(); })]); show('scrabble'); }
 function scDraw() {
