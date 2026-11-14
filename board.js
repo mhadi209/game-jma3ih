@@ -172,7 +172,7 @@ function ludoTurnStart() {
 }
 function legal(c, v) { const P = LD.pl[c]; return P.tok.map((s, t) => { if (s >= 56) return -1; if (s < 0) return v === 6 ? t : -1; return s + v <= 56 ? t : -1; }).filter(t => t >= 0); }
 function ludoRoll() {
-  if (!LD || LD.busy || LD.roll !== null) return; LD.busy = true;
+  if (!LD || LD.busy || LD.roll !== null || !$('ludo').classList.contains('on')) return; LD.busy = true;
   const v = 1 + rnd(6); beep(500, .05);
   window.DIE.roll($('ldDie'), v, () => {
     LD.roll = v; const c = cur(), mv = legal(c, v); LD.movable = mv;
@@ -194,7 +194,7 @@ function botPick(c, v, mv) {
   return best;
 }
 function ludoMove(t) {
-  if (!LD.waitPick) return; LD.waitPick = false; LD.busy = true;
+  if (!LD.waitPick || !$('ludo').classList.contains('on')) return; LD.waitPick = false; LD.busy = true;
   const c = cur(), P = LD.pl[c], v = LD.roll; const from = P.tok[t];
   const steps = from < 0 ? 1 : v; let k = 0;
   const step = () => {
@@ -254,6 +254,7 @@ function drawCard(p) { if (!UN.deck.length) { const t = UN.pile.pop(); UN.deck =
 function nextIdx(k) { const n = UN.pl.length; return ((UN.ti + UN.dir * (k || 1)) % n + n) % n; }
 const humans = () => UN.pl.filter(p => !p.bot).length;
 function unoTurn() {
+  if (!$('uno').classList.contains('on')) return;
   const p = UN.pl[UN.ti]; UN.drew = false;
   if (!p.bot && humans() > 1 && UN.lastHuman !== UN.ti) return unoPass(p);
   unoDraw();
@@ -311,6 +312,7 @@ function unoPickColor(i) {
 }
 function unoAdvance(k) { UN.ti = nextIdx(k); setTimeout(unoTurn, 250 * SP()); }
 function unoBot() {
+  if (!$('uno').classList.contains('on')) return;
   const p = UN.pl[UN.ti]; if (!p.bot) return;
   let opts = p.hand.map((c, i) => [c, i]).filter(([c]) => playable(c));
   if (!opts.length) { drawCard(p); opts = p.hand.map((c, i) => [c, i]).filter(([c]) => playable(c)); if (!opts.length) { UN.msg = p.name + ' سحب ومرر'; unoDraw(); return setTimeout(() => unoAdvance(1), 700 * SP()); } }
@@ -338,6 +340,8 @@ Object.assign(RULES, {
   uno: ['كل واحد ياخذ ٧ أوراق. لازم تنزل ورقة بنفس اللون أو نفس الرقم أو الرمز اللي فوق.', 'الأوراق الخاصة: ⊘ يحرم اللي بعدك من دوره، ⇄ يعكس الاتجاه، +2 اللي بعدك يسحب ورقتين ويروح دوره.', '★ تختار فيها أي لون، و+4 تختار اللون واللي بعدك يسحب ٤ ويروح دوره.', 'إذا ما عندك لعب، اسحب ورقة. إذا تنفع تقدر تلعبها، وإلا يمر الدور.', 'إذا لاعبين على نفس الجوال، يطلع لكم شاشة "عط الجوال لـ" عشان محد يشوف ورق الثاني.', 'أول واحد يخلص ورقه يفوز، وياخذ نقاط ورق الباقين (الرقم بقيمته، الخاصة ٢٠، الملونة ٥٠).']
 });
 Object.assign(window.EXTRA, { ludo: ludoSetup, uno: unoSetup });
+window.LUDO = { svg: ludoSVG, pawn, TRACK, START, SAFE, HOMECOL, YARD, FIN, LC, cellOf };
+window.UNOK = { newDeck, sym, cardEl, backEl, UC, UCOL };
 window.__tb = () => ({ LD, UN, TRACK, legal, cellOf });
 renderHome();
 })();

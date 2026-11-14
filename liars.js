@@ -126,7 +126,7 @@ function liarsTurn() {
   const p = LB.pl[LB.turn]; picked = [];
   if (!p.bot && humans() > 1 && lastHuman !== LB.turn) return liarsPass(p);
   liarsDraw();
-  if (p.bot) setTimeout(() => { lbBot(LB); beep(LB.phase === 'reveal' ? 300 : 700, .06); liarsTurn(); }, (window.__fast ? 20 : 1300));
+  if (p.bot) setTimeout(() => { if (!$('liars').classList.contains('on')) return; lbBot(LB); beep(LB.phase === 'reveal' ? 300 : 700, .06); liarsTurn(); }, (window.__fast ? 20 : 1300));
 }
 function liarsPass(p) {
   const b = lP.body; b.innerHTML = ''; const c = el('div', 'bigcard');
@@ -177,7 +177,7 @@ function liarsReveal() {
     if (r.boom) { bomb.textContent = '💥'; out.textContent = 'بوووم! ' + LB.pl[r.loser].name + ' طلع من اللعبة'; beep(100, .8, .35); buzz([300, 100, 400]); }
     else { bomb.textContent = '😮‍💨'; out.textContent = 'نجا ' + LB.pl[r.loser].name + '! (' + LB.pl[r.loser].pulls + ' من ٦ أسلاك)'; beep(1000, .15); }
     setBtns2(lP.row, [btn('كمّل ←', '', () => { lbAfter(LB); lastHuman = -1; liarsTurn(); })]);
-    if (LB.pl.every(p => p.bot || !p.alive)) setTimeout(() => { if (LB.phase === 'reveal') { lbAfter(LB); liarsTurn(); } }, window.__fast ? 20 : 1500);
+    if (LB.pl.every(p => p.bot || !p.alive)) setTimeout(() => { if (LB.phase === 'reveal' && $('liars').classList.contains('on')) { lbAfter(LB); liarsTurn(); } }, window.__fast ? 20 : 1500);
   }, window.__fast ? 20 : 1800);
   show('liars');
 }

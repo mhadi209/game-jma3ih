@@ -12,8 +12,8 @@ css.textContent = `
 .game .star.on{background:var(--yel)}
 .game.fav{outline:3px solid var(--yel);outline-offset:-3px}
 .tiles{display:grid;gap:6px;justify-content:center;margin:6px auto}
-.tile{width:52px;height:52px;border:2px solid var(--line);border-radius:10px;background:var(--paper);display:flex;align-items:center;justify-content:center;font-family:'Lalezar','Tajawal';font-size:28px;color:var(--txt);transition:transform .3s}
-.tile.g{background:#2f8f5b;color:#fff;border-color:#1d5c3a}.tile.y{background:#d7a632;color:#2b1d12;border-color:#9a7419}.tile.x{background:#6b6257;color:#fff;border-color:#4a433b}
+.tile{width:var(--tw,52px);height:var(--tw,52px);border:2px solid var(--line);border-radius:10px;background:var(--paper);display:flex;align-items:center;justify-content:center;font-family:'Lalezar','Tajawal';font-size:calc(var(--tw,52px) * .54);color:var(--txt);transition:transform .3s}
+.tile.g{background:#2f8f5b;color:#fff;border-color:#1d5c3a}.tile.y{background:#d7a632;color:#2b1d12;border-color:#9a7419}.tile.x{}
 .tile.cur{border-color:var(--red);box-shadow:0 0 0 2px var(--red)}
 .tile.flip{animation:tflip .45s ease}
 @keyframes tflip{0%{transform:rotateX(0)}50%{transform:rotateX(90deg)}100%{transform:rotateX(0)}}
@@ -21,7 +21,7 @@ css.textContent = `
 .kb .kr{display:flex;gap:4px;justify-content:center}
 .kb button{flex:1;min-width:0;padding:11px 0;font-size:19px;border-radius:8px;box-shadow:2px 2px 0 var(--line);background:var(--paper);color:var(--txt)}
 .kb button.wide{flex:1.6;font-size:15px}
-.kb button.g{background:#2f8f5b;color:#fff}.kb button.y{background:#d7a632;color:#2b1d12}.kb button.x{background:#6b6257;color:#fff;opacity:.8}
+.kb button.g{background:#2f8f5b;color:#fff}.kb button.y{background:#d7a632;color:#2b1d12}.kb button.x{}
 .bigin{width:100%;font-size:22px!important;text-align:center;padding:14px!important}
 .reslist{width:100%;display:flex;flex-direction:column;gap:6px}
 .reslist div{display:flex;justify-content:space-between;align-items:center;background:var(--paper);border:2px solid var(--line);border-radius:10px;padding:6px 12px;font-weight:700}
@@ -192,19 +192,20 @@ function cbSetup(mode) {
   cbS.h.textContent = mode === 'num' ? '🔐 الرقم السري' : '🔤 الكلمة السرية';
   const b = cbS.body; b.innerHTML = '';
   const box = el('div', 'box');
-  box.appendChild(stepper('عدد الخانات', () => S.cbLen, v => S.cbLen = v, () => 3, () => 5));
+  const mx = mode === 'num' ? 8 : 5; if (S.cbLen > mx) S.cbLen = mx;
+  box.appendChild(stepper('عدد الخانات', () => S.cbLen, v => S.cbLen = v, () => 3, () => mx));
   const t = el('div', 'toggle'); t.appendChild(el('b', '', 'مين يختار ' + (mode === 'num' ? 'الرقم' : 'الكلمة') + '؟'));
   const ch = el('div', 'chips');
   [['rnd', '🎲 التطبيق'], ['player', '🙋 لاعب']].forEach(([k, l]) => { const c = el('button', 'chip' + (S.cbSetter === k ? ' sel' : ''), l); c.onclick = () => { S.cbSetter = k; save(); cbSetup(mode); }; ch.appendChild(c); });
   t.appendChild(ch); box.appendChild(t);
   const info = el('div', 'box', ''); info.style.fontSize = '14px'; info.style.lineHeight = '1.8'; info.style.color = 'var(--mut)';
-  info.innerHTML = '🟩 الحرف أو الرقم في مكانه الصح<br>🟨 موجود بس في مكان ثاني<br>⬜ مو موجود أبد<br>عندكم ' + (mode === 'num' ? '٨' : '٦') + ' محاولات، وتتناوبون على التخمين.';
+  info.innerHTML = '🟩 في مكانه الصح<br>🟨 موجود بس في مكان ثاني<br>(اللي ما يتلوّن ما نقول لكم عنه شي 😏)<br>عندكم ' + (mode === 'num' ? '٨' : '٦') + ' محاولات، وتتناوبون على التخمين.';
   b.append(box, info);
   setBtns2(cbS.row, [btn('ابدأ ▶', '', cbStart)]);
   show('codebreak');
 }
 function cbStart() {
-  const L = S.cbLen, mode = CB.mode;
+  const mode = CB.mode, L = Math.min(S.cbLen, mode === 'num' ? 8 : 5);
   CB = { mode, L, rows: mode === 'num' ? 8 : 6, guesses: [], cur: '', setter: null, keys: {}, turnQ: null, sc: CB.sc || sc0() };
   if (S.cbSetter === 'player' && S.players.length >= 2) { CB.setter = pick(S.players); cbSecretInput(); }
   else { CB.secret = mode === 'num' ? Array.from({ length: L }, () => rnd(10)).join('') : pick(SECRET_WORDS[L]); cbPlay(); }
@@ -214,7 +215,7 @@ function cbSecretInput() {
   const add = (k, t) => { const d = el('div', k, t); c.appendChild(d); return d; };
   passCard(add, CB.setter, 'اختار ' + (CB.mode === 'num' ? 'رقم من ' : 'كلمة من ') + CB.L + ' خانات بالسر');
   CB.cur = ''; const tl = el('div', 'tiles'); c.appendChild(tl);
-  const draw1 = () => { tl.innerHTML = ''; tl.style.gridTemplateColumns = 'repeat(' + CB.L + ',52px)'; for (let i = 0; i < CB.L; i++) { const t = el('div', 'tile' + (i === CB.cur.length ? ' cur' : ''), CB.cur[i] ? '•' : ''); tl.appendChild(t); } };
+  const draw1 = () => { tl.innerHTML = ''; tl.style.gridTemplateColumns = 'repeat(' + CB.L + ',' + tileW() + 'px)'; tl.style.setProperty('--tw', tileW() + 'px'); for (let i = 0; i < CB.L; i++) { const t = el('div', 'tile' + (i === CB.cur.length ? ' cur' : ''), CB.cur[i] ? '•' : ''); tl.appendChild(t); } };
   draw1();
   b.appendChild(cbKeyboard(k => { if (k === '⌫') CB.cur = CB.cur.slice(0, -1); else if (k === '✓') { if (CB.cur.length === CB.L) { CB.secret = CB.cur; CB.cur = ''; cbPlay(); return; } buzz(80); } else if (CB.cur.length < CB.L) CB.cur += k; draw1(); }, true));
   setBtns2(cbS.row, []);
@@ -226,6 +227,7 @@ function cbKeyboard(onKey, plain) {
   const del = el('button', 'wide', '⌫ امسح'); del.onclick = () => onKey('⌫'); last.append(ok, del); kb.appendChild(last);
   return kb;
 }
+function tileW() { return Math.floor(Math.min(52, (Math.min(window.innerWidth - 40, 440) - (CB.L - 1) * 6) / CB.L)); }
 function score(guess, secret) {
   const g = [...guess].map(norm), s = [...secret].map(norm), res = Array(g.length).fill('x'), left = {};
   s.forEach((ch, i) => { if (g[i] === ch) res[i] = 'g'; else left[ch] = (left[ch] || 0) + 1; });
@@ -237,7 +239,7 @@ function cbPlay() {
   const b = cbS.body; b.innerHTML = '';
   const who = CB.order[CB.ti % CB.order.length];
   const info = el('div', 'sub', ''); info.innerHTML = 'دور <b style="color:var(--red);font-size:20px">' + esc(who) + '</b> يخمن · محاولة ' + (CB.guesses.length + 1) + ' من ' + CB.rows + (CB.setter ? ' · اللي اختار: ' + esc(CB.setter) : '');
-  const tl = el('div', 'tiles'); tl.style.gridTemplateColumns = 'repeat(' + CB.L + ',52px)'; tl.style.direction = CB.mode === 'num' ? 'ltr' : 'rtl';
+  const tl = el('div', 'tiles'); tl.style.gridTemplateColumns = 'repeat(' + CB.L + ',' + tileW() + 'px)'; tl.style.setProperty('--tw', tileW() + 'px'); tl.style.direction = CB.mode === 'num' ? 'ltr' : 'rtl';
   CB.guesses.forEach((g, gi) => { [...g.w].forEach((ch, i) => { const t = el('div', 'tile ' + g.r[i] + (gi === CB.guesses.length - 1 && CB.justAdded ? ' flip' : ''), ch); if (CB.justAdded && gi === CB.guesses.length - 1) t.style.animationDelay = (i * 0.12) + 's'; tl.appendChild(t); }); });
   if (CB.guesses.length < CB.rows && !CB.done) for (let i = 0; i < CB.L; i++) tl.appendChild(el('div', 'tile' + (i === CB.cur.length ? ' cur' : ''), CB.cur[i] || ''));
   for (let r = CB.guesses.length + 1; r < CB.rows && !CB.done; r++) for (let i = 0; i < CB.L; i++) { const t = el('div', 'tile'); t.style.opacity = '.4'; tl.appendChild(t); }
@@ -623,7 +625,7 @@ at('mil', { id: 'buzz', e: '🔔', n: 'الجرس', d: 'أسرع واحد يضغ
 at('feud', { id: 'whosaid', e: '🎤', n: 'مين قالها؟', d: 'كل واحد يكتب بالسر… وتخمنون مين', min: 3, t: '١٠ دقايق' });
 at('whosaid', { id: 'major', e: '🗳️', n: 'الأغلبية', d: 'كن مع الأغلبية تاخذ نقطة', min: 3, t: 'مفتوح' });
 at('major', { id: 'closest', e: '🎯', n: 'أقرب رقم', d: 'اللي تخمينه أقرب ياخذ النقطة', min: 2, t: 'مفتوح' });
-at('closest', { id: 'num', e: '🔐', n: 'الرقم السري', d: '٣ أو ٤ أو ٥ خانات… خمّنوه', min: 0, t: '٥ دقايق' });
+at('closest', { id: 'num', e: '🔐', n: 'الرقم السري', d: 'من ٣ لين ٨ خانات… خمّنوه', min: 0, t: '٥ دقايق' });
 at('num', { id: 'word', e: '🔤', n: 'الكلمة السرية', d: 'وردل بالعربي: ٣ أو ٤ أو ٥ حروف', min: 0, t: '٥ دقايق' });
 at('word', { id: 'flags', e: '🚩', n: 'خمن الدولة', d: 'من العلم أو الإيموجي', min: 0, t: 'مفتوح' });
 at('flags', { id: 'scr', e: '🔀', n: 'الحروف المخربطة', d: 'رتبوا الحروف قبل الوقت', min: 2, t: 'مفتوح' });
@@ -636,8 +638,8 @@ Object.assign(RULES, {
   whosaid: ['يطلع سؤال، مثل "وش أغرب أكلة جربتها؟".', 'الجوال يدور: كل واحد يكتب جوابه بالسر.', 'بعدين الأجوبة تطلع وحدة وحدة، وكل مرة واحد يخمن مين كاتب الجواب.', 'إذا خمن صح ياخذ نقطة. وإذا غلط، صاحب الجواب ياخذ نقطة لأنه ضيّعه 😏'],
   major: ['يطلع سؤال "لو خيروك" بخيارين.', 'الجوال يدور وكل واحد يختار بالسر.', 'اللي يطلع مع الأغلبية ياخذ نقطة. يعني فكر: وش بيختارون الباقين؟'],
   closest: ['يطلع سؤال جوابه رقم، مثل "كم طول برج خليفة؟".', 'الجوال يدور وكل واحد يكتب تخمينه بالسر.', 'اللي تخمينه أقرب للجواب الصح ياخذ نقطة.'],
-  num: ['اختاروا عدد الخانات (٣ أو ٤ أو ٥)، ومين يختار الرقم: التطبيق أو لاعب بالسر.', 'تتناوبون على التخمين، وبعد كل تخمين الألوان تقول لكم: 🟩 الرقم في مكانه، 🟨 موجود بس بمكان ثاني، ⬜ مو موجود.', 'عندكم ٨ محاولات. اللي يجيبه ياخذ نقاط أكثر كل ما كان أسرع. وإذا ما جبتوه، اللي اختاره ياخذ ٣ نقاط.'],
-  word: ['نفس فكرة "وردل" بس بالعربي: كلمة من ٣ أو ٤ أو ٥ حروف.', 'التطبيق يختار الكلمة، أو لاعب يكتبها بالسر.', 'تتناوبون على التخمين: 🟩 الحرف في مكانه، 🟨 موجود بمكان ثاني، ⬜ مو موجود. والكيبورد يتلون معكم.', 'الهمزات والتاء المربوطة تنحسب مثل أخواتها (أ=ا، ة=ه، ى=ي). عندكم ٦ محاولات.'],
+  num: ['اختاروا عدد الخانات (من ٣ لين ٨)، ومين يختار الرقم: التطبيق أو لاعب بالسر.', 'تتناوبون على التخمين، وبعد كل تخمين الألوان تقول لكم: 🟩 الرقم في مكانه، 🟨 موجود بس بمكان ثاني. اللي ما يتلون ما نقول لكم عنه شي!', 'عندكم ٨ محاولات. اللي يجيبه ياخذ نقاط أكثر كل ما كان أسرع. وإذا ما جبتوه، اللي اختاره ياخذ ٣ نقاط.'],
+  word: ['نفس فكرة "وردل" بس بالعربي: كلمة من ٣ أو ٤ أو ٥ حروف.', 'التطبيق يختار الكلمة، أو لاعب يكتبها بالسر.', 'تتناوبون على التخمين: 🟩 الحرف في مكانه، 🟨 موجود بمكان ثاني، والكيبورد يتلون معكم. اللي ما يتلون ما نقول لكم عنه شي.', 'الهمزات والتاء المربوطة تنحسب مثل أخواتها (أ=ا، ة=ه، ى=ي). عندكم ٦ محاولات.'],
   flags: ['اختاروا: أعلام، أو إيموجي (مثل 🍕🍝🛵 = إيطاليا)، أو مخلوط.', 'كل واحد بدوره يجاوب من ٤ خيارات قبل لا يخلص الوقت.', 'كل جواب صح بنقطة.'],
   scr: ['تطلع كلمة حروفها ملخبطة ومعها الموضوع.', 'أول واحد يعرفها يصارخ فيها، واضغطوا على اسمه ياخذ نقطة.', 'إذا علقتوا، اضغطوا 💡 تلميح يطلع لكم أول حرف.'],
   chain: ['كل واحد بدوره يكتب كلمة تبدأ بآخر حرف من الكلمة اللي قبلها.', 'عندك وقت قصير (تعدله من ⚙️)، وممنوع تكرر كلمة انقالت.', 'اللي يخلص وقته أو ما يعرف يطلع، وآخر واحد يبقى هو الفايز.', 'كلمة تبدأ بـ "ال" مقبولة إذا اللي بعدها يبدأ بالحرف المطلوب.'],

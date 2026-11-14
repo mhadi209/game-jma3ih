@@ -114,6 +114,7 @@ function status(t, k) { let s = $('onStatus'); if (!s) { s = el('div', 'status')
 let lastView = null, drawCtx = null;
 const ONL_R = {};
 function renderView(v, sendAct) {
+  const keep = {}; let foc = null; b0q().forEach(i => { if (i.dataset.k && !i.disabled) { keep[i.dataset.k] = i.value; if (document.activeElement === i) foc = [i.dataset.k, i.selectionStart]; } });
   lastView = v; const b = on.body; b.innerHTML = ''; on.h.textContent = v.title || '🌐 أونلاين';
   if (v.status) { const s = el('div', 'status ' + (v.status[1] || 'ok'), v.status[0]); s.id = 'onStatus'; b.appendChild(s); }
   const c = el('div', 'bigcard'); b.appendChild(c);
@@ -140,12 +141,14 @@ function renderView(v, sendAct) {
     }
   }
   if (v.opts) { const o = el('div', 'opts'); if (v.opts.length > 3) o.style.gridTemplateColumns = '1fr 1fr'; v.opts.forEach(op => { const x = btn(op.label, op.cls || '', () => { o.querySelectorAll('button').forEach(bb => bb.disabled = true); x.className = 'ok'; sendAct({ a: 'opt', v: op.id }); }); x.disabled = !!op.dis; o.appendChild(x); }); c.appendChild(o); }
-  if (v.input) { const inp = el('input'); inp.type = v.input.kind === 'number' ? 'number' : 'text'; if (v.input.kind === 'number') inp.inputMode = 'decimal'; inp.className = 'bigin'; inp.placeholder = v.input.ph || ''; inp.maxLength = 60; c.appendChild(inp); const go = () => { const val = inp.value.trim(); if (!val || (v.input.kind === 'number' && isNaN(parseFloat(val)))) { buzz(80); return; } sendAct({ a: 'input', v: v.input.kind === 'number' ? parseFloat(val) : val }); inp.disabled = true; }; inp.onkeydown = e => { if (e.key === 'Enter') go(); }; const g = btn(v.input.btn || 'إرسال ✓', '', go); g.style.width = '100%'; g.style.marginTop = '8px'; c.appendChild(g); }
+  if (v.input) { const inp = el('input'); inp.type = v.input.kind === 'number' ? 'number' : 'text'; if (v.input.kind === 'number') inp.inputMode = 'decimal'; inp.className = 'bigin'; inp.placeholder = v.input.ph || ''; inp.dataset.k = 'in:' + (v.input.key !== undefined ? v.input.key : v.title); inp.maxLength = 60; c.appendChild(inp); const go = () => { const val = inp.value.trim(); if (!val || (v.input.kind === 'number' && isNaN(parseFloat(val)))) { buzz(80); return; } sendAct({ a: 'input', v: v.input.kind === 'number' ? parseFloat(val) : val }); inp.disabled = true; }; inp.onkeydown = e => { if (e.key === 'Enter') go(); }; const g = btn(v.input.btn || 'إرسال ✓', '', go); g.style.width = '100%'; g.style.marginTop = '8px'; c.appendChild(g); }
   if (v.buzz) { const bz = el('button', 'bigBuzz', v.buzz.label || '🔔'); bz.disabled = !!v.buzz.dis; bz.addEventListener('pointerdown', e => { e.preventDefault(); if (bz.disabled) return; bz.disabled = true; buzz(120); sendAct({ a: 'buzz' }); }); c.appendChild(bz); }
   if (v.scores) { const r = el('div', 'reslist'); r.style.marginTop = '8px'; const mx = Math.max(...v.scores.map(x => x[1])); v.scores.forEach(([n, s]) => { const d = el('div', s === mx && s > 0 ? 'best' : ''); d.append(el('span', '', n), el('b', '', s)); r.appendChild(d); }); c.appendChild(el('div', 'lab', 'النقاط 🏆')); c.appendChild(r); }
   setBtns2(on.row, (v.btns || []).map(bb => btn(bb.label, bb.cls || '', () => sendAct({ a: 'btn', v: bb.id }), bb.flex || 1)));
   if (v.beep) beep(v.beep, .12);
+  b.querySelectorAll('input[data-k]').forEach(i => { if (!i.disabled && keep[i.dataset.k] !== undefined && !i.value) i.value = keep[i.dataset.k]; if (foc && foc[0] === i.dataset.k && !i.disabled) { i.focus({ preventScroll: true }); try { i.setSelectionRange(foc[1], foc[1]); } catch (e) { } } });
 }
+function b0q() { return [...on.body.querySelectorAll('input[data-k]')]; }
 function paintCv() {
   const D = drawCtx; if (!D) return; const x = D.cv.getContext('2d'), W = D.cv.width, H2 = D.cv.height;
   x.clearRect(0, 0, W, H2); x.lineCap = 'round'; x.lineJoin = 'round'; x.lineWidth = Math.max(4, W / 90);

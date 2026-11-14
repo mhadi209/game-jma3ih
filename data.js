@@ -1432,4 +1432,6 @@ const TRUTH=Q.TRUTH, DARE=Q.DARE, ML=Q.ML, NHIE=Q.NHIE, BOMB=Q.BOMB;
 const WYR=Q.WYR.map(split), TRIVIA=Q.TRIVIA.map(split), TABOO=Q.TABOO.map(split);
 
 const LETTERS=["أ","ب","ت","ج","ح","خ","د","ر","ز","س","ش","ص","ط","ع","ف","ق","ك","ل","م","ن","هـ","و","ي"];
-const LETTER_CATS=["اسم","حيوان","نبات","جماد","بلاد","أكلة","مهنة"];
+const LETTER_CATS_ALL=["اسم","حيوان","نبات","جماد","بلاد","مدينة","أكلة","مهنة","فاكهة","مشروب","ماركة","لون","رياضة","لاعب كورة"];
+const LETTER_CATS_DEF=["اسم","حيوان","نبات","جماد","بلاد"];
+const letCats=()=>{const s=(typeof S!=="undefined"&&S.letCats)||LETTER_CATS_DEF;return s.length?s:LETTER_CATS_DEF};
