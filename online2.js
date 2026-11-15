@@ -513,27 +513,26 @@ function makeMafia() { const G = {}; const RN = { maf: '🔪 مافيا', doc: '
    ====================================================== */
 R.sjB = (it, c, send) => { const b = el('div', 'sjB'); it.cats.forEach((cat, ci) => { const r = el('div', 'r'); r.appendChild(el('b', '', cat)); [200, 200, 400, 400, 600, 600].forEach((l, k) => { const used = it.used[ci + '|' + l + '|' + (k % 2)]; const x = btn(String(l), l === 200 ? 'grn' : l === 400 ? 'yel' : 'red', () => send({ a: 'opt', v: ci + '|' + l + '|' + (k % 2) })); x.disabled = used || !it.can; r.appendChild(x); }); b.appendChild(r); }); c.appendChild(b); };
 function makeSJ() { const G = {};
-  G.start = () => { const a = shuffle(ids()); G.team = {}; a.forEach((id, i) => G.team[id] = i % 2); const cats = []; while (cats.length < 6) { const c = draw('sjcats', Object.keys(SJ)); if (!cats.includes(c)) cats.push(c); } G.cats = cats; G.cells = {}; cats.forEach((c, ci) => [200, 400, 600].forEach(l => { G.cells[ci + '|' + l + '|0'] = draw('sj_' + c + '_' + l, SJ[c][l]); G.cells[ci + '|' + l + '|1'] = draw('sj_' + c + '_' + l, SJ[c][l]); })); G.used = {}; G.turn = 0; G.sc = [0, 0]; G.life = [{ swap: 1, dbl: 1, hint: 1 }, { swap: 1, dbl: 1, hint: 1 }]; G.q = null; G.over = false; };
+  G.start = () => { const a = shuffle(ids()); G.team = {}; a.forEach((id, i) => G.team[id] = i % 2); const cats = []; while (cats.length < 6) { const c = draw('sjcats', Object.keys(SJ)); if (!cats.includes(c)) cats.push(c); } G.cats = cats; G.cells = {}; cats.forEach((c, ci) => [200, 400, 600].forEach(l => { G.cells[ci + '|' + l + '|0'] = draw('sj_' + c + '_' + l, SJ[c][l]); G.cells[ci + '|' + l + '|1'] = draw('sj_' + c + '_' + l, SJ[c][l]); })); G.used = {}; G.turn = 0; G.sc = [0, 0]; G.life = [{ two: 1, call: 1, pit: 1 }, { two: 1, call: 1, pit: 1 }]; G.pit = false; G.q = null; G.over = false; };
   const tn = t => t ? 'الفريق الأزرق 🔵' : 'الفريق الأحمر 🔴';
   const members = t => Object.keys(G.team).filter(i => G.team[i] === t).map(nm).join('، ');
   G.join = p => { if (G.team[p.id] === undefined) G.team[p.id] = Object.values(G.team).filter(x => x === 0).length <= Object.values(G.team).filter(x => x === 1).length ? 0 : 1; };
   G.view = p => { const t = G.team[p.id]; const head = [{ t: 'list', v: [[tn(0) + ': ' + members(0), G.sc[0], G.turn === 0], [tn(1) + ': ' + members(1), G.sc[1], G.turn === 1]] }];
     if (G.over) return { title: '🧠 سين جيم', items: head.concat([{ t: 'win good', v: G.sc[0] === G.sc[1] ? 'تعادل 🤝' : '🏆 ' + tn(G.sc[0] > G.sc[1] ? 0 : 1) }]), scores: O.scoresList() };
-    if (!G.q) return { title: '🧠 سين جيم', items: head.concat([{ t: 'lab', v: 'إنت في ' + tn(t) }, { t: 'lab', v: 'دور ' + tn(G.turn) + ': اختاروا سؤال' }, { t: 'sjB', cats: G.cats, used: G.used, can: t === G.turn }]) };
-    const q = G.q, it = head.concat([{ t: 'lab', v: G.cats[q.ci] + ' · ' + q.l + ' نقطة' + (q.dbl ? ' · دبل ✖️٢' : '') }, { t: 'txt', v: q.q.q }]);
-    if (q.hint) it.push({ t: 'hintx', v: '💡 ' + q.q.h });
+    if (!G.q) return { title: '🧠 سين جيم', items: head.concat([{ t: 'lab', v: 'إنت في ' + tn(t) }, { t: 'lab', v: 'دور ' + tn(G.turn) + ': اختاروا سؤال' }, { t: 'sjB', cats: G.cats, used: G.used, can: t === G.turn }].concat(G.pit ? [{ t: 'hintx', v: '🕳️ الحفرة شغالة: إدا جاوب ' + tn(G.turn) + ' صح تنخصم نقاط السؤال من ' + tn(1 - G.turn) }] : [])), btns: t === G.turn && G.life[t].pit && !G.pit ? [{ id: 'pit', label: '🕳️ احفروا لهم (قبل السؤال)', cls: 'ghost' }] : [] };
+    const q = G.q, it = head.concat([{ t: 'lab', v: G.cats[q.ci] + ' · ' + q.l + ' نقطة' }].concat(q.pit ? [{ t: 'hintx', v: '🕳️ الحفرة: إدا جاوب ' + tn(G.turn) + ' صح ينخصم ' + q.l + ' من ' + tn(1 - G.turn) }] : [], q.two ? [{ t: 'hintx', v: '✌️ ' + tn(G.turn) + ' يقولون جوابين' }] : [], q.call ? [{ t: 'hintx', v: '📞 اتصال بصديق: ٣٠ ثانية' }] : [], [{ t: 'txt', v: q.q.q }]));
     if (q.rev) it.push({ t: 'lab', v: 'الجواب' }, { t: 'ans', v: q.q.a });
     else it.push(cd(left(q.end)));
-    const b = !q.rev && t === G.turn ? [{ id: 'swap', label: '🔄 غيّر', cls: 'ghost' }, { id: 'dbl', label: '✖️٢ دبل', cls: 'ghost' }, { id: 'hint', label: '💡 تلميح', cls: 'ghost' }].filter(x => G.life[t][x.id] && !(x.id === 'dbl' && q.dbl) && !(x.id === 'hint' && q.hint)) : [];
+    const b = !q.rev && t === G.turn ? [{ id: 'two', label: '✌️ جاوب جوابين', cls: 'ghost' }, { id: 'call', label: '📞 اتصال بصديق', cls: 'ghost' }].filter(x => G.life[t][x.id]) : [];
     return { title: '🧠 سين جيم', items: it, btns: b }; };
   G.hostBtns = () => G.over ? [{ id: 'h:again', label: 'لعبة جديدة 🔄', flex: 2 }] : !G.q ? [{ id: 'h:end', label: 'إنهاء 🏁', cls: 'ghost' }] : !G.q.rev ? [{ id: 'h:rev', label: 'اكشف الجواب 👀', flex: 2 }] : [{ id: 'h:t0', label: '🔴 جاوب صح', cls: 'red' }, { id: 'h:t1', label: '🔵 جاوب صح' }, { id: 'h:none', label: 'ولا أحد', cls: 'ghost' }];
   G.act = (p, m) => { const t = G.team[p.id];
     if (m.v === 'h:again') return G.start(); if (m.v === 'h:end') { G.over = true; return; }
-    if (!G.q) { if (m.a === 'opt' && t === G.turn && !G.used[m.v] && G.cells[m.v]) { const [ci, l] = m.v.split('|').map(Number); G.q = { key: m.v, ci, l, q: G.cells[m.v], end: Date.now() + TIME('sj') * 1000 }; } return; }
+    if (!G.q) { if (m.v === 'pit' && t === G.turn && G.life[t].pit) { G.life[t].pit = 0; G.pit = true; return; } if (m.a === 'opt' && t === G.turn && !G.used[m.v] && G.cells[m.v]) { const [ci, l] = m.v.split('|').map(Number); G.q = { key: m.v, ci, l, q: G.cells[m.v], pit: G.pit, end: Date.now() + TIME('sj') * 1000 }; G.pit = false; } return; }
     const q = G.q;
-    if (!q.rev && t === G.turn) { if (m.v === 'swap' && G.life[t].swap) { G.life[t].swap = 0; q.q = draw('sj_' + G.cats[q.ci] + '_' + q.l, SJ[G.cats[q.ci]][q.l]); } if (m.v === 'dbl' && G.life[t].dbl) { G.life[t].dbl = 0; q.dbl = true; } if (m.v === 'hint' && G.life[t].hint) { G.life[t].hint = 0; q.hint = true; } }
+    if (!q.rev && t === G.turn) { if (m.v === 'two' && G.life[t].two) { G.life[t].two = 0; q.two = true; } if (m.v === 'call' && G.life[t].call) { G.life[t].call = 0; q.call = true; q.end = Date.now() + 30000; } }
     if (m.v === 'h:rev') q.rev = true;
-    if (q.rev && /^h:(t0|t1|none)$/.test(m.v)) { const w = m.v === 'h:t0' ? 0 : m.v === 'h:t1' ? 1 : -1; if (w >= 0) { const pts = (w === G.turn && q.dbl) ? q.l * 2 : q.l; G.sc[w] += pts; Object.keys(G.team).forEach(i => { if (G.team[i] === w) addScore(i, Math.round(pts / 200)); }); } G.used[q.key] = 1; G.q = null; G.turn = 1 - G.turn; if (Object.keys(G.cells).every(k => G.used[k])) G.over = true; }
+    if (q.rev && /^h:(t0|t1|none)$/.test(m.v)) { const w = m.v === 'h:t0' ? 0 : m.v === 'h:t1' ? 1 : -1; if (w >= 0) { const pts = q.l; G.sc[w] += pts; if (w === G.turn && q.pit) G.sc[1 - w] -= pts; Object.keys(G.team).forEach(i => { if (G.team[i] === w) addScore(i, Math.round(pts / 200)); }); } G.used[q.key] = 1; G.q = null; G.turn = 1 - G.turn; if (Object.keys(G.cells).every(k => G.used[k])) G.over = true; }
   };
   return G; }
 
