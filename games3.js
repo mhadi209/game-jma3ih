@@ -81,7 +81,7 @@ document.head.appendChild(css);
 
 const norm = s => s.replace(/[أإآ]/g, 'ا').replace(/ى/g, 'ي').replace(/ؤ/g, 'و').replace(/ئ/g, 'ي').replace(/ة/g, 'ه');
 function passCard(add, name, msg) { add('lab', 'عط التلفون لـ'); add('nm', name); add('lab', msg || 'وخل الباقين ما يشوفون الشاشة 🤫'); }
-const sc0 = () => { const o = {}; S.players.forEach(p => o[p] = 0); return o; };
+const sc0 = () => { const o = {}; S.players.forEach(p => o[p] = 0); window.TOURSC = o; return o; };
 
 /* =================================================================
    ⚙️ الإعدادات
@@ -465,7 +465,7 @@ function bzSetup() {
   setBtns2(bzS.row, [btn('ابدأ 🔔', '', () => { BZ = { n: S.bzN, names: S.bzNames.slice(0, S.bzN), sc: Array(S.bzN).fill(0) }; bzQ(); })]);
   show('buzzer');
 }
-function bzPickQ() { const cats = Object.keys(SJ); const c = draw('bzcat', cats); const l = pick([200, 200, 400]); const q = draw('sj_' + c + '_' + l, SJ[c][l]); return { q: q.q, a: q.a, c }; }
+function bzPickQ() { const cats = Object.keys(SJ).filter(c => !SJ[c][200].some(q => q.img)); const c = draw('bzcat', cats); const l = pick([200, 200, 400]); const q = draw('sj_' + c + '_' + l, SJ[c][l]); return { q: q.q, a: q.a, c }; }
 function bzQ() {
   BZ.q = bzPickQ(); BZ.lock = null; BZ.out = [];
   let ar = $('bzArena'); if (ar) ar.remove();

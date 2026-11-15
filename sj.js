@@ -1,5 +1,6 @@
 // ===== سين جيم: بنك الأسئلة =====
-// كل موضوع يبدأ بـ #  وكل سطر: النقاط | السؤال | الجواب | تلميح
+// كل موضوع يبدأ بـ #  وكل سطر: النقاط | السؤال | الجواب | تلميح | صورة (اختياري)
+// الصورة: flag:BH (علم دولة) أو emoji:🍕🍝 (إيموجي كبير) أو مسار صورة مثل img/eiffel.jpg
 // 200 = مقدور عليه، 400 = صعب، 600 = صعب واجد
 const SJ_TEXT = `
 # جغرافيا 🌍
@@ -445,6 +446,22 @@ const SJ = {};
     const p = l.split('|').map(x => x.trim());
     if (p.length < 3 || !SJ[cur][p[0]]) return;
     if (p[2] === '-' ) return;
-    SJ[cur][p[0]].push({ q: p[1], a: p[2], h: p[3] || '' });
+    SJ[cur][p[0]].push(p[4] ? { q: p[1], a: p[2], h: p[3] || '', img: p[4] } : { q: p[1], a: p[2], h: p[3] || '' });
   });
 })();
+
+// ===== صورة السؤال (علم / إيموجي / ملف صورة) =====
+function sjImgEl(spec) {
+  const w = document.createElement('div'); w.className = 'sjimg';
+  const big = t => { const d = document.createElement('div'); d.className = 'sjemo'; d.textContent = t; return d; };
+  if (/^emoji:/.test(spec)) { w.appendChild(big(spec.slice(6))); return w; }
+  const i = document.createElement('img'); i.alt = ''; i.decoding = 'async';
+  if (/^flag:/.test(spec)) {
+    const code = spec.slice(5).trim();
+    i.src = 'https://flagcdn.com/w640/' + code.toLowerCase() + '.png';
+    // بدون نت؟ نعرض علم الإيموجي
+    i.onerror = () => { i.replaceWith(big(String.fromCodePoint(...[...code.toUpperCase()].map(ch => 0x1F1E6 + ch.charCodeAt(0) - 65)))); };
+  } else { i.src = spec; i.onerror = () => { i.replaceWith(big('🖼️')); }; }
+  w.appendChild(i); return w;
+}
+(function () { const st = document.createElement('style'); st.textContent = '.sjimg{width:100%;display:flex;justify-content:center;margin:4px 0}.sjimg img{max-width:min(100%,460px);max-height:38vh;border:2px solid var(--line);border-radius:12px;box-shadow:var(--sh);background:#fff}.sjemo{font-size:clamp(64px,17vw,130px);line-height:1.25;letter-spacing:.06em;direction:ltr}body.tvmode .sjimg img{max-width:46vw;max-height:44vh}body.tvmode .sjemo{font-size:clamp(90px,11vw,220px)}'; document.head.appendChild(st); })();

@@ -227,6 +227,8 @@ button:disabled{opacity:.75}
     <div class="players" id="players"></div>
   </div>
   <div class="err" id="homeErr"></div>
+  <div id="resume"></div>
+  <div id="tourBox"></div>
   <h3 class="secT">🎮 الألعاب</h3>
   <div class="grid" id="games"></div>
   <h3 class="secT">🧰 أدوات</h3>
@@ -382,7 +384,7 @@ function stopTimer(){if(timerId){clearInterval(timerId);timerId=null}if(bombT){c
 let wake=null;
 async function keepAwake(on){try{if(on&&!wake&&navigator.wakeLock){wake=await navigator.wakeLock.request('screen');wake.addEventListener('release',()=>{wake=null})}else if(!on&&wake){wake.release();wake=null}}catch(e){}}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&!$('home').classList.contains('on'))keepAwake(true)});
-const show=id=>{keepAwake(id!=='home');stopTimer();if(id!=='gs')stopRec();document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));window.scrollTo(0,0)};
+const show=id=>{window.onShowScreen&&onShowScreen(id);keepAwake(id!=='home');stopTimer();if(id!=='gs')stopRec();document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));window.scrollTo(0,0)};
 document.querySelectorAll('[data-home]').forEach(b=>b.onclick=()=>{renderHome();show('home')});
 document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>show(b.dataset.go));
 // صوت
@@ -478,6 +480,7 @@ function launch(g){
 function gs(title,sub){$('gsTitle').textContent=title;$('gsSub').textContent=sub||'';$('gsScores').classList.add('hidden');show('gs')}
 function card(){const c=$('gsCard');c.innerHTML='';return(cls,txt)=>{const d=el('div',cls,txt);c.appendChild(d);return d}}
 function scores(obj,title){
+  if(!title)window.TOURSC=obj;
   const b=$('gsScores');b.classList.remove('hidden');b.innerHTML='';b.appendChild(el('h2','',title||'النقاط 🏆'));
   Object.entries(obj).sort((a,c)=>c[1]-a[1]).forEach(([n,s])=>{const d=el('div','score');d.append(el('span','',n),el('b','',s));b.appendChild(d)});
 }
@@ -889,5 +892,6 @@ if('serviceWorker' in navigator&&window.isSecureContext&&location.protocol!=='fi
 <script src="scrabble.js"></script>
 <script src="sfx.js"></script>
 <script src="online2.js"></script>
+<script src="tour.js"></script>
 </body>
 </html>

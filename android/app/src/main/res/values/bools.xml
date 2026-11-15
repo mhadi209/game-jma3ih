@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- التلفون: طول بس. التاب (values-sw600dp): يلف طول وعرض -->
+    <bool name="portrait_only">true</bool>
+</resources>

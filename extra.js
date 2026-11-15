@@ -242,7 +242,10 @@ function sjStart() {
   SG = { cats, cells, used: {}, turn: 0, pit: false, teams: teamNames().map((n, i) => ({ n, s: 0, life: (lf[i] || SJL_DEF).slice() })) };
   sjBoard();
 }
+const sjSave = () => LS.set('sj_save', SG);
+function sjResume() { const g = LS.get('sj_save', null); if (!g || !g.teams || !g.cells) { LS.set('sj_save', null); return; } SG = g; CUR = GAMES.find(x => x.id === 'sj') || CUR; if (SG.cur) sjAsk(SG.cur.c, SG.cur.l, SG.cur.i, SG.cur); else sjBoard(); }
 function sjBoard() {
+  SG.cur = null; sjSave();
   const b = sjB.body; b.innerHTML = '';
   const t = SG.teams[SG.turn];
   const hd = el('div', ''); scoreHead(hd, SG.teams, SG.turn); b.appendChild(hd);
@@ -266,15 +269,16 @@ function sjBoard() {
   show('sjBoard');
   if (!left) sjEnd();
 }
-function sjAsk(c, l, i) {
+function sjAsk(c, l, i, res) {
   const t = SG.teams[SG.turn], o = SG.teams[1 - SG.turn];
-  const q = SG.cells[c][l][i]; let revealed = false;
-  const on = {}; // الوسائل المستخدمة في هالسؤال
-  if (SG.pit) { on.pit = true; SG.pit = false; t.life = t.life.filter(k => k !== 'pit'); }
+  const q = SG.cells[c][l][i]; let revealed = !!(res && res.revealed);
+  const on = (res && res.on) || {}; // الوسائل المستخدمة في هالسؤال
+  if (!res && SG.pit) { on.pit = true; SG.pit = false; t.life = t.life.filter(k => k !== 'pit'); }
   let callEnd = 0;
   const use = k => { if (!t.life.includes(k) || on[k]) return; t.life = t.life.filter(x => x !== k); on[k] = true; if (k === 'call') callEnd = Date.now() + 30000; window.SFX && SFX.ding ? SFX.ding() : beep(900, .1); render(); };
   const render = () => {
     stopTimer();
+    SG.cur = { c, l, i, on, revealed }; sjSave();
     const b = sjQ.body; b.innerHTML = '';
     const hd = el('div', ''); scoreHead(hd, SG.teams, SG.turn); b.appendChild(hd);
     const card = el('div', 'bigcard'); b.appendChild(card);
@@ -286,6 +290,7 @@ function sjAsk(c, l, i) {
     if (on.rest) tags.push('🪑 واحد من ' + o.n + ' يستريح وما يشارك');
     if (on.trap) tags.push('🪤 فخ! السؤال صار على ' + o.n + '، وإدا غلطوا ينخصم منهم ' + l);
     tags.forEach(x => card.appendChild(el('span', 'dblx', x)));
+    if (q.img) card.appendChild(sjImgEl(q.img));
     card.appendChild(el('div', 'txt', q.q));
     if (on.hint && q.h) card.appendChild(el('div', 'hintx', '💡 ' + q.h));
     if (!revealed) {
@@ -321,6 +326,7 @@ function sjAsk(c, l, i) {
   show('sjQ'); render();
 }
 function sjEnd() {
+  LS.set('sj_save', null);
   const b = sjB.body; b.innerHTML = '';
   const [a, c] = SG.teams; const card = el('div', 'bigcard');
   card.append(el('div', 'lab', 'النتيجة النهائية'));
@@ -351,7 +357,9 @@ function feudRound() {
   FG.q = q; FG.open = q.a.map(() => false); FG.bank = 0; FG.strikes = 0; FG.play = null; FG.phase = 'pick'; FG.mult = FG.r === S.frounds && S.frounds > 1 ? 2 : 1;
   feudDraw(); show('feudPlay');
 }
+function feudResume() { const g = LS.get('feud_save', null); if (!g || !g.teams || !g.q) { LS.set('feud_save', null); return; } FG = g; CUR = GAMES.find(x => x.id === 'feud') || CUR; feudDraw(); show('feudPlay'); }
 function feudDraw() {
+  LS.set('feud_save', FG);
   const b = fP.body; b.innerHTML = '';
   const hd = el('div', ''); scoreHead(hd, FG.teams, FG.play === null ? -1 : FG.play); b.appendChild(hd);
   const card = el('div', 'bigcard'); card.style.gap = '8px';
@@ -393,6 +401,7 @@ function feudFinish(team) {
   const card = fP.body.querySelector('.bigcard'); card.insertBefore(el('div', 'win good', '+' + pts + ' لـ ' + FG.teams[team].n), card.children[3]);
 }
 function feudEnd() {
+  LS.set('feud_save', null);
   const b = fP.body; b.innerHTML = ''; const [a, c] = FG.teams; const card = el('div', 'bigcard');
   card.append(el('div', 'lab', 'النتيجة النهائية'), el('div', 'win good', a.s === c.s ? 'تعادل! 🤝' : '🏆 ' + (a.s > c.s ? a.n : c.n)), el('div', 'txt', a.n + ': ' + a.s), el('div', 'txt', c.n + ': ' + c.s));
   b.appendChild(card);
@@ -758,7 +767,7 @@ add({ id: 'teams', e: '👥', n: 'تقسيم الفرق', d: 'قسّم الجم�
 add({ id: 'wheel', e: '🎡', n: 'عجلة الحظ', d: 'اكتب الخيارات ولف العجلة', min: 0, tool: 1 });
 Object.assign(RULES, {
   drw: ['كل واحد يسحب الشاشة ويشوف الكلمة، إلا الامبوستر ما يعرفها (وإدا شغلتوا الخيار يشوف الموضوع بس).', 'بعدين التلفون يدور: كل واحد يرسم **خط واحد بس** على نفس الورقة (تحط إصبعك وترسم وترفعه). كل لاعب له لون.', 'ارسم شي يثبت إنك تعرف الكلمة، بس لا تكون واضح واجد عشان الامبوستر ما يعرفها!', 'الامبوستر يحاول يرسم شي يمشي مع رسمتكم بدون ما ينكشف.', 'إدا غلطت، اضغط ↩️ تراجع وارسم من جديد قبل لا تعطي التلفون.', 'بعد آخر جولة، أو إدا ضغطتوا 🗳️ وقفوا، يبدأ التصويت السري ونفس نقاط الامبوستر: اللي يصوت صح +١، وكل صوت غلط +١ للامبوستر، والامبوستر +١ إدا خمّن الكلمة.'].map(x => x.replace(/\*\*/g, '')),
-  sj: ['نفس اللعبة الكويتية المشهورة: فريقين، ٦ مواضيع، و٣٦ سؤال.', 'كل موضوع فيه ٦ أسئلة: ٢ بـ ٢٠٠ (مقدور عليها)، ٢ بـ ٤٠٠ (صعبة)، ٢ بـ ٦٠٠ (صعبة واجد).', 'الفريق اللي عليه الدور يختار سؤال من اللوحة، ويقراه واحد بصوت عالي، وعندهم وقت يفكرون. إدا ما عرفوا، الفريق الثاني يقدر يجاوب وياخد النقاط.', 'كل فريق يختار ٣ وسائل مساعدة قبل اللعبة، وكل وسيلة مرة وحدة: ✌️ جاوب جوابين، 📞 اتصال بصديق (٣٠ ثانية)، 🕳️ الحفرة (قبل ما تشوفون السؤال: إدا جاوبتوا صح تنخصم نقاطه من الفريق الثاني)، 🪑 استريح، 🪤 الفخ (تعطون السؤال للفريق الثاني وإدا غلطوا تنخصم منهم نقاطه)، وبعد ✖️٢ دبل و💡 تلميح.', 'اضغطوا "اكشف الجواب" وبعدين اختاروا منهو جاوب صح.', 'الدور ينتقل بعد كل سؤال، واللي عنده نقاط أكثر في الأخير يفوز. الأسئلة ما تتكرر لين تخلص.'],
+  sj: ['نفس اللعبة الكويتية المشهورة: فريقين، ٦ مواضيع، و٣٦ سؤال. وفيها مواضيع بالصور: أعلام، وأفلام وأمثال بالإيموجي.', 'كل موضوع فيه ٦ أسئلة: ٢ بـ ٢٠٠ (مقدور عليها)، ٢ بـ ٤٠٠ (صعبة)، ٢ بـ ٦٠٠ (صعبة واجد).', 'الفريق اللي عليه الدور يختار سؤال من اللوحة، ويقراه واحد بصوت عالي، وعندهم وقت يفكرون. إدا ما عرفوا، الفريق الثاني يقدر يجاوب وياخد النقاط.', 'كل فريق يختار ٣ وسائل مساعدة قبل اللعبة، وكل وسيلة مرة وحدة: ✌️ جاوب جوابين، 📞 اتصال بصديق (٣٠ ثانية)، 🕳️ الحفرة (قبل ما تشوفون السؤال: إدا جاوبتوا صح تنخصم نقاطه من الفريق الثاني)، 🪑 استريح، 🪤 الفخ (تعطون السؤال للفريق الثاني وإدا غلطوا تنخصم منهم نقاطه)، وبعد ✖️٢ دبل و💡 تلميح.', 'اضغطوا "اكشف الجواب" وبعدين اختاروا منهو جاوب صح.', 'الدور ينتقل بعد كل سؤال، واللي عنده نقاط أكثر في الأخير يفوز. الأسئلة ما تتكرر لين تخلص.', 'اللعبة تنحفظ بروحها: إدا سكرتوا التطبيق في النص، تلقون "كمّلوها" في الرئيسية.'],
   feud: ['تنقسمون فريقين. كل جولة فيها سؤال "سألنا ١٠٠ شخص" ووراه ٦ أجوبة مخفية بنقاطها.', 'بالبداية واحد من كل فريق يتواجهون، واللي يجاوب الجواب الأعلى يختار فريقه يلعب. اضغطوا على اسم الفريق اللي بيلعب.', 'الفريق يقول أجوبة: إدا الجواب موجود اضغطوا على مربعه ينكشف وتنضاف نقاطه، وإدا مو موجود اضغطوا ✖ غلط.', 'إدا كشفوا كل الأجوبة ياخدون نقاط الجولة. وإدا وصلوا ٣ أغلاط، الفريق الثاني عنده فرصة وحدة يسرق كل النقاط بجواب صح.', 'آخر جولة نقاطها دبل! واللي يجمع أكثر في الأخير يفوز.'],
   dice: ['اختار نوع النرد: D4 أو D6 أو D8 أو D10 أو D12 أو D20، وچم نرد تبغى (لين ٤).', 'اضغط "ارمي" أو اضغط على النرد نفسه، ويطلع المجموع تحت.'],
   cups: ['تشوف الكورة تحت كوب، بعدين الأكواب تتلخبط.', 'تابع الكوب بعيونك، ولما يوقفون اضغط على الكوب اللي تظن الكورة تحته.', 'كل ما جبتها صح تزيد سلسلتك. تقدر تزيد عدد الأكواب والصعوبة.'],
@@ -773,6 +782,10 @@ window.DIE = {
   draw(cv, val) { const d = { sides: 6 }; renderDie(cv, 6, targetQ(d, val), i => i + 1); },
   roll(cv, val, cb) { const d = { cv, sides: 6, val }; animateRoll([d], cb); }
 };
+window.RESUMES = [
+  { key: 'sj_save', label: '🧠 سين جيم', info: g => g.teams.map(t => t.n + ' ' + t.s).join(' · '), go: sjResume },
+  { key: 'feud_save', label: '👨‍👩‍👧 فاميلي فيود', info: g => 'الجولة ' + g.r + ' · ' + g.teams.map(t => t.n + ' ' + t.s).join(' · '), go: feudResume }
+];
 window.UI = { mkScreen, stepper, chipSet, setBtns2, teamInputs, scoreHead, teamNames };
 window.__t = () => ({ DR, SG, FG, DICE, SHAPES, Qt, CP, CO, BT, WH });
 window.EXTRA = { drw: drawSetup, sj: sjSetup, feud: feudSetup, dice: diceScreen, cups: cupsScreen, bottle: bottleScreen, coin: coinScreen, teams: teamsScreen, wheel: wheelScreen };

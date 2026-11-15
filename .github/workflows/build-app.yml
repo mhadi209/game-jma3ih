@@ -27,6 +27,7 @@ jobs:
         run: |
           mkdir -p android/app/src/main/assets/www
           cp -r *.html *.js manifest.webmanifest icons android/app/src/main/assets/www/
+          if [ -d img ]; then cp -r img android/app/src/main/assets/www/; fi
 
       - name: بناء ملف APK
         working-directory: android
@@ -39,7 +40,7 @@ jobs:
         run: |
           mkdir out
           cp android/app/build/outputs/apk/release/app-release.apk out/taqzeera.apk
-          zip -r out/taqzeera-web.zip *.html *.js manifest.webmanifest icons
+          zip -r out/taqzeera-web.zip *.html *.js manifest.webmanifest icons $(ls -d img 2>/dev/null)
 
       - uses: softprops/action-gh-release@v2
         with:
@@ -52,9 +53,9 @@ jobs:
             - **أندرويد:** نزّل `taqzeera.apk` وافتحه، واسمح بالتثبيت من مصادر غير معروفة إذا طلب منك.
             - **نسخة الويب:** `taqzeera-web.zip` (تفتح من المتصفح).
 
+            📺 شاشة التلفزيون: اللعبة تطلع على التلفزيون أو الآيباد وكل واحد يجاوب من تلفونه.
+            🏆 بطولة الليلة: النقاط تتجمع من كل الألعاب ويتتوّج البطل.
+            🧠 سين جيم بوسائل اللعبة الأصلية (الحفرة، جاوب جوابين، اتصال بصديق، استريح، الفخ) ومواضيع بالصور.
+            💾 سين جيم وفاميلي فيود ينحفظون إدا سكرت التطبيق.
+            📱 التاب يلف طول وعرض.
             🇧🇭 كل النصوص والأسئلة باللهجة البحرانية.
-            📱 يشتغل على الآيباد والتاب بمقاس أكبر.
-            ✅ أسئلة محدثة (مونديال ٢٠٢٦ وخليجي ٢٧) ومواضيع منظفة: الأجهزة بروحها والأغراض بروحها، وكلمات بحرينية جديدة.
-            🔊 أصوات ومؤثرات في كل الألعاب، و🌐 أونلاين كل واحد من تلفونه.
-
-            حوالي ١٩٥٠ كلمة في ٢٢ موضوع، وأسئلة سين جيم في ٣٦ موضوع، ومئات الأسئلة لكل لعبة (بدون تكرار لين تخلص).

@@ -31,6 +31,34 @@ body.dark .status.ok{background:#1f3b31;color:#9fe3c4}body.dark .status.bad{back
 .bigBuzz:active{transform:translateY(8px);box-shadow:0 2px 0 #5a160f}
 .bigBuzz:disabled{filter:grayscale(1);opacity:.6}
 .onlTag{display:block;width:max-content;margin:-6px auto 10px;background:var(--grn);color:#fff;border-radius:999px;padding:2px 12px;font-size:12px;font-weight:700;border:2px solid var(--line)}
+
+.tvRow{margin-top:12px;padding-top:10px;border-top:1px dashed var(--dash)}
+body.tvmode #online{max-width:min(1500px,96vw);padding-bottom:30px}
+body.tvmode #online .top .back,body.tvmode #online .top .help,body.tvmode #online .bottom,body.tvmode .onlTag{display:none}
+body.tvmode #online .top h1{font-size:clamp(30px,3.2vw,60px);text-align:center}
+body.tvmode #online .bigcard{min-height:72vh;gap:1.4vh;padding:3vh 3vw;pointer-events:none}
+body.tvmode #online .lab{font-size:clamp(18px,1.9vw,36px)}
+body.tvmode #online .txt{font-size:clamp(34px,4.4vw,88px);line-height:1.35}
+body.tvmode #online .ans{font-size:clamp(34px,4.6vw,92px)}
+body.tvmode #online .nm{font-size:clamp(30px,3.6vw,72px)}
+body.tvmode #online .win{font-size:clamp(34px,4.4vw,88px)}
+body.tvmode #online .timer{font-size:clamp(60px,8vw,150px)}
+body.tvmode #online .hintx{font-size:clamp(18px,2vw,38px)}
+body.tvmode #online .code{font-size:clamp(90px,15vw,280px);letter-spacing:.08em}
+body.tvmode #online .link{font-size:clamp(16px,1.7vw,32px);padding:14px}
+body.tvmode #online .plist span{font-size:clamp(18px,2vw,38px);padding:6px 22px}
+body.tvmode #online .reslist{width:min(900px,90%);margin:0 auto}
+body.tvmode #online .reslist div{font-size:clamp(20px,2.3vw,44px);padding:10px 6px}
+body.tvmode #online .reslist b{font-size:clamp(24px,2.8vw,54px)}
+body.tvmode #online .opts{grid-template-columns:1fr 1fr;gap:1.4vw;width:100%}
+body.tvmode #online .opts button{font-size:clamp(24px,3vw,60px);padding:2.2vh 1vw;opacity:1}
+body.tvmode #online .sjB .r b{font-size:clamp(16px,1.7vw,32px)}
+body.tvmode #online .sjB button{font-size:clamp(20px,2.4vw,46px);padding:1.6vh 0;opacity:1}
+body.tvmode #online .sjB button:disabled{opacity:.25}
+body.tvmode #online .feud{width:100%;gap:1.2vh 1.4vw;grid-template-columns:1fr 1fr;grid-template-rows:repeat(3,auto);grid-auto-flow:column}
+body.tvmode #online .cdown{font-size:clamp(50px,6.5vw,130px)!important}
+body.tvmode #online .ftile{font-size:clamp(24px,3vw,58px);min-height:8.5vh}
+body.tvmode #online .scr span{font-size:clamp(44px,6vw,120px);width:1.5em;height:1.5em}
 `;
 document.head.appendChild(css);
 
@@ -102,7 +130,7 @@ const Net = {
 /* ---------- شاشة الأونلاين ---------- */
 const on = mkScreen('online', '🌐 أونلاين');
 on.el.querySelector('.help').onclick = () => { CUR = { id: 'online', e: '🌐', n: 'أونلاين' }; openHelp(); };
-RULES.online = ['إنت تسوي غرفة، ويطلع لك كود ورابط.', 'ترسل الرابط لربعك (واتساب مثلاً)، يفتحونه من المتصفح ويكتبون أساميهم، بدون ما ينزلون شي.', 'لما يدخلون، تختار اللعبة من تلفونك (إنت المضيف)، وكل واحد يشوف شاشته على تلفونه.', 'لازم نت عند الكل. إدا ما اتصل أحد، جربوا تكونون على نفس الواي فاي.', 'خل التطبيق مفتوح على تلفونك (لا تطلع منه) لين تخلصون، لأن تلفونك هو اللي يدير الغرفة.', 'إدا أحد انقطع عنه النت أو حدّث الصفحة، يرجع لمكانه بروحه وما يتكرر اسمه.', 'تبغى تطلّع أحد؟ في الغرفة اضغط على اسمه مرتين ✖، أو وانتم تلعبون اضغط زر 👥.'];
+RULES.online = ['إنت تسوي غرفة، ويطلع لك كود ورابط.', 'ترسل الرابط لربعك (واتساب مثلاً)، يفتحونه من المتصفح ويكتبون أساميهم، بدون ما ينزلون شي.', 'لما يدخلون، تختار اللعبة من تلفونك (إنت المضيف)، وكل واحد يشوف شاشته على تلفونه.', 'لازم نت عند الكل. إدا ما اتصل أحد، جربوا تكونون على نفس الواي فاي.', 'خل التطبيق مفتوح على تلفونك (لا تطلع منه) لين تخلصون، لأن تلفونك هو اللي يدير الغرفة.', 'إدا أحد انقطع عنه النت أو حدّث الصفحة، يرجع لمكانه بروحه وما يتكرر اسمه.', 'تبغى تطلّع أحد؟ في الغرفة اضغط على اسمه مرتين ✖، أو وانتم تلعبون اضغط زر 👥.', '📺 شاشة التلفزيون: من الغرفة انسخ "رابط الشاشة" وافتحه على التلفزيون أو الآيباد أو اللابتوب. الشاشة تعرض الكود واللوحة والأسئلة والنقاط بخط كبير، وكل واحد يجاوب من تلفونه. الألعاب اللي فيها أسرار (مثل الامبوستر) تعرض النقاط بس.'];
 let ROLE = null;   // 'host' | 'guest'
 let ME = null;     // pid
 let tagEl = null;
@@ -110,7 +138,7 @@ function setTag(t) { if (!tagEl) { tagEl = el('div', 'onlTag'); on.el.insertBefo
 on.back.onclick = () => { if (ROLE && !confirmLeave()) return; leaveRoom(); renderHome(); show('home'); };
 let leaveArmed = 0;
 function confirmLeave() { const now = Date.now(); if (now - leaveArmed < 2500) return true; leaveArmed = now; status('اضغط → مرة ثانية عشان تطلع من الغرفة', 'bad'); return false; }
-function leaveRoom() { GJ = null; clearInterval(gwT); clearInterval(hbT); try { Net.close && Net.close(); } catch (e) { } ROLE = null; ME = null; H = null; setTag(''); }
+function leaveRoom() { document.body.classList.remove('tvmode'); GJ = null; clearInterval(gwT); clearInterval(hbT); try { Net.close && Net.close(); } catch (e) { } ROLE = null; ME = null; H = null; setTag(''); }
 function status(t, k) { let s = $('onStatus'); if (!s) { s = el('div', 'status'); s.id = 'onStatus'; on.body.prepend(s); } s.className = 'status ' + (k || 'ok'); s.textContent = t; if (!t) s.remove(); }
 
 /* ---------- عرض الشاشة (مشترك بين المضيف والضيوف) ---------- */
@@ -181,7 +209,7 @@ const PCOL = ['#d7263d', '#1b6ca8', '#2e8b57', '#f29e0c', '#7b2cbf', '#e75a9c', 
 function hostStart() {
   const code = String(1000 + rnd(9000));
   ROLE = 'host'; ME = 'host';
-  H = { code, n: 0, players: [{ id: 'host', conn: 'host', name: S.myName || S.players[0] || 'المضيف', on: true, score: 0 }], game: null };
+  H = { code, n: 0, tvs: [], players: [{ id: 'host', conn: 'host', name: S.myName || S.players[0] || 'المضيف', on: true, score: 0 }], game: null };
   clearInterval(hbT); hbT = setInterval(heartbeat, 4000);
   status('جاري تجهيز الغرفة…', 'ok'); show('online');
   Net.host(code, { msg: hostMsg, leave: hostLeave }).then(() => { setTag('🌐 غرفة ' + code); hostLobby(); }).catch(e => {
@@ -200,10 +228,18 @@ function heartbeat() {
   // إدا تلفون المضيف كان نايم (الشاشة مسكرة) لا نطلّع أحد ظلم
   if (hbLast && now - hbLast > 9000) H.players.forEach(p => p.seen = now);
   hbLast = now;
+  H.tvs.forEach(c => Net.send(c, { t: 'ping' }));
   H.players.forEach(p => { if (p.id === 'host' || !p.on) return; sendTo(p, { t: 'ping' }); if (p.hb && now - (p.seen || now) > 16000) hostLeave(p.conn); });
 }
 function hostMsg(conn, m) {
   if (!H) return;
+  if (m.t === 'hello' && m.tv) {
+    if (!H.tvs.includes(conn)) H.tvs.push(conn);
+    Net.send(conn, { t: 'welcome', name: '📺', code: H.code, tv: 1 }); if (window.SFX) SFX.join();
+    if (!H.game && ROLE === 'host') hostLobby();
+    return pushTV();
+  }
+  if (H.tvs.includes(conn)) { if (m.t === 'bye') hostLeave(conn); return; }
   if (m.t === 'hello') {
     let name = String(m.name || 'لاعب').slice(0, 16).trim() || 'لاعب';
     const cid = m.cid ? String(m.cid).slice(0, 40) : null;
@@ -228,7 +264,7 @@ function hostMsg(conn, m) {
   if (m.t === 'bye') return hostLeave(conn);
   if (m.t === 'act') return hostAct(p.id, m);
 }
-function hostLeave(conn) { const p = byConn(conn); if (p && p.on) { p.on = false; if (H.game && H.game.leave) H.game.leave(p); if (window.SFX) SFX.leave(); push(); } }
+function hostLeave(conn) { if (H && H.tvs.includes(conn)) { H.tvs.splice(H.tvs.indexOf(conn), 1); if (!H.game && ROLE === 'host') hostLobby(); return; } const p = byConn(conn); if (p && p.on) { p.on = false; if (H.game && H.game.leave) H.game.leave(p); if (window.SFX) SFX.leave(); push(); } }
 function hostKick(id) {
   const p = P(id); if (!p || id === 'host') return;
   if (p.on) { sendTo(p, { t: 'kicked' }); setTimeout(() => { try { Net.drop(p.conn); } catch (e) { } }, 300); }
@@ -251,6 +287,21 @@ function push() {
     if (p.id === 'host') renderView(v, a => hostAct('host', a)); else sendTo(p, { t: 'view', v });
   });
 }
+/* ---------- 📺 شاشة التلفزيون: تعرض اللعبة للكل بدون ما تلعب ---------- */
+const TV_OK = ['sj', 'feud', 'triv', 'flags', 'mil', 'scrr', 'buzz', 'xo', 'ludo', 'wyr', 'ml', 'nhie'];
+function tvView() {
+  const sc = H.players.some(x => x.score) ? scoresList() : null;
+  if (!H.game) return { title: '🎲 تقزيرة', items: [{ t: 'lab', v: 'ادخلوا من تلفوناتكم بهالكود' }, { t: 'code', v: H.code }, { t: 'link', v: joinUrl() }, { t: 'lab', v: active().length < 2 ? 'ننتظر الربع يدخلون…' : 'اللي دخلوا (' + active().length + ')' }, { t: 'plist', v: active().map(x => [x.name, '']) }], scores: sc };
+  let v = null; const def = H.gdef || {};
+  if (TV_OK.includes(H.gid)) { try { v = JSON.parse(JSON.stringify(H.game.tv ? H.game.tv() : H.game.view({ id: '__tv', name: '📺', tv: true }))); } catch (e) { v = null; } }
+  if (!v) v = { title: (def.e || '🎮') + ' ' + (def.n || ''), items: [{ t: 'win', v: (def.e || '🎮') + ' ' + (def.n || '') }, { t: 'lab', v: 'اللعب على التلفونات 📱 كل واحد يطالع شاشته' }], scores: scoresList() };
+  v.items = (v.items || []).filter(it => !(typeof it.v === 'string' && /^إنت |طلعت من المسابقة/.test(it.v)));
+  delete v.btns; delete v.input; delete v.buzz; delete v.secret; delete v.status; delete v.beep;
+  if (v.canvas) v.canvas.can = false;
+  if (v.opts) v.opts = v.opts.map(o => Object.assign({}, o, { dis: true }));
+  return v;
+}
+function pushTV() { if (!H || !H.tvs.length) return; const v = tvView(); H.tvs.forEach(c => Net.send(c, { t: 'view', v })); }
 const scoresList = () => H.players.map(p => [p.name + (p.on ? '' : ' (طلع)'), p.score]).sort((a, b) => b[1] - a[1]);
 function joinUrl() { const base = /github\.io/.test(location.host) ? location.origin + location.pathname : PUBLIC_URL; return base + '?r=' + H.code; }
 function viewFor(p) {
@@ -269,6 +320,9 @@ function hostLobby() {
   const cp = btn('📋 انسخ الرابط', 'ghost', async () => { try { await navigator.clipboard.writeText(joinUrl()); cp.textContent = 'تم النسخ ✓'; } catch (e) { const sel = window.getSelection(), rg = document.createRange(); rg.selectNodeContents(link); sel.removeAllRanges(); sel.addRange(rg); cp.textContent = 'انسخه من فوق 👆'; } });
   const wa = el('a', ''); wa.href = 'https://wa.me/?text=' + encodeURIComponent('تعالوا العبوا وياي في تقزيرة 🎲 ادخلوا من اهني: ' + joinUrl()); wa.target = '_blank'; wa.rel = 'noopener'; const wb = el('button', 'grn', '🟢 أرسل بالواتساب'); wb.style.width = '100%'; wa.appendChild(wb); wa.style.flex = '1';
   r.append(cp, wa); c.appendChild(r);
+  const tvr = el('div', 'tvRow'); const tvu = joinUrl() + '&tv=1';
+  tvr.appendChild(el('div', 'lab', '📺 تبغى اللعبة تطلع على التلفزيون أو الآيباد؟ افتح هالرابط عليه (أو اختار "شاشة تلفزيون" من ادخل غرفة). ' + (H.tvs.length ? 'الشاشات الشغالة: ' + H.tvs.length + ' ✅' : '')));
+  const tvb = btn('📺 انسخ رابط الشاشة', 'ghost', async () => { try { await navigator.clipboard.writeText(tvu); tvb.textContent = 'تم النسخ ✓'; } catch (e) { link.textContent = tvu; tvb.textContent = 'انسخه من فوق 👆'; } }); tvb.style.cssText = 'width:100%;margin-top:6px'; tvr.appendChild(tvb); c.appendChild(tvr);
   const nm = el('div', 'row'); nm.style.marginTop = '10px'; const ni = el('input'); ni.type = 'text'; ni.value = H.players[0].name; ni.maxLength = 16; ni.placeholder = 'اسمك'; ni.oninput = () => { H.players[0].name = ni.value.trim() || 'المضيف'; S.myName = H.players[0].name; save(); }; nm.append(el('b', '', 'اسمك: '), ni); c.appendChild(nm);
   b.appendChild(c);
   const pb = el('div', 'box'); pb.append(el('h2', '', 'اللي دخلوا (' + active().length + ')')); const pl = el('div', 'plist');
@@ -446,7 +500,7 @@ function makeSimple(kind) {
 // 🔔 الجرس
 function makeBuzz() {
   const G3 = {};
-  G3.start = () => { const c = draw('bzcat', Object.keys(SJ)); const l = pick([200, 200, 400]); const q = draw('sj_' + c + '_' + l, SJ[c][l]); G3.q = q; G3.c = c; G3.lock = null; G3.out = []; G3.phase = 'q'; G3.msg = ''; };
+  G3.start = () => { const c = draw('bzcat', Object.keys(SJ).filter(k => !SJ[k][200].some(q => q.img))); const l = pick([200, 200, 400]); const q = draw('sj_' + c + '_' + l, SJ[c][l]); G3.q = q; G3.c = c; G3.lock = null; G3.out = []; G3.phase = 'q'; G3.msg = ''; };
   const nm = id => (P(id) || {}).name || '؟';
   G3.view = p => {
     const base = [{ t: 'lab', v: G3.c }, { t: 'txt', v: G3.q.q }];
@@ -474,12 +528,12 @@ const GAMES_ON = {
   buzz: { e: '🔔', n: 'الجرس', d: 'كل تلفون صار زر جرس', min: 2, make: makeBuzz }
 };
 // نعدل push عشان اللوبي ينرسم صح
-push = function () { if (!H) return; if (!H.game && ROLE === 'host') { hostLobby(); H.players.forEach(p => { if (p.on && p.id !== 'host') sendTo(p, { t: 'view', v: viewFor(p) }); }); return; } H.players.forEach(p => { if (!p.on) return; const v = viewFor(p); if (p.id === 'host') renderView(JSON.parse(JSON.stringify(v)), a => hostAct('host', a)); else sendTo(p, { t: 'view', v }); }); };
+push = function () { if (!H) return; pushTV(); if (!H.game && ROLE === 'host') { hostLobby(); H.players.forEach(p => { if (p.on && p.id !== 'host') sendTo(p, { t: 'view', v: viewFor(p) }); }); return; } H.players.forEach(p => { if (!p.on) return; const v = viewFor(p); if (p.id === 'host') renderView(JSON.parse(JSON.stringify(v)), a => hostAct('host', a)); else sendTo(p, { t: 'view', v }); }); };
 const _hostAct = hostAct;
 hostAct = function (pid, m) { const p = P(pid); if (!p) return; if (m.a === 'btn' && String(m.v).startsWith('h:') && pid !== 'host') return; if (m.a === 'btn' && m.v === 'h:lobby') { H.game = null; H.ppl = false; return push(); }
   if (pid === 'host' && m.a === 'btn' && m.v === 'h:ppl') { H.ppl = !H.ppl; return push(); }
   if (pid === 'host' && m.a === 'kick') { hostKick(m.v); return; }
-  let r; if (H.game) r = H.game.act(p, m); else if (m.a === 'btn' && pid === 'host' && GAMES_ON[m.v]) { H.game = GAMES_ON[m.v].make(); H.game.start(); }
+  let r; if (H.game) r = H.game.act(p, m); else if (m.a === 'btn' && pid === 'host' && GAMES_ON[m.v]) { H.gid = m.v; H.gdef = GAMES_ON[m.v]; H.game = GAMES_ON[m.v].make(); H.game.start(); }
   if (r !== 'nopush') push(); };
 
 /* =================================================================
@@ -493,6 +547,7 @@ function guestJoin(code) {
   const ni = el('input'); ni.type = 'text'; ni.className = 'bigin'; ni.maxLength = 16; ni.placeholder = 'اكتب اسمك'; ni.value = S.myName || ''; ni.style.marginTop = '10px';
   c.append(ci, ni); b.appendChild(c);
   const err = el('div', 'err', ''); b.appendChild(err);
+  const tvB = btn('📺 هادي شاشة تلفزيون (تعرض اللعبة بس)', 'ghost', () => { const cd = ci.value.trim(); if (!/^\d{4}$/.test(cd)) { err.textContent = 'اكتب كود الغرفة أول (٤ أرقام)'; return; } tvJoin(cd); }); tvB.style.cssText = 'width:100%;margin-top:4px'; b.appendChild(tvB);
   setBtns2(on.row, [btn('ادخل 🚪', '', () => {
     const cd = ci.value.trim(), nm = ni.value.trim(); if (!/^\d{4}$/.test(cd)) { err.textContent = 'الكود ٤ أرقام'; return; } if (!nm) { err.textContent = 'اكتب اسمك'; return; }
     S.myName = nm; save(); err.textContent = ''; status('جاري الاتصال بالغرفة…', 'ok');
@@ -502,15 +557,16 @@ function guestJoin(code) {
   show('online');
 }
 let GJ = null, gwT = null;
+function tvJoin(code) { document.body.classList.add('tvmode'); on.body.innerHTML = ''; on.h.textContent = '📺 شاشة التلفزيون'; setBtns2(on.row, []); status('جاري الاتصال بالغرفة ' + code + '…', 'ok'); GJ = { code, name: '📺', tv: 1, tries: 0, last: Date.now() }; ROLE = 'guest'; show('online'); guestConnect(true); }
 function myCid() { const st = useBC() ? sessionStorage : localStorage; let c = null; try { c = st.getItem('tqz_cid'); if (!c) { c = rid() + rid(); st.setItem('tqz_cid', c); } } catch (e) { c = c || rid(); } return c; }
 function guestConnect(first) {
   if (ROLE !== 'guest' || !GJ) return;
   const g = GJ; let opened = false;
   Net.join(g.code, {
-    open: () => { opened = true; g.tries = 0; g.last = Date.now(); Net.toHost({ t: 'hello', name: g.name, cid: myCid(), hb: 1 }); },
+    open: () => { opened = true; g.tries = 0; g.last = Date.now(); Net.toHost(g.tv ? { t: 'hello', tv: 1 } : { t: 'hello', name: g.name, cid: myCid(), hb: 1 }); },
     msg: m => {
       if (GJ !== g) return; g.last = Date.now();
-      if (m.t === 'welcome') { ME = m.name; setTag('🌐 ' + m.name + ' · غرفة ' + m.code); status('', 'ok'); }
+      if (m.t === 'welcome') { ME = m.name; setTag(m.tv ? '' : '🌐 ' + m.name + ' · غرفة ' + m.code); status('', 'ok'); }
       else if (m.t === 'ping') Net.toHost({ t: 'pong' });
       else if (m.t === 'view') renderView(m.v, a => Net.toHost(Object.assign({ t: 'act' }, a)));
       else if (m.t === 'strokes' && drawCtx && !drawCtx.cur) { drawCtx.strokes = m.s; paintCv(); }
@@ -531,7 +587,7 @@ function guestRetry() {
   try { Net.close && Net.close(); } catch (e) { }
   setTimeout(() => { if (GJ === g && ROLE === 'guest') guestConnect(false); }, window.__fast ? 50 : (g.tries < 4 ? 2500 : 5000));
 }
-function guestLost(t) { if (ROLE !== 'guest') return; ROLE = null; GJ = null; clearInterval(gwT); try { Net.close && Net.close(); } catch (e) { } setTag(''); on.body.innerHTML = ''; status(t, 'bad'); setBtns2(on.row, [btn('ادخل مرة ثانية 🔄', '', () => guestJoin(''))]); }
+function guestLost(t) { if (ROLE !== 'guest') return; document.body.classList.remove('tvmode'); ROLE = null; GJ = null; clearInterval(gwT); try { Net.close && Net.close(); } catch (e) { } setTag(''); on.body.innerHTML = ''; status(t, 'bad'); setBtns2(on.row, [btn('ادخل مرة ثانية 🔄', '', () => guestJoin(''))]); }
 window.addEventListener('pagehide', () => { if (ROLE === 'guest') { try { Net.toHost({ t: 'bye' }); } catch (e) { } } });
 
 /* ---------- زر الأونلاين في الرئيسية ---------- */
@@ -541,8 +597,9 @@ const r = el('div', 'row'); r.append(btn('سوّ غرفة 🏠', '', () => { CUR
 box.appendChild(r);
 const homeBox = $('home').querySelector('.box'); $('home').insertBefore(box, homeBox);
 // لو فتح الرابط فيه ?r=1234 ندخله على طول
-const m = location.search.match(/[?&]r=(\d{4})/);
-if (m) { CUR = { id: 'online', e: '🌐', n: 'أونلاين' }; setTimeout(() => guestJoin(m[1]), 0); }
+const m = location.search.match(/[?&]r=(\d{4})/), isTV = /[?&]tv(=1)?(&|$)/.test(location.search);
+if (m) { CUR = { id: 'online', e: '🌐', n: 'أونلاين' }; setTimeout(() => isTV ? tvJoin(m[1]) : guestJoin(m[1]), 0); }
+else if (isTV) { CUR = { id: 'online', e: '🌐', n: 'أونلاين' }; setTimeout(() => guestJoin(''), 0); }
 window.ONL = { register: (id, def) => { GAMES_ON[id] = def; }, renderers: ONL_R, P: id => P(id), active: () => active(), scoresList: () => scoresList(), host: () => H, liveSend: (id, msg) => sendTo(P(id), msg), kick: id => hostKick(id), push: () => push() };
 window.__on = () => ({ H, ROLE, ME, Net, lastView, hostStart, guestJoin, push, hostKick, heartbeat, GJ });
 })();
