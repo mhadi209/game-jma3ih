@@ -560,10 +560,18 @@ function srQ() {
   const s = el('div', 'scr'); sh.forEach((ch, i) => { const sp = el('span', '', ch); sp.style.animationDelay = (i * 0.06) + 's'; s.appendChild(sp); }); card.appendChild(s);
   const hint = el('div', 'hintx hidden', ''); card.appendChild(hint);
   const tm = el('div', 'timer'); tm.id = 'srT'; card.appendChild(tm);
-  const reveal = (who) => { stopTimer(); card.querySelectorAll('.opts').forEach(x => x.remove()); card.append(el('div', 'lab', 'الكلمة'), el('div', 'txt good', w), el('div', 'desc', descOf(c, w))); if (who) { SR.sc[who]++; card.appendChild(el('div', 'win good', '+١ لـ ' + who)); beep(1200, .15); } setBtns2(srS.row, [btn('النقاط', 'ghost', () => { const bx = el('div', 'box'); bx.appendChild(resList(SR.sc)); b.appendChild(bx); }), btn('كلمة جديدة ←', '', srQ, 2)]); };
-  card.appendChild(el('div', 'lab', 'منهو جابها؟'));
-  const o = el('div', 'opts'); o.style.gridTemplateColumns = '1fr 1fr'; S.players.forEach(p => o.appendChild(btn(p, '', () => reveal(p)))); card.appendChild(o);
-  setBtns2(srS.row, [btn('💡 تلميح', 'ghost', () => { SR.hint = Math.min(SR.hint + 1, [...w].length - 1); hint.classList.remove('hidden'); hint.textContent = 'تبدأ بـ: ' + [...w].slice(0, SR.hint).join(''); }), btn('اكشف 👀', '', () => reveal(null), 1.3)]);
+  const next = () => setBtns2(srS.row, [btn('النقاط', 'ghost', () => { const bx = el('div', 'box'); bx.appendChild(resList(SR.sc)); b.appendChild(bx); }), btn('كلمة جديدة ←', '', srQ, 2)]);
+  const reveal = (timeUp) => {
+    stopTimer(); tm.remove(); hint.classList.add('hidden');
+    card.append(el('div', 'lab', timeUp ? '⏰ خلص الوقت! الكلمة' : 'الكلمة'), el('div', 'txt good', w), el('div', 'desc', descOf(c, w)));
+    const ask = el('div', 'lab', 'منهو جابها؟'); card.appendChild(ask);
+    const o = el('div', 'opts'); o.style.gridTemplateColumns = '1fr 1fr';
+    const done = who => { ask.remove(); o.remove(); if (who) { SR.sc[who]++; card.appendChild(el('div', 'win good', '+١ لـ ' + who)); beep(1200, .15); } else card.appendChild(el('div', 'lab', 'ولا أحد جابها')); next(); };
+    S.players.forEach(p => o.appendChild(btn(p, '', () => done(p))));
+    const none = btn('ولا أحد ❌', 'ghost', () => done(null)); none.style.gridColumn = '1 / -1'; o.appendChild(none);
+    card.appendChild(o); setBtns2(srS.row, []);
+  };
+  setBtns2(srS.row, [btn('💡 تلميح', 'ghost', () => { SR.hint = Math.min(SR.hint + 1, [...w].length - 1); hint.classList.remove('hidden'); hint.textContent = 'تبدأ بـ: ' + [...w].slice(0, SR.hint).join(''); }), btn('اكشف الكلمة 👀', '', () => reveal(false), 1.3)]);
   show('scramble'); countdownTimer(TIME('scr'), 'srT', () => reveal(null));
 }
 
@@ -642,7 +650,7 @@ Object.assign(RULES, {
   num: ['اختاروا عدد الخانات (من ٣ لين ٨)، ومنهو يختار الرقم: التطبيق أو لاعب بالسر.', 'تتناوبون على التخمين، وبعد كل تخمين الألوان تقول لكم: 🟩 الرقم في مكانه، 🟨 موجود بس بمكان ثاني. اللي ما يتلون ما نقول لكم عنه شي!', 'عندكم ٨ محاولات. اللي يجيبه ياخد نقاط أكثر كل ما كان أسرع. وإدا ما جبتوه، اللي اختاره ياخد ٣ نقاط.'],
   word: ['نفس فكرة "وردل" بس بالعربي: كلمة من ٣ أو ٤ أو ٥ حروف.', 'التطبيق يختار الكلمة، أو لاعب يكتبها بالسر.', 'تتناوبون على التخمين: 🟩 الحرف في مكانه، 🟨 موجود بمكان ثاني، والكيبورد يتلون وياكم. اللي ما يتلون ما نقول لكم عنه شي.', 'الهمزات والتاء المربوطة تنحسب مثل أخواتها (أ=ا، ة=ه، ى=ي). عندكم ٦ محاولات.'],
   flags: ['اختاروا: أعلام، أو إيموجي (مثل 🍕🍝🛵 = إيطاليا)، أو مخلوط.', 'كل واحد بدوره يجاوب من ٤ خيارات قبل لا يخلص الوقت.', 'كل جواب صح بنقطة.'],
-  scr: ['تطلع كلمة حروفها ملخبطة ووياها الموضوع.', 'أول واحد يعرفها يصارخ فيها، واضغطوا على اسمه ياخد نقطة.', 'إدا علقتوا، اضغطوا 💡 تلميح يطلع لكم أول حرف.'],
+  scr: ['تطلع كلمة حروفها ملخبطة ووياها الموضوع.', 'أول واحد يعرفها يقولها بصوت عالي.', 'اضغطوا "اكشف الكلمة" وتأكدوا من جوابه، وبعدين اختاروا منهو جابها، أو "ولا أحد" إدا طلع غلط.', 'إدا علقتوا، اضغطوا 💡 تلميح يطلع لكم أول حرف.'],
   chain: ['كل واحد بدوره يكتب كلمة تبدأ بآخر حرف من الكلمة اللي قبلها.', 'عندك وقت قصير (تعدله من ⚙️)، وممنوع تكرر كلمة انقالت.', 'اللي يخلص وقته أو ما يعرف يطلع، وآخر واحد يبقى هو الفايز.', 'كلمة تبدأ بـ "ال" مقبولة إدا اللي بعدها يبدأ بالحرف المطلوب.'],
   five: ['يطلع لك تحدي مثل "قول ٣ أنواع سيارات".', 'اضغط ابدأ، وعندك ٥ ثواني بس (تقدر تغير الوقت من ⚙️).', 'إدا قلتها كلها قبل لا يخلص الوقت، الجماعة يضغطون ✅ وتاخد نقطة.'],
   xo: ['لاعبين على نفس التلفون، أو ضد الكمبيوتر (سهل أو صعب).', 'أول واحد يكمّل ٣ بخط (عرض أو طول أو مايل) يفوز.']

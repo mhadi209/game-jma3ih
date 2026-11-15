@@ -51,7 +51,7 @@ function scoreHead(box, teams, turn) {
   teams.forEach((t, i) => {
     const d = el('div', 'tbox' + (i === turn ? ' turn' : ''));
     d.append(el('div', 'tn', t.n), el('div', 'ts', t.s));
-    if (t.life) { const l = el('div', 'tl'); [['swap', '🔄'], ['dbl', '✖️٢'], ['hint', '💡']].forEach(([k, e]) => { const s = el('span', t.life[k] ? '' : 'used', e); l.appendChild(s); }); d.appendChild(l); }
+    if (Array.isArray(t.life)) { const l = el('div', 'tl'); t.life.forEach(k => l.appendChild(el('span', '', SJL[k].n.split(' ')[0]))); if (!t.life.length) l.appendChild(el('span', 'used', '—')); d.appendChild(l); }
     r.appendChild(d);
   });
   box.appendChild(r);
@@ -77,7 +77,7 @@ body.dark .tbox.turn{color:#1c1611}
 .ans{font-family:'Lalezar';font-size:30px;color:var(--grn);line-height:1.4;overflow-wrap:anywhere;word-break:break-word;max-width:100%}
 #sjQ .bigcard .txt{overflow-wrap:anywhere;max-width:100%}
 .hintx{background:var(--paper);border:2px dashed var(--yel);border-radius:10px;padding:6px 12px;font-weight:700}
-.dblx{background:var(--red);color:var(--cream);border-radius:999px;padding:0 12px;font-family:'Lalezar'}
+.dblx{background:var(--red);color:var(--cream);border-radius:14px;padding:2px 12px;font-family:'Lalezar';font-size:16px;line-height:1.6}
 .paper{background:#fffdf7;border:2px solid var(--line);border-radius:14px;box-shadow:var(--sh);touch-action:none;display:block;margin:0 auto;
  background-image:linear-gradient(#e7eef7 1px,transparent 1px);background-size:100% 28px}
 .dot{display:inline-block;width:16px;height:16px;border-radius:50%;border:2px solid var(--line);vertical-align:middle;margin-left:6px}
@@ -197,8 +197,21 @@ const sjB = mkScreen('sjBoard', '🧠 سين جيم');
 const sjQ = mkScreen('sjQ', '🧠 سين جيم');
 const SJCATS = Object.keys(SJ);
 let SG = null;
+/* وسائل المساعدة مثل اللعبة الأصلية: كل فريق يختار ٣ */
+const SJL = {
+  two: { n: '✌️ جاوب جوابين', d: 'قولوا جوابين، وإدا واحد منهم صح تنحسب لكم', when: 'q' },
+  call: { n: '📞 اتصال بصديق', d: 'دقوا على رفيقكم اللي يعرف كل شي، عندكم ٣٠ ثانية', when: 'q' },
+  pit: { n: '🕳️ الحفرة', d: 'قبل ما تشوفون السؤال: إدا جاوبتوا صح تنخصم نفس النقاط من الفريق الثاني', when: 'b' },
+  rest: { n: '🪑 استريح', d: 'اختاروا أشطر واحد ضدكم وخلوه يستريح عن هالسؤال', when: 'q' },
+  trap: { n: '🪤 الفخ', d: 'ما عرفتوا؟ عطوا السؤال للفريق الثاني، وإدا جاوبوا غلط تنخصم منهم نقاطه', when: 'q' },
+  dbl: { n: '✖️٢ دبل', d: 'نقاط السؤال تتضاعف إدا جاوبتوا صح', when: 'q' },
+  hint: { n: '💡 تلميح', d: 'يطلع لكم تلميح للجواب', when: 'q' }
+};
+const SJL_DEF = ['two', 'call', 'pit'];
 function sjSetup() {
   S.sjcats = (S.sjcats || []).filter(c => SJ[c]);
+  if (!Array.isArray(S.sjlife) || S.sjlife.length !== 2) S.sjlife = [SJL_DEF.slice(), SJL_DEF.slice()];
+  S.sjlife = S.sjlife.map(a => (a || []).filter(k => SJL[k]));
   const b = sjS.body; b.innerHTML = '';
   const tb = el('div', 'box'); teamInputs(tb);
   const cb = el('div', 'box'); const h = el('h2', '', ''); const cnt = el('span', '', ''); h.append(cnt);
@@ -206,21 +219,34 @@ function sjSetup() {
   const chips = el('div', 'chips'); cb.append(h, chips);
   const upd = () => { cnt.textContent = 'المواضيع (' + S.sjcats.length + ' من ٦)'; save(); };
   chipSet(chips, SJCATS, S.sjcats, 6, upd); upd();
+  const lb = el('div', 'box'); lb.appendChild(el('h2', '', 'وسائل المساعدة 🛟'));
+  lb.appendChild(el('div', 'lab', 'كل فريق يختار ٣ وسائل، وكل وسيلة تنستخدم مرة وحدة باللعبة.'));
+  const names = Object.keys(SJL).map(k => SJL[k].n), keyOf = n => Object.keys(SJL).find(k => SJL[k].n === n);
+  [0, 1].forEach(ti => {
+    const t = el('div', 'lab', ''); t.style.cssText = 'font-weight:700;margin:10px 0 6px;color:var(--txt)';
+    const cc = el('div', 'chips'); const sel = S.sjlife[ti].map(k => SJL[k].n);
+    const u = () => { S.sjlife[ti] = sel.map(keyOf); t.textContent = teamNames()[ti] + ' (' + sel.length + ' من ٣)'; save(); };
+    chipSet(cc, names, sel, 3, u); u(); lb.append(t, cc);
+  });
+  const ex = el('div', 'lab', ''); ex.style.cssText = 'margin-top:10px;line-height:1.9;text-align:right';
+  ex.innerHTML = Object.keys(SJL).map(k => '<b>' + SJL[k].n + '</b>: ' + SJL[k].d).join('<br>'); lb.appendChild(ex);
   const err = el('div', 'err', '');
-  b.append(tb, cb, err);
+  b.append(tb, cb, lb, err);
   setBtns2(sjS.row, [btn('ابدأ 🎯', '', () => { if (S.sjcats.length < 1) { err.textContent = 'اختار موضوع واحد على الأقل'; return; } sjStart(); })]);
   show('sjSetup');
 }
 function sjStart() {
   const cats = S.sjcats.slice(), cells = {};
   cats.forEach(c => { cells[c] = {}; [200, 400, 600].forEach(l => { const a = draw('sj_' + c + '_' + l, SJ[c][l]); let b2 = draw('sj_' + c + '_' + l, SJ[c][l]); cells[c][l] = [a, b2]; }); });
-  SG = { cats, cells, used: {}, turn: 0, teams: teamNames().map(n => ({ n, s: 0, life: { swap: 1, dbl: 1, hint: 1 } })) };
+  const lf = (S.sjlife || [SJL_DEF, SJL_DEF]);
+  SG = { cats, cells, used: {}, turn: 0, pit: false, teams: teamNames().map((n, i) => ({ n, s: 0, life: (lf[i] || SJL_DEF).slice() })) };
   sjBoard();
 }
 function sjBoard() {
   const b = sjB.body; b.innerHTML = '';
+  const t = SG.teams[SG.turn];
   const hd = el('div', ''); scoreHead(hd, SG.teams, SG.turn); b.appendChild(hd);
-  b.appendChild(el('div', 'sub', 'دور ' + SG.teams[SG.turn].n + ': اختاروا سؤال'));
+  b.appendChild(el('div', 'sub', 'دور ' + t.n + ': اختاروا سؤال'));
   let left = 0;
   SG.cats.forEach(c => {
     const r = el('div', 'sjrow'); r.appendChild(el('div', 'cn', c));
@@ -232,40 +258,64 @@ function sjBoard() {
     });
     r.appendChild(g); b.appendChild(r);
   });
+  if (t.life.includes('pit') || SG.pit) {
+    const pb = btn(SG.pit ? '🕳️ الحفرة شغالة! اختاروا السؤال (اضغط للإلغاء)' : '🕳️ احفروا لهم قبل لا تختارون السؤال', SG.pit ? 'red' : 'ghost', () => { SG.pit = !SG.pit; sjBoard(); });
+    pb.style.cssText = 'width:100%;margin-top:12px'; b.appendChild(pb);
+  }
   setBtns2(sjB.row, [btn('إنهاء اللعبة 🏁', 'ghost', sjEnd)]);
   show('sjBoard');
   if (!left) sjEnd();
 }
 function sjAsk(c, l, i) {
-  const t = SG.teams[SG.turn]; let q = SG.cells[c][l][i]; let dbl = false, hint = false, revealed = false;
+  const t = SG.teams[SG.turn], o = SG.teams[1 - SG.turn];
+  const q = SG.cells[c][l][i]; let revealed = false;
+  const on = {}; // الوسائل المستخدمة في هالسؤال
+  if (SG.pit) { on.pit = true; SG.pit = false; t.life = t.life.filter(k => k !== 'pit'); }
+  let callEnd = 0;
+  const use = k => { if (!t.life.includes(k) || on[k]) return; t.life = t.life.filter(x => x !== k); on[k] = true; if (k === 'call') callEnd = Date.now() + 30000; window.SFX && SFX.ding ? SFX.ding() : beep(900, .1); render(); };
   const render = () => {
     stopTimer();
     const b = sjQ.body; b.innerHTML = '';
     const hd = el('div', ''); scoreHead(hd, SG.teams, SG.turn); b.appendChild(hd);
     const card = el('div', 'bigcard'); b.appendChild(card);
-    const tag = el('div', 'lab', c + ' · ' + l + ' نقطة'); card.appendChild(tag);
-    if (dbl) card.appendChild(el('span', 'dblx', 'دبل ✖️٢ = ' + (l * 2)));
+    card.appendChild(el('div', 'lab', c + ' · ' + l + ' نقطة'));
+    const tags = [];
+    if (on.pit) tags.push('🕳️ الحفرة: إدا جاوب ' + t.n + ' صح ينخصم ' + l + ' من ' + o.n);
+    if (on.dbl) tags.push('دبل ✖️٢ = ' + (l * 2));
+    if (on.two) tags.push('✌️ ' + t.n + ' يقولون جوابين');
+    if (on.rest) tags.push('🪑 واحد من ' + o.n + ' يستريح وما يشارك');
+    if (on.trap) tags.push('🪤 فخ! السؤال صار على ' + o.n + '، وإدا غلطوا ينخصم منهم ' + l);
+    tags.forEach(x => card.appendChild(el('span', 'dblx', x)));
     card.appendChild(el('div', 'txt', q.q));
-    if (hint && q.h) card.appendChild(el('div', 'hintx', '💡 ' + q.h));
+    if (on.hint && q.h) card.appendChild(el('div', 'hintx', '💡 ' + q.h));
     if (!revealed) {
-      const tm = el('div', 'timer'); tm.id = 'sjT'; card.appendChild(tm); countdownTimer(TIME('sj'), 'sjT', () => {});
-      const life = el('div', 'life');
-      const bs = btn('🔄 غيّر', 'ghost', () => { if (!t.life.swap) return; t.life.swap = 0; q = draw('sj_' + c + '_' + l, SJ[c][l]); render(); });
-      const bd = btn('✖️٢ دبل', 'ghost', () => { if (!t.life.dbl) return; t.life.dbl = 0; dbl = true; render(); });
-      const bh = btn('💡 تلميح', 'ghost', () => { if (!t.life.hint) return; t.life.hint = 0; hint = true; render(); });
-      bs.disabled = !t.life.swap; bd.disabled = !t.life.dbl || dbl; bh.disabled = !t.life.hint || hint;
-      life.append(bs, bd, bh); card.appendChild(el('div', 'lab', 'وسائل المساعدة لـ ' + t.n + ' (مرة وحدة باللعبة):')); card.appendChild(life);
+      const tm = el('div', 'timer'); tm.id = 'sjT'; card.appendChild(tm);
+      if (on.call && callEnd > Date.now()) { card.insertBefore(el('div', 'lab', '📞 اتصال بصديق: عندكم ٣٠ ثانية'), tm); countdownTimer(Math.ceil((callEnd - Date.now()) / 1000), 'sjT', () => {}); }
+      else countdownTimer(TIME('sj'), 'sjT', () => {});
+      const avail = t.life.filter(k => SJL[k].when === 'q' && !(on.trap) && !(k === 'hint' && !q.h));
+      if (avail.length) {
+        const life = el('div', 'life'); avail.forEach(k => life.appendChild(btn(SJL[k].n, 'ghost', () => use(k))));
+        card.appendChild(el('div', 'lab', 'وسائل ' + t.n + ':')); card.appendChild(life);
+      }
       setBtns2(sjQ.row, [btn('اكشف الجواب 👀', '', () => { revealed = true; render(); })]);
     } else {
       card.appendChild(el('div', 'lab', 'الجواب'));
       card.appendChild(el('div', 'ans', q.a));
-      card.appendChild(el('div', 'lab', 'منهو جاوب صح؟'));
-      const done = who => {
-        SG.used[c + '|' + l + '|' + i] = 1;
-        if (who !== null) { SG.teams[who].s += (who === SG.turn && dbl) ? l * 2 : l; beep(1200, .15); } else beep(250, .25);
-        SG.turn = 1 - SG.turn; sjBoard();
-      };
-      setBtns2(sjQ.row, [btn(SG.teams[0].n + ' ✅', 'grn', () => done(0)), btn(SG.teams[1].n + ' ✅', 'grn', () => done(1)), btn('ولا أحد ❌', 'ghost', () => done(null))]);
+      const fin = () => { SG.used[c + '|' + l + '|' + i] = 1; SG.turn = 1 - SG.turn; sjBoard(); };
+      const ti = SG.turn, oi = 1 - SG.turn;
+      if (on.trap) {
+        card.appendChild(el('div', 'lab', o.n + ' جاوبوا صح؟'));
+        setBtns2(sjQ.row, [btn('صح ✅ (+' + l + ')', 'grn', () => { o.s += l; beep(1200, .15); fin(); }), btn('غلط ❌ (−' + l + ')', 'red', () => { o.s -= l; beep(250, .25); fin(); })]);
+      } else {
+        card.appendChild(el('div', 'lab', 'منهو جاوب صح؟'));
+        const done = who => {
+          if (who === ti) { t.s += on.dbl ? l * 2 : l; if (on.pit) o.s -= l; beep(1200, .15); }
+          else if (who === oi) { o.s += l; beep(1200, .15); }
+          else beep(250, .25);
+          fin();
+        };
+        setBtns2(sjQ.row, [btn(SG.teams[0].n + ' ✅', 'grn', () => done(0)), btn(SG.teams[1].n + ' ✅', 'grn', () => done(1)), btn('ولا أحد ❌', 'ghost', () => done(null))]);
+      }
     }
   };
   show('sjQ'); render();
@@ -708,7 +758,7 @@ add({ id: 'teams', e: '👥', n: 'تقسيم الفرق', d: 'قسّم الجم�
 add({ id: 'wheel', e: '🎡', n: 'عجلة الحظ', d: 'اكتب الخيارات ولف العجلة', min: 0, tool: 1 });
 Object.assign(RULES, {
   drw: ['كل واحد يسحب الشاشة ويشوف الكلمة، إلا الامبوستر ما يعرفها (وإدا شغلتوا الخيار يشوف الموضوع بس).', 'بعدين التلفون يدور: كل واحد يرسم **خط واحد بس** على نفس الورقة (تحط إصبعك وترسم وترفعه). كل لاعب له لون.', 'ارسم شي يثبت إنك تعرف الكلمة، بس لا تكون واضح واجد عشان الامبوستر ما يعرفها!', 'الامبوستر يحاول يرسم شي يمشي مع رسمتكم بدون ما ينكشف.', 'إدا غلطت، اضغط ↩️ تراجع وارسم من جديد قبل لا تعطي التلفون.', 'بعد آخر جولة، أو إدا ضغطتوا 🗳️ وقفوا، يبدأ التصويت السري ونفس نقاط الامبوستر: اللي يصوت صح +١، وكل صوت غلط +١ للامبوستر، والامبوستر +١ إدا خمّن الكلمة.'].map(x => x.replace(/\*\*/g, '')),
-  sj: ['تنقسمون فريقين، وتختارون لين ٦ مواضيع (أو اضغطوا 🎲 عشوائي).', 'كل موضوع فيه ٦ أسئلة: ٢ بـ ٢٠٠ (مقدور عليها)، ٢ بـ ٤٠٠ (صعبة)، ٢ بـ ٦٠٠ (صعبة واجد).', 'الفريق اللي عليه الدور يختار سؤال من اللوحة، ويقراه واحد بصوت عالي. عندهم دقيقة يفكرون.', 'وسائل المساعدة (كل فريق مرة وحدة باللعبة): 🔄 غيّر السؤال بسؤال ثاني من نفس الموضوع والنقاط، ✖️٢ دبل يضاعف نقاط السؤال إدا جاوبتوا صح، 💡 تلميح.', 'اضغطوا "اكشف الجواب" واختاروا منهو جاوب صح. إدا الفريق الثاني جاوب صح ياخد النقاط (بدون الدبل).', 'الدور ينتقل بعد كل سؤال، واللي عنده نقاط أكثر في الأخير يفوز. الأسئلة ما تتكرر لين تخلص.'],
+  sj: ['نفس اللعبة الكويتية المشهورة: فريقين، ٦ مواضيع، و٣٦ سؤال.', 'كل موضوع فيه ٦ أسئلة: ٢ بـ ٢٠٠ (مقدور عليها)، ٢ بـ ٤٠٠ (صعبة)، ٢ بـ ٦٠٠ (صعبة واجد).', 'الفريق اللي عليه الدور يختار سؤال من اللوحة، ويقراه واحد بصوت عالي، وعندهم وقت يفكرون. إدا ما عرفوا، الفريق الثاني يقدر يجاوب وياخد النقاط.', 'كل فريق يختار ٣ وسائل مساعدة قبل اللعبة، وكل وسيلة مرة وحدة: ✌️ جاوب جوابين، 📞 اتصال بصديق (٣٠ ثانية)، 🕳️ الحفرة (قبل ما تشوفون السؤال: إدا جاوبتوا صح تنخصم نقاطه من الفريق الثاني)، 🪑 استريح، 🪤 الفخ (تعطون السؤال للفريق الثاني وإدا غلطوا تنخصم منهم نقاطه)، وبعد ✖️٢ دبل و💡 تلميح.', 'اضغطوا "اكشف الجواب" وبعدين اختاروا منهو جاوب صح.', 'الدور ينتقل بعد كل سؤال، واللي عنده نقاط أكثر في الأخير يفوز. الأسئلة ما تتكرر لين تخلص.'],
   feud: ['تنقسمون فريقين. كل جولة فيها سؤال "سألنا ١٠٠ شخص" ووراه ٦ أجوبة مخفية بنقاطها.', 'بالبداية واحد من كل فريق يتواجهون، واللي يجاوب الجواب الأعلى يختار فريقه يلعب. اضغطوا على اسم الفريق اللي بيلعب.', 'الفريق يقول أجوبة: إدا الجواب موجود اضغطوا على مربعه ينكشف وتنضاف نقاطه، وإدا مو موجود اضغطوا ✖ غلط.', 'إدا كشفوا كل الأجوبة ياخدون نقاط الجولة. وإدا وصلوا ٣ أغلاط، الفريق الثاني عنده فرصة وحدة يسرق كل النقاط بجواب صح.', 'آخر جولة نقاطها دبل! واللي يجمع أكثر في الأخير يفوز.'],
   dice: ['اختار نوع النرد: D4 أو D6 أو D8 أو D10 أو D12 أو D20، وچم نرد تبغى (لين ٤).', 'اضغط "ارمي" أو اضغط على النرد نفسه، ويطلع المجموع تحت.'],
   cups: ['تشوف الكورة تحت كوب، بعدين الأكواب تتلخبط.', 'تابع الكوب بعيونك، ولما يوقفون اضغط على الكوب اللي تظن الكورة تحته.', 'كل ما جبتها صح تزيد سلسلتك. تقدر تزيد عدد الأكواب والصعوبة.'],
