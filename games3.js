@@ -80,7 +80,7 @@ css.textContent = `
 document.head.appendChild(css);
 
 const norm = s => s.replace(/[أإآ]/g, 'ا').replace(/ى/g, 'ي').replace(/ؤ/g, 'و').replace(/ئ/g, 'ي').replace(/ة/g, 'ه');
-function passCard(add, name, msg) { add('lab', 'عط الجوال لـ'); add('nm', name); add('lab', msg || 'وخل الباقين ما يشوفون الشاشة 🤫'); }
+function passCard(add, name, msg) { add('lab', 'عط التلفون لـ'); add('nm', name); add('lab', msg || 'وخل الباقين ما يشوفون الشاشة 🤫'); }
 const sc0 = () => { const o = {}; S.players.forEach(p => o[p] = 0); return o; };
 
 /* =================================================================
@@ -134,9 +134,9 @@ window.renderHome = function () {
 };
 
 /* =================================================================
-   🎤 مين قالها
+   🎤 منهو قالها
    ================================================================= */
-const wsS = mkScreen('whosaid', '🎤 مين قالها؟');
+const wsS = mkScreen('whosaid', '🎤 منهو قالها؟');
 let WS = null;
 function whoStart() { WS = { sc: sc0() }; whoRound(); }
 function whoRound() {
@@ -159,7 +159,7 @@ function whoWrite() {
 function whoGuess() {
   const a = WS.ans[WS.k]; let g = WS.gq[WS.gi % WS.gq.length]; if (g === a.p) { WS.gi++; g = WS.gq[WS.gi % WS.gq.length]; }
   const b = wsS.body; b.innerHTML = ''; const c = el('div', 'bigcard'); b.appendChild(c);
-  c.append(el('div', 'lab', WS.q), el('div', 'lab', 'جواب ' + (WS.k + 1) + ' من ' + WS.ans.length + ':'), el('div', 'txt', '«' + a.t + '»'), el('div', 'lab', 'يخمن مين كاتبه:'), el('div', 'nm', g));
+  c.append(el('div', 'lab', WS.q), el('div', 'lab', 'جواب ' + (WS.k + 1) + ' من ' + WS.ans.length + ':'), el('div', 'txt', '«' + a.t + '»'), el('div', 'lab', 'يخمن منهو كاتبه:'), el('div', 'nm', g));
   const o = el('div', 'opts'); o.style.gridTemplateColumns = '1fr 1fr';
   S.players.filter(x => x !== g).forEach(x => o.appendChild(btn(x, '', () => {
     o.querySelectorAll('button').forEach(bb => { bb.disabled = true; if (bb.textContent === a.p) bb.className = 'ok'; });
@@ -195,7 +195,7 @@ function cbSetup(mode) {
   const box = el('div', 'box');
   const mx = mode === 'num' ? 8 : 5; if (S.cbLen > mx) S.cbLen = mx;
   box.appendChild(stepper('عدد الخانات', () => S.cbLen, v => S.cbLen = v, () => 3, () => mx));
-  const t = el('div', 'toggle'); t.appendChild(el('b', '', 'مين يختار ' + (mode === 'num' ? 'الرقم' : 'الكلمة') + '؟'));
+  const t = el('div', 'toggle'); t.appendChild(el('b', '', 'منهو يختار ' + (mode === 'num' ? 'الرقم' : 'الكلمة') + '؟'));
   const ch = el('div', 'chips');
   [['rnd', '🎲 التطبيق'], ['player', '🙋 لاعب']].forEach(([k, l]) => { const c = el('button', 'chip' + (S.cbSetter === k ? ' sel' : ''), l); c.onclick = () => { S.cbSetter = k; save(); cbSetup(mode); }; ch.appendChild(c); });
   t.appendChild(ch); box.appendChild(t);
@@ -228,7 +228,7 @@ function cbKeyboard(onKey, plain) {
   const del = el('button', 'wide', '⌫ امسح'); del.onclick = () => onKey('⌫'); last.append(ok, del); kb.appendChild(last);
   return kb;
 }
-function tileW() { return Math.floor(Math.min(52, (Math.min(window.innerWidth - 40, 440) - (CB.L - 1) * 6) / CB.L)); }
+function tileW() { return Math.floor(Math.min(52, (Math.min(window.innerWidth - 40, TABW(440)) - (CB.L - 1) * 6) / CB.L)); }
 function score(guess, secret) {
   const g = [...guess].map(norm), s = [...secret].map(norm), res = Array(g.length).fill('x'), left = {};
   s.forEach((ch, i) => { if (g[i] === ch) res[i] = 'g'; else left[ch] = (left[ch] || 0) + 1; });
@@ -236,7 +236,7 @@ function score(guess, secret) {
   return res;
 }
 function cbPlay() {
-  if (!CB.turnQ) { const pl = S.players.filter(p => p !== CB.setter); CB.order = pl.length ? shuffle(pl) : ['أنت']; CB.ti = 0; CB.turnQ = 1; }
+  if (!CB.turnQ) { const pl = S.players.filter(p => p !== CB.setter); CB.order = pl.length ? shuffle(pl) : ['إنت']; CB.ti = 0; CB.turnQ = 1; }
   const b = cbS.body; b.innerHTML = '';
   const who = CB.order[CB.ti % CB.order.length];
   const info = el('div', 'sub', ''); info.innerHTML = 'دور <b style="color:var(--red);font-size:20px">' + esc(who) + '</b> يخمن · محاولة ' + (CB.guesses.length + 1) + ' من ' + CB.rows + (CB.setter ? ' · اللي اختار: ' + esc(CB.setter) : '');
@@ -305,7 +305,7 @@ function mjRound() { MJ.q = draw('majority', WYR); MJ.v = {}; MJ.order = shuffle
 function mjAsk() {
   const b = mjS.body; b.innerHTML = ''; const c = el('div', 'bigcard'); b.appendChild(c);
   const add = (k, t) => { const d = el('div', k, t); c.appendChild(d); return d; };
-  add('lab', 'لو خيروك… وش بيختار أغلب الجماعة؟'); const p = MJ.order[MJ.i]; passCard(add, p, 'اختار بالسر. اللي مع الأغلبية ياخذ نقطة!');
+  add('lab', 'لو خيروك… ويش بيختار أغلب الجماعة؟'); const p = MJ.order[MJ.i]; passCard(add, p, 'اختار بالسر. اللي مع الأغلبية ياخد نقطة!');
   const o = el('div', 'opts'); MJ.q.forEach((t, k) => o.appendChild(btn(t, '', () => { MJ.v[p] = k; MJ.i++; beep(900, .05); if (MJ.i < MJ.order.length) mjAsk(); else mjReveal(); }))); c.appendChild(o);
   setBtns2(mjS.row, []); show('majority');
 }
@@ -314,7 +314,7 @@ function mjReveal() {
   const g = [[], []]; Object.entries(MJ.v).forEach(([p, k]) => g[k].push(p));
   const win = g[0].length === g[1].length ? -1 : (g[0].length > g[1].length ? 0 : 1);
   MJ.q.forEach((t, k) => { const d = el('div', 'box'); d.style.width = '100%'; d.style.background = win === k ? 'var(--grn)' : 'var(--paper)'; d.style.color = win === k ? '#fff' : 'var(--txt)'; d.append(el('div', 'txt', t + ' (' + g[k].length + ')')); d.querySelector('.txt').style.fontSize = '20px'; d.append(el('div', '', g[k].join('، ') || '—')); c.appendChild(d); });
-  if (win < 0) c.appendChild(el('div', 'win', 'تعادل! 🤝 ولا أحد ياخذ نقطة')); else { g[win].forEach(p => MJ.sc[p]++); c.appendChild(el('div', 'win good', '+١ للأغلبية')); }
+  if (win < 0) c.appendChild(el('div', 'win', 'تعادل! 🤝 ولا أحد ياخد نقطة')); else { g[win].forEach(p => MJ.sc[p]++); c.appendChild(el('div', 'win good', '+١ للأغلبية')); }
   c.appendChild(resList(MJ.sc)); beep(1000, .12);
   setBtns2(mjS.row, [btn('السؤال اللي بعده ←', '', mjRound)]);
 }
@@ -339,7 +339,7 @@ function chTurn() {
   const submit = () => {
     const w = inp.value.trim(); if (!w) return;
     if (norm(w.replace(/^ال/, ''))[0] !== norm(CH2.letter) && norm(w)[0] !== norm(CH2.letter)) { err.textContent = 'لازم تبدأ بحرف ' + CH2.letter; buzz(100); return; }
-    if (CH2.used.has(norm(w))) { err.textContent = 'هذي انقالت قبل!'; buzz(100); return; }
+    if (CH2.used.has(norm(w))) { err.textContent = 'هادي انقالت قبل!'; buzz(100); return; }
     if ([...w].length < 2) { err.textContent = 'كلمة أطول شوي'; return; }
     CH2.used.add(norm(w)); CH2.last = w; CH2.letter = lastLetter(w) || pick(START_LETTERS); CH2.ptr = (CH2.ptr + 1) % CH2.alive.length; beep(1000, .06); chTurn();
   };
@@ -388,9 +388,9 @@ let MI = null;
 const fmt = n => n.toLocaleString('en-US');
 function milStart() {
   const b = mlS.body; b.innerHTML = ''; const c = el('div', 'bigcard'); b.appendChild(c);
-  c.append(el('div', 'lab', 'مين بيلعب؟'));
+  c.append(el('div', 'lab', 'منهو بيلعب؟'));
   const o = el('div', 'opts'); o.style.gridTemplateColumns = '1fr 1fr';
-  (S.players.length ? S.players : ['أنا']).forEach(p => o.appendChild(btn(p, '', () => { MI = { p, lvl: 0, life: { f: 1, a: 1, c: 1 } }; milQ(); })));
+  (S.players.length ? S.players : ['أني']).forEach(p => o.appendChild(btn(p, '', () => { MI = { p, lvl: 0, life: { f: 1, a: 1, c: 1 } }; milQ(); })));
   c.appendChild(o); setBtns2(mlS.row, []); show('million');
 }
 function milPick(lvl) {
@@ -420,7 +420,7 @@ function milDraw(extra) {
   }
   if (extra === 'call') {
     const right = Math.random() < Math.max(.4, .9 - MI.lvl * .04); const cand = MI.opts.filter(o => !MI.gone.includes(o)); const ans = right ? MI.Q.r : pick(cand.filter(o => o !== MI.Q.r));
-    const d = el('div', 'mq', '📞 صديقك يقول: "' + (right ? 'متأكد تقريباً إنها: ' : 'أظن… يمكن: ') + ans + '"'); d.style.marginTop = '10px'; d.style.fontSize = '16px'; m.appendChild(d);
+    const d = el('div', 'mq', '📞 رفيقك يقول: "' + (right ? 'متأكد تقريباً إنها: ' : 'أظن… يمكن: ') + ans + '"'); d.style.marginTop = '10px'; d.style.fontSize = '16px'; m.appendChild(d);
   }
   const mo = el('div', 'mo');
   MI.opts.forEach((o, i) => { const x = el('button', MI.gone.includes(o) ? 'gone' : ''); x.innerHTML = '<b>' + 'أبجد'[i] + ':</b>' + esc(o); x.onclick = () => milAnswer(o, x, mo); mo.appendChild(x); });
@@ -448,7 +448,7 @@ function milEnd(won, why) {
 }
 
 /* =================================================================
-   🔔 الجرس (على جوال واحد)
+   🔔 الجرس (على تلفون واحد)
    ================================================================= */
 const bzS = mkScreen('buzzer', '🔔 الجرس');
 const BZC = ['#c94a3b', '#1f4f8a', '#2c7a6b', '#c9861f'];
@@ -456,11 +456,11 @@ let BZ = null;
 function bzSetup() {
   S.bzN = S.bzN || 2;
   const b = bzS.body; b.innerHTML = '';
-  const box = el('div', 'box'); box.appendChild(stepper('كم لاعب أو فريق (على نفس الجوال)', () => S.bzN, v => S.bzN = v, () => 2, () => 4));
+  const box = el('div', 'box'); box.appendChild(stepper('چم لاعب أو فريق (على نفس التلفون)', () => S.bzN, v => S.bzN = v, () => 2, () => 4));
   const nb = el('div', 'box'); nb.appendChild(el('h2', '', 'الأسامي'));
   S.bzNames = S.bzNames || [];
   for (let i = 0; i < 4; i++) { const inp = el('input'); inp.type = 'text'; inp.style.width = '100%'; inp.style.marginBottom = '6px'; inp.value = S.bzNames[i] || S.players[i] || ('لاعب ' + (i + 1)); inp.oninput = () => { S.bzNames[i] = inp.value; save(); }; S.bzNames[i] = inp.value; nb.appendChild(inp); }
-  const info = el('div', 'box'); info.style.color = 'var(--mut)'; info.style.fontSize = '14px'; info.textContent = 'حطوا الجوال بالنص، كل واحد ياخذ زاوية. يطلع سؤال، وأول واحد يضغط زره يجاوب. عندكم ' + TIME('buzz') + ' ثانية لكل سؤال.';
+  const info = el('div', 'box'); info.style.color = 'var(--mut)'; info.style.fontSize = '14px'; info.textContent = 'حطوا التلفون بالنص، كل واحد ياخد زاوية. يطلع سؤال، وأول واحد يضغط زره يجاوب. عندكم ' + TIME('buzz') + ' ثانية لكل سؤال.';
   b.append(box, nb, info);
   setBtns2(bzS.row, [btn('ابدأ 🔔', '', () => { BZ = { n: S.bzN, names: S.bzNames.slice(0, S.bzN), sc: Array(S.bzN).fill(0) }; bzQ(); })]);
   show('buzzer');
@@ -526,7 +526,7 @@ function flSetup() {
 }
 function flQ() {
   const mode = S.flMode === 'mix' ? (Math.random() < .55 ? 'flag' : 'emoji') : S.flMode;
-  const p = S.players.length ? FL.q() : 'أنت';
+  const p = S.players.length ? FL.q() : 'إنت';
   let shown, right, pool;
   if (mode === 'flag') { const f = draw('flags', FLAGS); shown = el('div', 'flagBig', flagEmoji(f.code)); right = f.name; pool = FLAGS.map(x => x.name); }
   else { const f = draw('emojic', EMOJI_COUNTRIES); shown = el('div', 'emojiBig', f.e); right = f.name; pool = FLAGS.map(x => x.name).concat(EMOJI_COUNTRIES.map(x => x.name)); }
@@ -561,7 +561,7 @@ function srQ() {
   const hint = el('div', 'hintx hidden', ''); card.appendChild(hint);
   const tm = el('div', 'timer'); tm.id = 'srT'; card.appendChild(tm);
   const reveal = (who) => { stopTimer(); card.querySelectorAll('.opts').forEach(x => x.remove()); card.append(el('div', 'lab', 'الكلمة'), el('div', 'txt good', w), el('div', 'desc', descOf(c, w))); if (who) { SR.sc[who]++; card.appendChild(el('div', 'win good', '+١ لـ ' + who)); beep(1200, .15); } setBtns2(srS.row, [btn('النقاط', 'ghost', () => { const bx = el('div', 'box'); bx.appendChild(resList(SR.sc)); b.appendChild(bx); }), btn('كلمة جديدة ←', '', srQ, 2)]); };
-  card.appendChild(el('div', 'lab', 'مين جابها؟'));
+  card.appendChild(el('div', 'lab', 'منهو جابها؟'));
   const o = el('div', 'opts'); o.style.gridTemplateColumns = '1fr 1fr'; S.players.forEach(p => o.appendChild(btn(p, '', () => reveal(p)))); card.appendChild(o);
   setBtns2(srS.row, [btn('💡 تلميح', 'ghost', () => { SR.hint = Math.min(SR.hint + 1, [...w].length - 1); hint.classList.remove('hidden'); hint.textContent = 'تبدأ بـ: ' + [...w].slice(0, SR.hint).join(''); }), btn('اكشف 👀', '', () => reveal(null), 1.3)]);
   show('scramble'); countdownTimer(TIME('scr'), 'srT', () => reveal(null));
@@ -579,14 +579,14 @@ const SVGO = '<svg viewBox="0 0 100 100"><circle class="do" cx="50" cy="50" r="3
 function xoSetup() {
   S.xoMode = S.xoMode || 'pvp';
   const b = xoS.body; b.innerHTML = '';
-  const box = el('div', 'box'); box.appendChild(el('h2', '', 'ضد مين؟'));
+  const box = el('div', 'box'); box.appendChild(el('h2', '', 'ضد منهو؟'));
   const ch = el('div', 'chips'); [['pvp', '👥 لاعبين'], ['easy', '🤖 كمبيوتر سهل'], ['hard', '🧠 كمبيوتر صعب']].forEach(([k, l]) => { const c = el('button', 'chip' + (S.xoMode === k ? ' sel' : ''), l); c.onclick = () => { S.xoMode = k; save(); xoSetup(); }; ch.appendChild(c); });
   box.appendChild(ch); b.appendChild(box);
   setBtns2(xoS.row, [btn('ابدأ ▶', '', () => { XO = { sc: { X: 0, O: 0, '=': 0 }, first: 'X' }; xoNew(); })]);
   show('xo');
 }
 function xoNew() { XO.b = Array(9).fill(null); XO.t = XO.first; XO.over = false; XO.first = XO.first === 'X' ? 'O' : 'X'; xoDraw(); if (S.xoMode !== 'pvp' && XO.t === 'O') setTimeout(xoBot, 500); }
-function xoName(s) { if (S.xoMode !== 'pvp') return s === 'X' ? 'أنت' : 'الكمبيوتر'; const p = S.players; return s === 'X' ? (p[0] || 'إكس') : (p[1] || 'أو'); }
+function xoName(s) { if (S.xoMode !== 'pvp') return s === 'X' ? 'إنت' : 'الكمبيوتر'; const p = S.players; return s === 'X' ? (p[0] || 'إكس') : (p[1] || 'أو'); }
 function xoDraw(line) {
   const b = xoS.body; b.innerHTML = '';
   const hd = el('div', 'tscore'); [['X', '#c94a3b'], ['O', '#1f4f8a']].forEach(([s, c]) => { const d = el('div', 'tbox' + (XO.t === s && !XO.over ? ' turn' : '')); const n = el('div', 'tn', (s === 'X' ? '❌ ' : '⭕ ') + xoName(s)); d.append(n, el('div', 'ts', XO.sc[s])); hd.appendChild(d); }); b.appendChild(hd);
@@ -623,29 +623,29 @@ function xoBot() {
 const at = (id, g) => { const k = GAMES.findIndex(x => x.id === id); GAMES.splice(k >= 0 ? k + 1 : GAMES.length, 0, g); };
 at('sj', { id: 'mil', e: '💰', n: 'من سيربح المليون', d: '١٥ سؤال لين المليون ووسائل مساعدة', min: 0, t: '١٠ دقايق' });
 at('mil', { id: 'buzz', e: '🔔', n: 'الجرس', d: 'أسرع واحد يضغط يجاوب', min: 0, t: 'مفتوح' });
-at('feud', { id: 'whosaid', e: '🎤', n: 'مين قالها؟', d: 'كل واحد يكتب بالسر… وتخمنون مين', min: 3, t: '١٠ دقايق' });
-at('whosaid', { id: 'major', e: '🗳️', n: 'الأغلبية', d: 'كن مع الأغلبية تاخذ نقطة', min: 3, t: 'مفتوح' });
-at('major', { id: 'closest', e: '🎯', n: 'أقرب رقم', d: 'اللي تخمينه أقرب ياخذ النقطة', min: 2, t: 'مفتوح' });
+at('feud', { id: 'whosaid', e: '🎤', n: 'منهو قالها؟', d: 'كل واحد يكتب بالسر… وتخمنون منهو', min: 3, t: '١٠ دقايق' });
+at('whosaid', { id: 'major', e: '🗳️', n: 'الأغلبية', d: 'كن مع الأغلبية تاخد نقطة', min: 3, t: 'مفتوح' });
+at('major', { id: 'closest', e: '🎯', n: 'أقرب رقم', d: 'اللي تخمينه أقرب ياخد النقطة', min: 2, t: 'مفتوح' });
 at('closest', { id: 'num', e: '🔐', n: 'الرقم السري', d: 'من ٣ لين ٨ خانات… خمّنوه', min: 0, t: '٥ دقايق' });
 at('num', { id: 'word', e: '🔤', n: 'الكلمة السرية', d: 'وردل بالعربي: ٣ أو ٤ أو ٥ حروف', min: 0, t: '٥ دقايق' });
 at('word', { id: 'flags', e: '🚩', n: 'خمن الدولة', d: 'من العلم أو الإيموجي', min: 0, t: 'مفتوح' });
 at('flags', { id: 'scr', e: '🔀', n: 'الحروف المخربطة', d: 'رتبوا الحروف قبل الوقت', min: 2, t: 'مفتوح' });
 at('scr', { id: 'chain', e: '🔗', n: 'سلسلة الكلمات', d: 'كلمة تبدأ بآخر حرف… بسرعة!', min: 2, t: 'مفتوح' });
 at('chain', { id: 'five', e: '⏱️', n: '٥ ثواني', d: 'قول ٣ أشياء قبل لا يخلص الوقت', min: 2, t: 'مفتوح' });
-at('five', { id: 'xo', e: '❌', n: 'إكس أو', d: 'ضد صاحبك أو الكمبيوتر', min: 0, t: 'دقيقة' });
+at('five', { id: 'xo', e: '❌', n: 'إكس أو', d: 'ضد رفيقك أو الكمبيوتر', min: 0, t: 'دقيقة' });
 Object.assign(RULES, {
-  mil: ['اختاروا مين بيلعب. فيه ١٥ سؤال، كل واحد أصعب من اللي قبله، لين المليون.', 'كل سؤال له ٤ خيارات ووقت محدد (تعدله من ⚙️).', 'وسائل المساعدة مرة وحدة: ٥٠:٥٠ يشيل جوابين غلط، 👥 الجمهور يعطيك نسب، 📞 صديق يقول لك وش يظن.', 'المحطات الآمنة: ١٠٠٠ و٣٢٠٠٠. إذا غلطت ترجع لآخر محطة آمنة.', 'تقدر تنسحب بأي وقت وتاخذ اللي جمعته.'],
-  buzz: ['اختاروا كم لاعب أو فريق (٢ لين ٤)، وحطوا الجوال بالنص. كل واحد له زر ملوّن.', 'يطلع سؤال بالنص، وأول واحد يضغط زره يجاوب بصوت عالي.', 'اللي يدير اللعبة يضغط ✅ صح أو ❌ غلط. إذا غلط، ينقفل زره والباقين يقدرون يضغطون.', 'كل جواب صح بنقطة.'],
-  whosaid: ['يطلع سؤال، مثل "وش أغرب أكلة جربتها؟".', 'الجوال يدور: كل واحد يكتب جوابه بالسر.', 'بعدين الأجوبة تطلع وحدة وحدة، وكل مرة واحد يخمن مين كاتب الجواب.', 'إذا خمن صح ياخذ نقطة. وإذا غلط، صاحب الجواب ياخذ نقطة لأنه ضيّعه 😏'],
-  major: ['يطلع سؤال "لو خيروك" بخيارين.', 'الجوال يدور وكل واحد يختار بالسر.', 'اللي يطلع مع الأغلبية ياخذ نقطة. يعني فكر: وش بيختارون الباقين؟'],
-  closest: ['يطلع سؤال جوابه رقم، مثل "كم طول برج خليفة؟".', 'الجوال يدور وكل واحد يكتب تخمينه بالسر.', 'اللي تخمينه أقرب للجواب الصح ياخذ نقطة.'],
-  num: ['اختاروا عدد الخانات (من ٣ لين ٨)، ومين يختار الرقم: التطبيق أو لاعب بالسر.', 'تتناوبون على التخمين، وبعد كل تخمين الألوان تقول لكم: 🟩 الرقم في مكانه، 🟨 موجود بس بمكان ثاني. اللي ما يتلون ما نقول لكم عنه شي!', 'عندكم ٨ محاولات. اللي يجيبه ياخذ نقاط أكثر كل ما كان أسرع. وإذا ما جبتوه، اللي اختاره ياخذ ٣ نقاط.'],
-  word: ['نفس فكرة "وردل" بس بالعربي: كلمة من ٣ أو ٤ أو ٥ حروف.', 'التطبيق يختار الكلمة، أو لاعب يكتبها بالسر.', 'تتناوبون على التخمين: 🟩 الحرف في مكانه، 🟨 موجود بمكان ثاني، والكيبورد يتلون معكم. اللي ما يتلون ما نقول لكم عنه شي.', 'الهمزات والتاء المربوطة تنحسب مثل أخواتها (أ=ا، ة=ه، ى=ي). عندكم ٦ محاولات.'],
+  mil: ['اختاروا منهو بيلعب. فيه ١٥ سؤال، كل واحد أصعب من اللي قبله، لين المليون.', 'كل سؤال له ٤ خيارات ووقت محدد (تعدله من ⚙️).', 'وسائل المساعدة مرة وحدة: ٥٠:٥٠ يشيل جوابين غلط، 👥 الجمهور يعطيك نسب، 📞 صديق يقول لك ويش يظن.', 'المحطات الآمنة: ١٠٠٠ و٣٢٠٠٠. إدا غلطت ترجع لآخر محطة آمنة.', 'تقدر تنسحب بأي وقت وتاخد اللي جمعته.'],
+  buzz: ['اختاروا چم لاعب أو فريق (٢ لين ٤)، وحطوا التلفون بالنص. كل واحد له زر ملوّن.', 'يطلع سؤال بالنص، وأول واحد يضغط زره يجاوب بصوت عالي.', 'اللي يدير اللعبة يضغط ✅ صح أو ❌ غلط. إدا غلط، ينقفل زره والباقين يقدرون يضغطون.', 'كل جواب صح بنقطة.'],
+  whosaid: ['يطلع سؤال، مثل "ويش أغرب أكلة جربتها؟".', 'التلفون يدور: كل واحد يكتب جوابه بالسر.', 'بعدين الأجوبة تطلع وحدة وحدة، وكل مرة واحد يخمن منهو كاتب الجواب.', 'إدا خمن صح ياخد نقطة. وإدا غلط، صاحب الجواب ياخد نقطة لأنه ضيّعه 😏'],
+  major: ['يطلع سؤال "لو خيروك" بخيارين.', 'التلفون يدور وكل واحد يختار بالسر.', 'اللي يطلع مع الأغلبية ياخد نقطة. يعني فكر: ويش بيختارون الباقين؟'],
+  closest: ['يطلع سؤال جوابه رقم، مثل "چم طول برج خليفة؟".', 'التلفون يدور وكل واحد يكتب تخمينه بالسر.', 'اللي تخمينه أقرب للجواب الصح ياخد نقطة.'],
+  num: ['اختاروا عدد الخانات (من ٣ لين ٨)، ومنهو يختار الرقم: التطبيق أو لاعب بالسر.', 'تتناوبون على التخمين، وبعد كل تخمين الألوان تقول لكم: 🟩 الرقم في مكانه، 🟨 موجود بس بمكان ثاني. اللي ما يتلون ما نقول لكم عنه شي!', 'عندكم ٨ محاولات. اللي يجيبه ياخد نقاط أكثر كل ما كان أسرع. وإدا ما جبتوه، اللي اختاره ياخد ٣ نقاط.'],
+  word: ['نفس فكرة "وردل" بس بالعربي: كلمة من ٣ أو ٤ أو ٥ حروف.', 'التطبيق يختار الكلمة، أو لاعب يكتبها بالسر.', 'تتناوبون على التخمين: 🟩 الحرف في مكانه، 🟨 موجود بمكان ثاني، والكيبورد يتلون وياكم. اللي ما يتلون ما نقول لكم عنه شي.', 'الهمزات والتاء المربوطة تنحسب مثل أخواتها (أ=ا، ة=ه، ى=ي). عندكم ٦ محاولات.'],
   flags: ['اختاروا: أعلام، أو إيموجي (مثل 🍕🍝🛵 = إيطاليا)، أو مخلوط.', 'كل واحد بدوره يجاوب من ٤ خيارات قبل لا يخلص الوقت.', 'كل جواب صح بنقطة.'],
-  scr: ['تطلع كلمة حروفها ملخبطة ومعها الموضوع.', 'أول واحد يعرفها يصارخ فيها، واضغطوا على اسمه ياخذ نقطة.', 'إذا علقتوا، اضغطوا 💡 تلميح يطلع لكم أول حرف.'],
-  chain: ['كل واحد بدوره يكتب كلمة تبدأ بآخر حرف من الكلمة اللي قبلها.', 'عندك وقت قصير (تعدله من ⚙️)، وممنوع تكرر كلمة انقالت.', 'اللي يخلص وقته أو ما يعرف يطلع، وآخر واحد يبقى هو الفايز.', 'كلمة تبدأ بـ "ال" مقبولة إذا اللي بعدها يبدأ بالحرف المطلوب.'],
-  five: ['يطلع لك تحدي مثل "قول ٣ أنواع سيارات".', 'اضغط ابدأ، وعندك ٥ ثواني بس (تقدر تغير الوقت من ⚙️).', 'إذا قلتها كلها قبل لا يخلص الوقت، الجماعة يضغطون ✅ وتاخذ نقطة.'],
-  xo: ['لاعبين على نفس الجوال، أو ضد الكمبيوتر (سهل أو صعب).', 'أول واحد يكمّل ٣ بخط (عرض أو طول أو مايل) يفوز.']
+  scr: ['تطلع كلمة حروفها ملخبطة ووياها الموضوع.', 'أول واحد يعرفها يصارخ فيها، واضغطوا على اسمه ياخد نقطة.', 'إدا علقتوا، اضغطوا 💡 تلميح يطلع لكم أول حرف.'],
+  chain: ['كل واحد بدوره يكتب كلمة تبدأ بآخر حرف من الكلمة اللي قبلها.', 'عندك وقت قصير (تعدله من ⚙️)، وممنوع تكرر كلمة انقالت.', 'اللي يخلص وقته أو ما يعرف يطلع، وآخر واحد يبقى هو الفايز.', 'كلمة تبدأ بـ "ال" مقبولة إدا اللي بعدها يبدأ بالحرف المطلوب.'],
+  five: ['يطلع لك تحدي مثل "قول ٣ أنواع سيارات".', 'اضغط ابدأ، وعندك ٥ ثواني بس (تقدر تغير الوقت من ⚙️).', 'إدا قلتها كلها قبل لا يخلص الوقت، الجماعة يضغطون ✅ وتاخد نقطة.'],
+  xo: ['لاعبين على نفس التلفون، أو ضد الكمبيوتر (سهل أو صعب).', 'أول واحد يكمّل ٣ بخط (عرض أو طول أو مايل) يفوز.']
 });
 Object.assign(window.EXTRA, {
   mil: milStart, buzz: bzSetup, whosaid: whoStart, major: mjStart, closest: clStart, num: () => cbSetup('num'), word: () => cbSetup('word'),

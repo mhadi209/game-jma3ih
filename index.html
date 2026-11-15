@@ -148,6 +148,67 @@ button:disabled{opacity:.75}
 .meta span{border:2px solid var(--line);border-radius:999px;padding:1px 12px;font-size:13px;background:var(--paper);font-weight:700}
 .modal{position:fixed;inset:0;background:rgba(43,29,18,.55);display:flex;align-items:flex-end;justify-content:center;z-index:20;padding:16px}
 .modal .box{max-width:488px;width:100%;max-height:82vh;overflow:auto;margin-bottom:calc(env(safe-area-inset-bottom))}
+/* ===== آيباد وتاب ===== */
+@media (min-width:700px){
+ body{font-size:19px}
+ .screen{max-width:780px;padding-left:28px;padding-right:28px;padding-bottom:160px}
+ .bottom>*{max-width:724px}
+ .bottom button{padding:18px;font-size:25px}
+ .modal{align-items:center}
+ .modal .box{max-width:640px}
+ h1{font-size:56px}
+ .top h1{font-size:32px}
+ .back{width:54px;height:54px;font-size:24px}
+ .help{width:auto;font-size:20px;padding:0 16px}
+ .sub{font-size:19px}
+ .secT{font-size:28px;margin-top:26px}
+ .box{padding:20px;border-radius:16px}
+ .box h2{font-size:25px}
+ input[type=text]{font-size:20px;padding:14px 16px}
+ button{font-size:21px;padding:14px 20px}
+ .small{font-size:17px;padding:6px 16px}
+ .pl{font-size:19px;padding:6px 16px}
+ .chip{font-size:18px;padding:9px 16px}
+ .grid{grid-template-columns:repeat(3,1fr);gap:18px}
+ .game{min-height:158px;padding:18px}
+ .game .e{font-size:42px}.game .n{font-size:25px}.game .d{font-size:15.5px}
+ .toggle{padding:12px 0;font-size:19px}.toggle small{font-size:15px}
+ .stepper button{width:52px;height:52px;font-size:28px}.stepper span{font-size:34px}
+ .pname{font-size:52px}
+ .stage{height:58vh;min-height:440px}
+ .secret .emo{font-size:80px}.secret .t1{font-size:21px}.secret .t2{font-size:54px}
+ .cover .lbl{font-size:34px}.cover .hint{font-size:18px}.cover .q{font-size:150px;width:210px;height:210px}
+ .bigcard{min-height:400px;padding:34px 28px;gap:14px}
+ .bigcard .lab{font-size:19px}.bigcard .txt{font-size:42px}.bigcard .nm{font-size:46px}.bigcard .huge{font-size:160px}
+ .or{font-size:25px}.pair .a,.pair .b{font-size:46px}.pair .v{font-size:23px}
+ .timer{font-size:92px}
+ .score{padding:10px 6px;font-size:20px}.score b{font-size:25px}.score small{font-size:14px}
+ .opts{grid-template-columns:1fr 1fr;gap:14px}.opts button{font-size:25px;padding:18px}
+ .forb span{font-size:25px;padding:4px 22px}
+ .lcats span{font-size:20px;padding:4px 16px}
+ .bomb{font-size:160px}
+ .win{font-size:46px}
+ .desc{font-size:19px;max-width:480px}
+ .recbtns button{font-size:19px;padding:16px 6px}.recbtns button span{font-size:34px}
+ .rules li{font-size:19px;padding:11px 46px 11px 0}
+ .introHead .e{font-size:88px}.introHead .n{font-size:50px}.meta span{font-size:16px}
+ .steps li{font-size:19px}.rolelist div{font-size:19px;padding:11px 4px}
+ .bar{font-size:19px}.bar .nmx{width:120px}.bar .tr{height:34px}
+ .prog{font-size:19px}.err{font-size:18px}.install{font-size:15px}
+ .drawThumb{max-width:380px}
+ .sdGrid,.sdPad,.sdTools,.race{width:min(94vw,620px)!important}
+ .sdC{font-size:38px!important}.nt{font-size:14px!important}
+ .xo{width:480px!important}.xoO{width:420px!important}
+ .cnKey{width:340px!important}
+ .scWrap{width:min(96vw,680px)!important}.sct{font-size:34px!important}
+ .ludoWrap{width:min(94vw,680px)!important}
+}
+@media (min-width:1000px){
+ .screen{max-width:980px}
+ .bottom>*{max-width:924px}
+ .grid{grid-template-columns:repeat(4,1fr)}
+ .stage{height:62vh}
+}
 </style>
 </head>
 <body>
@@ -156,7 +217,7 @@ button:disabled{opacity:.75}
 <div id="home" class="screen on">
   <button class="back themeBtn" id="themeBtn" aria-label="الوضع الليلي">🌙</button>
   <h1>تقزيرة</h1>
-  <div class="sub">حطوا أساميكم مرة وحدة، واختاروا اللعبة.<br>داخل كل لعبة فيه زر 📖 شرح إذا تبي تعرف طريقة اللعب</div>
+  <div class="sub">حطوا أساميكم مرة وحدة، واختاروا اللعبة.<br>داخل كل لعبة فيه زر 📖 شرح إدا تبغى تعرف طريقة اللعب</div>
   <div class="box">
     <h2>اللاعبين <span id="pc" style="color:var(--mut);font-size:14px"></span></h2>
     <form class="row" id="addForm">
@@ -194,7 +255,7 @@ button:disabled{opacity:.75}
     <div class="toggle"><div><b>الامبوستر يعرف الموضوع</b><small>يشوف "حيوانات" بس بدون الكلمة</small></div><div class="sw" id="hintSw"></div></div>
   </div>
   <div class="box" style="color:var(--mut);font-size:14px;line-height:1.7">
-    الكلمات ما تتكرر لين تخلص كل كلمات الموضوع. كل واحد يسحب الشاشة ويشوف الكلمة، الامبوستر ما يعرفها. بعدين اللعبة تحدد مين يسأل مين.
+    الكلمات ما تتكرر لين تخلص كل كلمات الموضوع. كل واحد يسحب الشاشة ويشوف الكلمة، الامبوستر ما يعرفها. بعدين اللعبة تحدد منهو يسأل منهو.
   </div>
   <div class="err" id="impErr"></div>
   <div class="bottom"><button id="impStart">ابدأ 🎮</button></div>
@@ -203,14 +264,14 @@ button:disabled{opacity:.75}
 <!-- SHARED REVEAL -->
 <div id="reveal" class="screen">
   <div class="top"><button class="back" id="revBack">→</button><h1 id="revTitle"></h1><button class="back help" data-help>📖 شرح</button></div>
-  <div class="who">عط الجوال لـ</div>
+  <div class="who">عط التلفون لـ</div>
   <div class="pname" id="rName"></div>
   <div class="stage" id="stage">
     <div class="secret" id="secret"></div>
     <div class="cover" id="cover">
       <div class="q">؟</div><div class="arrow">⬆️</div>
       <div class="lbl">اسحب الشاشة لفوق</div>
-      <div class="hint">وخلك مخبي الجوال عن الباقين 👀</div>
+      <div class="hint">وخلك مخبي التلفون عن الباقين 👀</div>
     </div>
   </div>
   <div class="prog" id="prog"></div>
@@ -219,7 +280,7 @@ button:disabled{opacity:.75}
 
 <!-- IMPOSTER ASK -->
 <div id="impAsk" class="screen">
-  <div class="top"><button class="back" data-home>→</button><h1>🗣️ مين يسأل مين</h1><button class="back help" data-help>📖 شرح</button></div>
+  <div class="top"><button class="back" data-home>→</button><h1>🗣️ منهو يسأل منهو</h1><button class="back help" data-help>📖 شرح</button></div>
   <div class="sub" id="askRound"></div>
   <div class="bigcard">
     <div class="pair"><span class="a" id="askA"></span><span class="v">يسأل 👉</span><span class="b" id="askB"></span></div>
@@ -296,6 +357,7 @@ button:disabled{opacity:.75}
 <script src="more_sj.js"></script>
 <script>
 /* ===== HELPERS ===== */
+const TABW=n=>window.innerWidth>=700?Math.round(n*1.45):n; /* آيباد: مقاسات أكبر */
 const $=id=>document.getElementById(id);
 const rnd=n=>Math.floor(Math.random()*n);
 const pick=a=>a[rnd(a.length)];
@@ -344,7 +406,7 @@ function turnQueue(){let q=[];return()=>{if(!q.length)q=shuffle(S.players);retur
 let S={players:[],cats:Object.keys(TOPICS),tcats:Object.keys(TOPICS),imps:1,hint:true,maf:1,doc:true,cop:true,nar:true};
 S=Object.assign(S,LS.get('jm_s',{}));
 // المواضيع القديمة اندمجت: نحول الاختيارات القديمة للمواضيع الجديدة
-const OLD_TOPICS={'حيوانات 🦁':'حيوانات 🐾','طيور 🦅':'حيوانات 🐾','كائنات بحرية 🐠':'حيوانات 🐾','حشرات 🐜':'حيوانات 🐾','أكلات 🍛':'أكل وشرب 🍽️','حلويات 🍰':'أكل وشرب 🍽️','مشروبات 🥤':'أكل وشرب 🍽️','مطاعم وماركات أكل 🍔':'أكل وشرب 🍽️','نباتات 🌵':'نباتات وفواكه وخضار 🌿','فواكه وخضار 🍉':'نباتات وفواكه وخضار 🌿','دول 🌍':'دول ومدن 🌍','مدن 🏙️':'دول ومدن 🌍','سيارات 🚗':'سيارات ومواصلات 🚗','مواصلات 🚌':'سيارات ومواصلات 🚗','تواصل اجتماعي 📱':'تطبيقات ومواقع 📱','تطبيقات 📲':'تطبيقات ومواقع 📱','رياضات ⚽':'رياضة وكورة ⚽','أندية كورة ⚽':'رياضة وكورة ⚽','لاعبين كورة 🌟':'رياضة وكورة ⚽','ألعاب فيديو 🎮':'ألعاب 🎮','ألعاب شعبية وجمعات 🎲':'ألعاب 🎮','ملابس 👕':'ملابس وماركات 👕','ماركات 👜':'ملابس وماركات 👕','أغراض البيت 🏠':'أغراض وأجهزة 🏠','أجهزة إلكترونية 💻':'أغراض وأجهزة 🏠','أدوات وعدة 🔧':'أغراض وأجهزة 🏠','أدوات مدرسية ✏️':'أغراض وأجهزة 🏠'};
+const OLD_TOPICS={'حيوانات 🦁':'حيوانات 🐾','طيور 🦅':'حيوانات 🐾','كائنات بحرية 🐠':'حيوانات 🐾','حشرات 🐜':'حيوانات 🐾','أكلات 🍛':'أكل وشرب 🍽️','حلويات 🍰':'أكل وشرب 🍽️','مشروبات 🥤':'أكل وشرب 🍽️','مطاعم وماركات أكل 🍔':'أكل وشرب 🍽️','نباتات 🌵':'نباتات وفواكه وخضار 🌿','فواكه وخضار 🍉':'نباتات وفواكه وخضار 🌿','دول 🌍':'دول ومدن 🌍','مدن 🏙️':'دول ومدن 🌍','سيارات 🚗':'سيارات ومواصلات 🚗','مواصلات 🚌':'سيارات ومواصلات 🚗','تواصل اجتماعي 📱':'تطبيقات ومواقع 📱','تطبيقات 📲':'تطبيقات ومواقع 📱','رياضات ⚽':'رياضة وكورة ⚽','أندية كورة ⚽':'رياضة وكورة ⚽','لاعبين كورة 🌟':'رياضة وكورة ⚽','ألعاب فيديو 🎮':'ألعاب 🎮','ألعاب شعبية وجمعات 🎲':'ألعاب 🎮','ملابس 👕':'ملابس وماركات 👕','ماركات 👜':'ملابس وماركات 👕','أغراض البيت 🏠':'أغراض 🏠','أجهزة إلكترونية 💻':'أجهزة 🔌','أدوات وعدة 🔧':'أغراض 🏠','أدوات مدرسية ✏️':'أغراض 🏠','أغراض وأجهزة 🏠':'أغراض 🏠','تراث خليجي 🏺':'تراث بحريني 🏺'};
 const fixCats=a=>{const r=[...new Set(a.map(c=>OLD_TOPICS[c]||c).filter(c=>TOPICS[c]))];return r.length?r:Object.keys(TOPICS)};
 S.cats=fixCats(S.cats);S.tcats=fixCats(S.tcats);
 const save=()=>LS.set('jm_s',S);
@@ -352,20 +414,20 @@ function applyTheme(){document.body.classList.toggle('dark',!!S.dark);const t=$(
 
 /* ===== RULES ===== */
 const RULES={
-rev:["اللعبة تختار لاعبين: واحد يسجّل وواحد يخمّن، وتعطي اللي يسجّل كلمة سرية (اضغط مطوّل عشان تشوفها).","اللي يسجّل يضغط 🎙️ تسجيل ويقول الكلمة بصوت واضح، وبعدين ⏹️ وقف. يقدر يسمع صوته ▶️ طبيعي أو 🔁 معكوس.","بعدين يعطي الجوال للي يخمّن. هذا يسمع صوت الأول 🔁 معكوس (يطلع كلام غريب!).","اللي يخمّن يحاول يقلّد الصوت المعكوس بالضبط ويسجله 🎙️.","بعدين يضغط 🔁 على تسجيله، فينعكس تقليده ويرجع قريب من الكلمة الأصلية، ويحاول يخمّنها.","اكشفوا الكلمة: إذا خمّنها صح ياخذ نقطة، واللي يسجّل ياخذ نقطة بعد إذا كان صوته واضح وخمّنوها.","المايك يحتاج إذن: أول مرة الجوال بيسألك تسمح بالمايك، اضغط سماح."],
-imp:["كل واحد ياخذ الجوال بدوره ويسحب الشاشة لفوق عشان يشوف الكلمة السرية، وبعدين يخبيها ويعطي الجوال للي بعده.","الكل يشوف نفس الكلمة، إلا الامبوستر: يطلع له \"أنت الامبوستر\" (وإذا شغلت الخيار يشوف الموضوع بس).","بعد ما الكل يشوف، اللعبة تحدد مين يسأل مين. كل واحد يسأل اللي قدامه سؤال عن الكلمة، والثاني يجاوب.","السؤال والجواب لازم يكونون واضحين بما يكفي عشان تثبت إنك تعرف الكلمة، بس مو واضحين لدرجة إن الامبوستر يعرفها.","الامبوستر يحاول يجاري ويفهم الكلمة من كلامكم بدون ما ينكشف.","تقدرون تسوون جولة أسئلة ثانية، أو تروحون للتصويت.","التصويت سري: الجوال يدور على الكل، وكل واحد يختار اللي يشك إنه الامبوستر بدون ما أحد يشوف.","النقاط: كل واحد يصوت على الامبوستر ياخذ +١. وكل واحد يصوت على واحد بريء، الامبوستر ياخذ +١.","بعد التصويت، الامبوستر تطلع له ٦ خيارات من نفس الموضوع ويختار الكلمة: إذا جابها صح ياخذ +١، وإذا غلط ما يخسر شي.","النقاط تتجمع من جولة لجولة، وفيه زر تصفير.","وتحت كل كلمة فيه شرح بسيط عشان لو أحد ما يعرفها."],
-maf:["اللعبة توزع أدوار سرية: مافيا 🔪، دكتور 💉، شرطي 🕵️، والباقي مواطنين 👤. كل واحد يسحب الشاشة ويشوف دوره بالسر.","إذا شغلت \"اللعبة تختار الراوي\"، واحد منكم يصير الراوي: ما يلعب، بس يدير اللعبة، ويشوف كل الأدوار بالضغط المطوّل.","الليل: الكل يغمض. المافيا تفتح وتتفق بالإشارة على واحد تطلعه. بعدها الدكتور يختار واحد ينقذه، والشرطي يأشر على واحد والراوي يقول له مافيا ولا لا.","الصباح: الراوي يعلن مين طلع (إلا إذا الدكتور أنقذه). اللي يطلع ما يتكلم باقي اللعبة.","النهار: الكل يتناقش ويصوت على واحد يشكون إنه مافيا، واللي ياخذ أكثر أصوات يطلع ويكشف دوره.","المواطنين يفوزون إذا طلعت كل المافيا، والمافيا تفوز إذا صار عددها يساوي عدد الباقين."],
-tod:["اللعبة تختار الدور على مين، وتختار واحد ثاني هو اللي يسأله.","اللي عليه الدور يختار: صراحة 💬 (يجاوب على سؤال بصدق) ولا جرأة 🔥 (ينفذ تحدي).","إذا ما عجبكم السؤال، اضغطوا \"غيّر\"، أو اللي يسأل يقدر يسأل سؤال من عنده.","اللي يرفض يجاوب أو ينفذ، الجماعة تحط عليه عقاب يتفقون عليه 😄"],
-cha:["اختاروا المواضيع، واللعبة تختار الدور على مين.","اللي عليه الدور ياخذ الجوال ويضغط \"أنا جاهز\"، فتطلع له كلمة ويبدأ عداد دقيقة.","يمثّل الكلمة بحركات بس: ممنوع الكلام والأصوات والتأشير على الأشياء.","إذا أحد خمّنها صح اضغط \"جابوها ✅\" وتطلع كلمة جديدة، وإذا صعبة اضغط \"تخطي\".","كل كلمة صح بنقطة، وفي الأخير اللي عنده أكثر نقاط يفوز."],
-tab:["اللي عليه الدور يشوف كلمة، وتحتها ٣ كلمات ممنوعة.","عنده دقيقة يوصّف الكلمة للباقين عشان يخمنونها، بدون ما يقول الكلمة نفسها ولا الكلمات الممنوعة.","ممنوع يأشر أو يقول \"تبدأ بحرف كذا\" أو \"تتقافى مع\".","خلوا واحد جنبه يراقب: إذا قال كلمة ممنوعة اضغطوا \"قالها ❌\" وتنقص عليه نقطة.","\"جابوها ✅\" بنقطة، و\"تخطي\" بدون نقاط، واللي عنده أكثر نقاط يفوز."],
-bomb:["اللعبة تعطيكم مهمة، مثلاً: \"قول اسم حيوان\".","اضغطوا \"شغّل القنبلة\" والقنبلة تبدأ تتكتك. اللي ماسك الجوال يقول كلمة صح ويعطيه للي جنبه بسرعة.","ممنوع تكرار كلمة انقالت، وإذا الكلمة غلط ما يقدر يمرر لين يقول وحدة صح.","القنبلة تنفجر في وقت عشوائي (بين ١٥ و٤٥ ثانية)، والتكتكة تسرع كل ما قربت.","اللي تنفجر القنبلة وهو ماسكها يخسر الجولة، وتختارون اسمه عشان تنحسب عليه."],
-let:["اختاروا الخانات اللي تبونها (اسم، حيوان، نبات، جماد، بلاد… وتقدرون تضيفون أو تشيلون). كل واحد ياخذ ورقة وقلم ويرسم جدول فيه الخانات.","اضغطوا \"طلّع الحرف\" فيطلع حرف عشوائي، ويبدأ عداد دقيقة.","كل واحد يكتب كلمة تبدأ بهذا الحرف في كل خانة.","أول واحد يخلص يضغط \"خلصت ✋\" ويوقف الكل، أو يخلص الوقت.","التصحيح: كلمة صح ما كتبها غيرك = ١٠ نقاط، كلمة صح كتبها غيرك = ٥، والفاضي أو الغلط = صفر."],
-triv:["اللعبة تختار الدور على مين، وتعطيه سؤال معلومات عامة وتحته ٤ خيارات.","اللي عليه الدور يختار الجواب بنفسه، والباقين ممنوع يساعدونه!","الجواب الصح يطلع أخضر وياخذ نقطة، والغلط يطلع أحمر.","تستمرون بالدور، واللي يوصل أول لعدد نقاط تتفقون عليه (مثلاً ١٠) يفوز."],
-g20:["اختاروا المواضيع، واللعبة تختار واحد يعرف الكلمة.","هذا الواحد يضغط مطوّل على الزر ويشوف الكلمة بالسر، والباقين يعرفون الموضوع بس.","الباقين يسألونه أسئلة جوابها \"إيه\" أو \"لا\" بس، مثلاً: \"ينوكل؟\" \"أكبر من السيارة؟\"","كل سؤال اضغطوا \"سؤال +1\". عندكم ٢٠ سؤال بس.","إذا خمنوها اضغطوا \"جابوها ✅\"، وإذا خلصت الأسئلة أو استسلموا تنكشف الكلمة."],
-hot:["اللعبة تختار واحد يقعد على الكرسي الساخن 🪑.","اضغطوا \"ابدأ الوقت\" وعندكم دقيقتين تسألونه أي شي، وهو لازم يجاوب بسرعة وبصراحة.","اللعبة تعطيكم سؤال تبدون فيه إذا ما عندكم فكرة.","يقدر يرفض سؤال واحد بس في دوره كله.","بعد ما يخلص الوقت ينتقل الكرسي للي بعده."],
-wyr:["اللعبة تختار واحد يقرأ السؤال بصوت عالي: \"لو خيروك بين كذا ولا كذا؟\"","كل واحد لازم يختار وحدة من الثنتين، وممنوع تقول \"ولا وحدة\".","كل واحد يبرر اختياره، والنقاش هو أحلى شي فيها 😄","اضغطوا \"اللي بعده\" للسؤال الجاي."],
-ml:["اللعبة تختار واحد يقرأ السؤال، مثلاً: \"مين أكثر واحد ممكن يتأخر على أي موعد؟\"","اضغطوا \"٣.. ٢.. ١\"، ولما يقول \"أشّروا\" الكل يأشر على واحد في نفس اللحظة.","اللي ياخذ أكثر أشارات لازم يبرر أو يدافع عن نفسه 😂","ممنوع تأشر على نفسك!"],
-nhie:["اللعبة تختار واحد يقرأ الجملة اللي تبدأ بـ \"ولا مرة…\".","اللي سوّى الشي هذا قبل يرفع يده (أو ينزل إصبع إذا تلعبون بالأصابع).","اللي رفع يده يقول القصة باختصار 😄","إذا تلعبون بالأصابع: كل واحد يبدأ بـ ١٠ أصابع، واللي يخلص أصابعه أول يخسر."]
+rev:["اللعبة تختار لاعبين: واحد يسجّل وواحد يخمّن، وتعطي اللي يسجّل كلمة سرية (اضغط مطوّل عشان تشوفها).","اللي يسجّل يضغط 🎙️ تسجيل ويقول الكلمة بصوت واضح، وبعدين ⏹️ وقف. يقدر يسمع صوته ▶️ طبيعي أو 🔁 معكوس.","بعدين يعطي التلفون للي يخمّن. هدا يسمع صوت الأول 🔁 معكوس (يطلع كلام غريب!).","اللي يخمّن يحاول يقلّد الصوت المعكوس بالضبط ويسجله 🎙️.","بعدين يضغط 🔁 على تسجيله، فينعكس تقليده ويرجع قريب من الكلمة الأصلية، ويحاول يخمّنها.","اكشفوا الكلمة: إدا خمّنها صح ياخد نقطة، واللي يسجّل ياخد نقطة بعد إدا كان صوته واضح وخمّنوها.","المايك يحتاج إذن: أول مرة التلفون بيسألك تسمح بالمايك، اضغط سماح."],
+imp:["كل واحد ياخد التلفون بدوره ويسحب الشاشة لفوق عشان يشوف الكلمة السرية، وبعدين يخبيها ويعطي التلفون للي بعده.","الكل يشوف نفس الكلمة، إلا الامبوستر: يطلع له \"إنت الامبوستر\" (وإدا شغلت الخيار يشوف الموضوع بس).","بعد ما الكل يشوف، اللعبة تحدد منهو يسأل منهو. كل واحد يسأل اللي قدامه سؤال عن الكلمة، والثاني يجاوب.","السؤال والجواب لازم يكونون واضحين بما يكفي عشان تثبت إنك تعرف الكلمة، بس مو واضحين لدرجة إن الامبوستر يعرفها.","الامبوستر يحاول يجاري ويفهم الكلمة من كلامكم بدون ما ينكشف.","تقدرون تسوون جولة أسئلة ثانية، أو تروحون للتصويت.","التصويت سري: التلفون يدور على الكل، وكل واحد يختار اللي يشك إنه الامبوستر بدون ما أحد يشوف.","النقاط: كل واحد يصوت على الامبوستر ياخد +١. وكل واحد يصوت على واحد بريء، الامبوستر ياخد +١.","بعد التصويت، الامبوستر تطلع له ٦ خيارات من نفس الموضوع ويختار الكلمة: إدا جابها صح ياخد +١، وإدا غلط ما يخسر شي.","النقاط تتجمع من جولة لجولة، وفيه زر تصفير.","وتحت كل كلمة فيه شرح بسيط عشان لو أحد ما يعرفها."],
+maf:["اللعبة توزع أدوار سرية: مافيا 🔪، دكتور 💉، شرطي 🕵️، والباقي مواطنين 👤. كل واحد يسحب الشاشة ويشوف دوره بالسر.","إدا شغلت \"اللعبة تختار الراوي\"، واحد منكم يصير الراوي: ما يلعب، بس يدير اللعبة، ويشوف كل الأدوار بالضغط المطوّل.","الليل: الكل يغمض. المافيا تفتح وتتفق بالإشارة على واحد تطلعه. بعدها الدكتور يختار واحد ينقذه، والشرطي يأشر على واحد والراوي يقول له مافيا ولا لا.","الصباح: الراوي يعلن منهو طلع (إلا إدا الدكتور أنقذه). اللي يطلع ما يتكلم باقي اللعبة.","النهار: الكل يتناقش ويصوت على واحد يشكون إنه مافيا، واللي ياخد أكثر أصوات يطلع ويكشف دوره.","المواطنين يفوزون إدا طلعت كل المافيا، والمافيا تفوز إدا صار عددها يساوي عدد الباقين."],
+tod:["اللعبة تختار الدور على منهو، وتختار واحد ثاني هو اللي يسأله.","اللي عليه الدور يختار: صراحة 💬 (يجاوب على سؤال بصدق) ولا جرأة 🔥 (ينفذ تحدي).","إدا ما عجبكم السؤال، اضغطوا \"غيّر\"، أو اللي يسأل يقدر يسأل سؤال من عنده.","اللي يرفض يجاوب أو ينفذ، الجماعة تحط عليه عقاب يتفقون عليه 😄"],
+cha:["اختاروا المواضيع، واللعبة تختار الدور على منهو.","اللي عليه الدور ياخد التلفون ويضغط \"أني جاهز\"، فتطلع له كلمة ويبدأ عداد دقيقة.","يمثّل الكلمة بحركات بس: ممنوع الكلام والأصوات والتأشير على الأشياء.","إدا أحد خمّنها صح اضغط \"جابوها ✅\" وتطلع كلمة جديدة، وإدا صعبة اضغط \"تخطي\".","كل كلمة صح بنقطة، وفي الأخير اللي عنده أكثر نقاط يفوز."],
+tab:["اللي عليه الدور يشوف كلمة، وتحتها ٣ كلمات ممنوعة.","عنده دقيقة يوصّف الكلمة للباقين عشان يخمنونها، بدون ما يقول الكلمة نفسها ولا الكلمات الممنوعة.","ممنوع يأشر أو يقول \"تبدأ بحرف چدي\" أو \"تتقافى مع\".","خلوا واحد جنبه يراقب: إدا قال كلمة ممنوعة اضغطوا \"قالها ❌\" وتنقص عليه نقطة.","\"جابوها ✅\" بنقطة، و\"تخطي\" بدون نقاط، واللي عنده أكثر نقاط يفوز."],
+bomb:["اللعبة تعطيكم مهمة، مثلاً: \"قول اسم حيوان\".","اضغطوا \"شغّل القنبلة\" والقنبلة تبدأ تتكتك. اللي ماسك التلفون يقول كلمة صح ويعطيه للي جنبه بسرعة.","ممنوع تكرار كلمة انقالت، وإدا الكلمة غلط ما يقدر يمرر لين يقول وحدة صح.","القنبلة تنفجر في وقت عشوائي (بين ١٥ و٤٥ ثانية)، والتكتكة تسرع كل ما قربت.","اللي تنفجر القنبلة وهو ماسكها يخسر الجولة، وتختارون اسمه عشان تنحسب عليه."],
+let:["اختاروا الخانات اللي تبغونها (اسم، حيوان، نبات، جماد، بلاد… وتقدرون تضيفون أو تشيلون). كل واحد ياخد ورقة وقلم ويرسم جدول فيه الخانات.","اضغطوا \"طلّع الحرف\" فيطلع حرف عشوائي، ويبدأ عداد دقيقة.","كل واحد يكتب كلمة تبدأ بهدا الحرف في كل خانة.","أول واحد يخلص يضغط \"خلصت ✋\" ويوقف الكل، أو يخلص الوقت.","التصحيح: كلمة صح ما كتبها غيرك = ١٠ نقاط، كلمة صح كتبها غيرك = ٥، والفاضي أو الغلط = صفر."],
+triv:["اللعبة تختار الدور على منهو، وتعطيه سؤال معلومات عامة وتحته ٤ خيارات.","اللي عليه الدور يختار الجواب بنفسه، والباقين ممنوع يساعدونه!","الجواب الصح يطلع أخضر وياخد نقطة، والغلط يطلع أحمر.","تستمرون بالدور، واللي يوصل أول لعدد نقاط تتفقون عليه (مثلاً ١٠) يفوز."],
+g20:["اختاروا المواضيع، واللعبة تختار واحد يعرف الكلمة.","هدا الواحد يضغط مطوّل على الزر ويشوف الكلمة بالسر، والباقين يعرفون الموضوع بس.","الباقين يسألونه أسئلة جوابها \"إي\" أو \"لا\" بس، مثلاً: \"ينوكل؟\" \"أكبر من السيارة؟\"","كل سؤال اضغطوا \"سؤال +1\". عندكم ٢٠ سؤال بس.","إدا خمنوها اضغطوا \"جابوها ✅\"، وإدا خلصت الأسئلة أو استسلموا تنكشف الكلمة."],
+hot:["اللعبة تختار واحد يقعد على الكرسي الساخن 🪑.","اضغطوا \"ابدأ الوقت\" وعندكم دقيقتين تسألونه أي شي، وهو لازم يجاوب بسرعة وبصراحة.","اللعبة تعطيكم سؤال تبدون فيه إدا ما عندكم فكرة.","يقدر يرفض سؤال واحد بس في دوره كله.","بعد ما يخلص الوقت ينتقل الكرسي للي بعده."],
+wyr:["اللعبة تختار واحد يقرأ السؤال بصوت عالي: \"لو خيروك بين چدي ولا چدي؟\"","كل واحد لازم يختار وحدة من الثنتين، وممنوع تقول \"ولا وحدة\".","كل واحد يبرر اختياره، والنقاش هو أحلى شي فيها 😄","اضغطوا \"اللي بعده\" للسؤال الجاي."],
+ml:["اللعبة تختار واحد يقرأ السؤال، مثلاً: \"منهو أكثر واحد ممكن يتأخر على أي موعد؟\"","اضغطوا \"٣.. ٢.. ١\"، ولما يقول \"أشّروا\" الكل يأشر على واحد في نفس اللحظة.","اللي ياخد أكثر أشارات لازم يبرر أو يدافع عن نفسه 😂","ممنوع تأشر على نفسك!"],
+nhie:["اللعبة تختار واحد يقرأ الجملة اللي تبدأ بـ \"ولا مرة…\".","اللي سوّى الشي هدا قبل يرفع يده (أو ينزل إصبع إدا تلعبون بالأصابع).","اللي رفع يده يقول القصة باختصار 😄","إدا تلعبون بالأصابع: كل واحد يبدأ بـ ١٠ أصابع، واللي يخلص أصابعه أول يخسر."]
 };
 /* ===== HOME ===== */
 const GAMES=[
@@ -374,14 +436,14 @@ const GAMES=[
  {id:'tod',e:'🔥',n:'صراحة ولا جرأة',d:'اللعبة تختار الدور عليك',min:2,t:'مفتوح'},
  {id:'cha',e:'🎭',n:'تمثيل بدون كلام',d:'مثّل أكثر كلمات في دقيقة',min:2,t:'دقيقة لكل دور'},
  {id:'tab',e:'🚫',n:'الكلمة الممنوعة',d:'وصّف الكلمة بدون الكلمات الممنوعة',min:2,t:'دقيقة لكل دور'},
- {id:'bomb',e:'💣',n:'القنبلة',d:'قول كلمة وعط الجوال قبل تنفجر!',min:2,t:'جولات سريعة'},
+ {id:'bomb',e:'💣',n:'القنبلة',d:'قول كلمة وعط التلفون قبل تنفجر!',min:2,t:'جولات سريعة'},
  {id:'let',e:'🔤',n:'إنسان حيوان نبات',d:'حرف عشوائي ودقيقة وحدة',min:2,t:'دقيقة لكل حرف'},
  {id:'triv',e:'🧠',n:'سين جيم',d:'أسئلة معلومات عامة بالنقاط',min:1,t:'مفتوح'},
- {id:'g20',e:'❓',n:'خمن الشي',d:'٢٠ سؤال بـ إيه ولا لا',min:2,t:'٥ دقايق للجولة'},
+ {id:'g20',e:'❓',n:'خمن الشي',d:'٢٠ سؤال بـ إي ولا لا',min:2,t:'٥ دقايق للجولة'},
  {id:'rev',e:'🔄',n:'الكلام المعكوس',d:'سجّل كلمة، والثاني يسمعها معكوسة ويخمن',min:2,t:'دقيقتين للجولة'},
  {id:'hot',e:'🪑',n:'الكرسي الساخن',d:'دقيقتين والكل يسألك',min:3,t:'دقيقتين لكل دور'},
  {id:'wyr',e:'🤔',n:'لو خيروك',d:'اختار وحدة… وبرر!',min:2,t:'مفتوح'},
- {id:'ml',e:'👉',n:'مين أكثر واحد',d:'على العد الكل يأشر',min:3,t:'مفتوح'},
+ {id:'ml',e:'👉',n:'منهو أكثر واحد',d:'على العد الكل يأشر',min:3,t:'مفتوح'},
  {id:'nhie',e:'🙈',n:'ولا مرة',d:'اللي سواها يرفع يده',min:2,t:'مفتوح'}
 ];
 function renderHome(){
@@ -395,7 +457,7 @@ function renderHome(){
 $('addForm').onsubmit=e=>{e.preventDefault();const v=$('nameIn').value.trim();if(!v)return;if(S.players.includes(v)){$('homeErr').textContent='الاسم موجود';return}$('homeErr').textContent='';S.players.push(v);$('nameIn').value='';renderHome();$('nameIn').focus()};
 let CUR=null;
 function openGame(g){
-  if(S.players.length<g.min){$('homeErr').textContent=g.n+' تبي '+g.min+' لاعبين على الأقل';return}
+  if(S.players.length<g.min){$('homeErr').textContent=g.n+' تبغى '+g.min+' لاعبين على الأقل';return}
   $('homeErr').textContent='';CUR=g;window.SFX&&SFX.open();
   $('inE').textContent=g.e;$('inN').textContent=g.n;
   $('inMeta').innerHTML='';[ '👥 '+g.min+'+ لاعبين','⏱️ '+g.t].forEach(x=>$('inMeta').appendChild(el('span','',x)));
@@ -472,12 +534,12 @@ function impRound(){
   const imps=shuffle(S.players.map((_,i)=>i)).slice(0,S.imps);
   G={cat,word,imps,order:S.players.slice(),round:0,out:[]};
   const items=G.order.map((n,i)=>({name:n,html:imps.includes(i)
-    ?'<div class="emo">🤫</div><div class="t2 bad">أنت الامبوستر!</div><div class="t1">'+(S.hint?'الموضوع: <b>'+esc(cat)+'</b>':'حاول تعرف الكلمة بدون ما ينكشف أمرك')+'</div>'
+    ?'<div class="emo">🤫</div><div class="t2 bad">إنت الامبوستر!</div><div class="t1">'+(S.hint?'الموضوع: <b>'+esc(cat)+'</b>':'حاول تعرف الكلمة بدون ما ينكشف أمرك')+'</div>'
     :'<div class="emo">✅</div><div class="t1">'+esc(cat)+'</div><div class="t2 good">'+esc(word)+'</div><div class="desc">'+esc(descOf(cat,word))+'</div>'}));
   startReveal('🕵️ الامبوستر',items,'خلصنا، يلا نبدأ الأسئلة 🎉',newAskRound,'impSetup');
 }
 $('impStart').onclick=impRound;
-// مين يسأل مين: دائرة عشوائية، كل واحد يسأل مرة وينسأل مرة
+// منهو يسأل منهو: دائرة عشوائية، كل واحد يسأل مرة وينسأل مرة
 function newAskRound(){G.round++;const p=shuffle(G.order);G.pairs=p.map((a,i)=>[a,p[(i+1)%p.length]]);G.k=0;showAsk();show('impAsk')}
 function showAsk(){
   const [a,b]=G.pairs[G.k];
@@ -496,21 +558,21 @@ function voteTurn(){
   $('voteTitle').textContent='🗳️ التصويت';const v=G.voters[G.vi];
   $('voteSub').textContent='تصويت سري: '+(G.vi+1)+' من '+G.voters.length;
   const c=$('voteCard');c.innerHTML='';const add=(k,t)=>{const d=el('div',k,t);c.appendChild(d);return d};
-  add('lab','عط الجوال لـ');add('nm',v);add('lab','وخل الباقين ما يشوفون الشاشة 🤫');
-  setBtns('voteBtns',[btn('أنا '+v+'، أبي أصوت','',()=>voteChoose(v))]);
+  add('lab','عط التلفون لـ');add('nm',v);add('lab','وخل الباقين ما يشوفون الشاشة 🤫');
+  setBtns('voteBtns',[btn('أني '+v+'، أبغى أصوّت','',()=>voteChoose(v))]);
 }
 function voteChoose(v){
-  const c=$('voteCard');c.innerHTML='';voteImg(c);c.append(el('div','lab',v+'، مين تشك إنه الامبوستر؟'));
+  const c=$('voteCard');c.innerHTML='';voteImg(c);c.append(el('div','lab',v+'، منهو تشك إنه الامبوستر؟'));
   const o=el('div','opts');G.cands.filter(p=>p!==v).forEach(p=>o.appendChild(btn(p,'',()=>{G.votes[v]=p;beep(900,.08);voteDone(v)})));c.appendChild(o);
   setBtns('voteBtns',[]);
 }
 function voteDone(v){
   const c=$('voteCard');c.innerHTML='';c.append(el('div','win','تم التصويت ✓'),el('div','lab','صوتك سري. خبّ الشاشة'));
   G.vi++;
-  if(G.vi<G.voters.length)setBtns('voteBtns',[btn('عط الجوال لـ '+G.voters[G.vi]+' ←','',voteTurn)]);
+  if(G.vi<G.voters.length)setBtns('voteBtns',[btn('عط التلفون لـ '+G.voters[G.vi]+' ←','',voteTurn)]);
   else setBtns('voteBtns',[btn('اكشف النتيجة 📊','red',voteTally)]);
 }
-// النقاط: اللي يصوت على الامبوستر +١، وكل صوت راح على بريء يعطي الامبوستر +١، والامبوستر +١ إذا خمّن الكلمة
+// النقاط: اللي يصوت على الامبوستر +١، وكل صوت راح على بريء يعطي الامبوستر +١، والامبوستر +١ إدا خمّن الكلمة
 function voteImg(c){if(G&&G.img){const i=el('img','drawThumb');i.src=G.img;c.appendChild(i)}}
 function impNames(){return G.imps.map(i=>G.order[i])}
 function voteTally(){
@@ -534,7 +596,7 @@ function voteTally(){
 function impGuess(k){
   const imps=impNames(),p=imps[k];
   const c=$('voteCard');c.innerHTML='';$('voteTitle').textContent='🎯 دور الامبوستر';$('voteSub').textContent='';
-  c.append(el('div','lab','عط الجوال لـ'),el('div','nm',p),el('div','lab','أنت الامبوستر! وش كانت الكلمة؟ إذا جبتها صح تاخذ +١'));
+  c.append(el('div','lab','عط التلفون لـ'),el('div','nm',p),el('div','lab','إنت الامبوستر! ويش كانت الكلمة؟ إدا جبتها صح تاخد +١'));
   const opts=shuffle([G.word,...shuffle(TOPICS[G.cat].filter(w=>w!==G.word)).slice(0,5)]);
   const o=el('div','opts');o.style.gridTemplateColumns='1fr 1fr';
   opts.forEach(w=>o.appendChild(btn(w,'',()=>{
@@ -572,14 +634,14 @@ function todShow(p,ask,isDare){
 }
 
 /* ===== CARD GAMES ===== */
-const CG={wyr:['🤔 لو خيروك','كل واحد يختار ويبرر اختياره',WYR],ml:['👉 مين أكثر واحد','على العد ٣ الكل يأشر على واحد. اللي ياخذ أكثر يبرر!',ML],nhie:['🙈 ولا مرة','اللي سواها يرفع يده ويقول القصة',NHIE]};
+const CG={wyr:['🤔 لو خيروك','كل واحد يختار ويبرر اختياره',WYR],ml:['👉 منهو أكثر واحد','على العد ٣ الكل يأشر على واحد. اللي ياخد أكثر يبرر!',ML],nhie:['🙈 ولا مرة','اللي سواها يرفع يده ويقول القصة',NHIE]};
 let cgId,cgQ;
 function startCard(id){cgId=id;cgQ=turnQueue();gs(CG[id][0],CG[id][1]);cardNext()}
 function cardNext(){
   const q=draw(cgId,CG[cgId][2]);const add=card();
   add('lab','يقرأ السؤال: '+cgQ());
   if(cgId==='wyr'){add('lab','لو خيروك بين');add('txt',q[0]);add('or','ولا');add('txt',q[1])}
-  else if(cgId==='ml'){add('lab','مين أكثر واحد ممكن…');add('txt',q+'؟')}
+  else if(cgId==='ml'){add('lab','منهو أكثر واحد ممكن…');add('txt',q+'؟')}
   else{add('lab','ولا مرة…');add('txt',q)}
   const b=[];if(cgId==='ml')b.push(btn('٣.. ٢.. ١ ⏱️','ghost',function(){this.disabled=true;const d=add('timer');let n=3;const t=()=>{d.textContent=n>0?n:'أشّروا! 👉';beep(n>0?600:1000,.15);if(n-->0)setTimeout(t,800)};t()}));
   b.push(btn('اللي بعده ←','',cardNext,2));setBtns('gsBtns',b);
@@ -595,7 +657,7 @@ function startTimed(kind){
 function ttTurn(){
   TT.cur=TT.q();TT.got=0;const add=card();
   add('lab','الدور على');add('nm',TT.cur);add('lab',TT.kind==='cha'?'عندك دقيقة تمثل فيها أكثر عدد كلمات':'عندك دقيقة. خل اللي جنبك يراقب الكلمات الممنوعة 👀');
-  scores(TT.scores);setBtns('gsBtns',[btn('أنا جاهز ▶️','',ttGo)]);
+  scores(TT.scores);setBtns('gsBtns',[btn('أني جاهز ▶️','',ttGo)]);
 }
 function ttWord(){
   const add=card();add('timer').id='ttT';
@@ -620,7 +682,7 @@ function ttEnd(){
 
 /* ===== BOMB ===== */
 let BM;
-function startBomb(){BM={lost:{}};S.players.forEach(p=>BM.lost[p]=0);gs('💣 القنبلة','قول كلمة صح وعط الجوال للي جنبك بسرعة! اللي تنفجر في يده يخسر');bombReady()}
+function startBomb(){BM={lost:{}};S.players.forEach(p=>BM.lost[p]=0);gs('💣 القنبلة','قول كلمة صح وعط التلفون للي جنبك بسرعة! اللي تنفجر في يده يخسر');bombReady()}
 function bombReady(){
   stopTimer();const add=card();add('bomb','💣');add('lab','المهمة');add('txt',draw('bomb',BOMB));add('lab','يبدأ: '+pick(S.players));
   scores(BM.lost,'مرات الخسارة 💥');setBtns('gsBtns',[btn('شغّل القنبلة 🔥','red',bombGo)]);
@@ -629,19 +691,19 @@ function bombGo(){
   $('gsScores').classList.add('hidden');$('gsCard').querySelector('.bomb').classList.add('tick');
   const lo=Math.min(TIME('bombMin'),TIME('bombMax')),hi=Math.max(TIME('bombMin'),TIME('bombMax'));const total=(lo+Math.random()*(hi-lo))*1000,start=Date.now();
   const tick=()=>{const left=total-(Date.now()-start);if(left<=0){bombBoom();return}const p=left/total;window.SFX?SFX.fuse(p<.25):beep(900,.05);bombT=setTimeout(tick,Math.max(150,p*900))};tick();
-  const pb=btn('⏳ مرّر الجوال بسرعة!','yel',()=>{});pb.disabled=true;setBtns('gsBtns',[pb]);
+  const pb=btn('⏳ مرّر التلفون بسرعة!','yel',()=>{});pb.disabled=true;setBtns('gsBtns',[pb]);
 }
 function bombBoom(){
   bombT=null;document.body.classList.add('boom');beep(120,1,.35);buzz([300,100,500]);
-  const add=card();add('bomb','💥');add('txt','بووووم!');add('lab','مين كان الجوال في يده؟');
+  const add=card();add('bomb','💥');add('txt','بووووم!');add('lab','منهو كان التلفون في يده؟');
   const o=add('opts');S.players.forEach(p=>o.appendChild(btn(p,'',()=>{BM.lost[p]++;document.body.classList.remove('boom');bombReady()})));
   setBtns('gsBtns',[btn('جولة ثانية بدون تسجيل','ghost',()=>{document.body.classList.remove('boom');bombReady()})]);
 }
 
 /* ===== LETTERS ===== */
-function startLetters(){gs('🔤 إنسان حيوان نبات','كل واحد ياخذ ورقة وقلم ويكتب كلمة تبدأ بالحرف لكل خانة');letReady()}
+function startLetters(){gs('🔤 إنسان حيوان نبات','كل واحد ياخد ورقة وقلم ويكتب كلمة تبدأ بالحرف لكل خانة');letReady()}
 function letReady(){
-  const add=card();add('lab','اختار الخانات اللي تبيها، وبعدين اضغط عشان يطلع الحرف');add('huge','؟');const c=add('chips');c.style.justifyContent='center';
+  const add=card();add('lab','اختار الخانات اللي تبغاها، وبعدين اضغط عشان يطلع الحرف');add('huge','؟');const c=add('chips');c.style.justifyContent='center';
   S.letCats=S.letCats||LETTER_CATS_DEF.slice();LETTER_CATS_ALL.forEach(x=>{const b=el('button','chip'+(S.letCats.includes(x)?' sel':''),x);b.onclick=()=>{if(S.letCats.includes(x))S.letCats.splice(S.letCats.indexOf(x),1);else S.letCats.push(x);save();letReady()};c.appendChild(b)});
   setBtns('gsBtns',[btn('طلّع الحرف 🎲','',letGo)]);
 }
@@ -668,7 +730,7 @@ function trivNext(){
 
 /* ===== GUESS (20 QUESTIONS) ===== */
 let GQ;
-function startG20(){GQ={q:turnQueue()};gs('❓ خمن الشي','واحد يعرف الكلمة، والباقين عندهم ٢٠ سؤال جوابها إيه أو لا');g20Turn()}
+function startG20(){GQ={q:turnQueue()};gs('❓ خمن الشي','واحد يعرف الكلمة، والباقين عندهم ٢٠ سؤال جوابها إي أو لا');g20Turn()}
 function g20Turn(){
   const p=GQ.q(),[c,w]=topicWord(S.tcats);GQ.n=0;GQ.c=c;const add=card();
   add('lab','اللي يعرف الكلمة');add('nm',p);add('lab','الموضوع: '+c);
@@ -736,13 +798,13 @@ function startRev(){RV={q:turnQueue(),scores:{}};S.players.forEach(p=>RV.scores[
 function revA(){
   stopRec();const A=RV.q(),B=pick(S.players.filter(p=>p!==A)),[c,w]=topicWord(S.tcats);
   Object.assign(RV,{A,B,c,w,bufA:null,bufB:null});
-  const add=card();add('step','الخطوة ١ من ٢');add('lab','عط الجوال لـ');add('nm',A);add('lab','الموضوع: '+c);
+  const add=card();add('step','الخطوة ١ من ٢');add('lab','عط التلفون لـ');add('nm',A);add('lab','الموضوع: '+c);
   const hb=el('button','ghost hold','اضغط مطوّل عشان تشوف كلمتك 👀');hb.style.width='100%';$('gsCard').appendChild(hb);
   const wd=add('hidden','');wd.append(el('div','txt good',w),el('div','desc',descOf(c,w)));
   hb.addEventListener('pointerdown',e=>{e.preventDefault();wd.classList.remove('hidden')});['pointerup','pointerleave','pointercancel'].forEach(ev=>hb.addEventListener(ev,()=>wd.classList.add('hidden')));hb.oncontextmenu=e=>e.preventDefault();
-  add('lab','سجّل نفسك وأنت تقول الكلمة بوضوح');
+  add('lab','سجّل نفسك وإنت تقول الكلمة بوضوح');
   $('gsCard').appendChild(recRow(()=>RV.bufA,b=>{RV.bufA=b;nb.disabled=false}));add('err','').id='micErr';
-  scores(RV.scores);const nb=btn('خلصت، عط الجوال لـ '+B+' ←','',revB);nb.disabled=true;setBtns('gsBtns',[nb]);
+  scores(RV.scores);const nb=btn('خلصت، عط التلفون لـ '+B+' ←','',revB);nb.disabled=true;setBtns('gsBtns',[nb]);
 }
 function revB(){
   stopRec();$('gsScores').classList.add('hidden');
@@ -777,7 +839,7 @@ function renderMaf(){
 $('mafPlus').onclick=()=>{S.maf=Math.min(mafMax(),S.maf+1);renderMaf()};
 $('mafMinus').onclick=()=>{S.maf=Math.max(1,S.maf-1);renderMaf()};
 $('docSw').onclick=()=>{S.doc=!S.doc;renderMaf()};$('copSw').onclick=()=>{S.cop=!S.cop;renderMaf()};$('narSw').onclick=()=>{S.nar=!S.nar;renderMaf()};
-const ROLES={maf:['🔪','مافيا','bad','كل ليلة تتفقون أنتم المافيا على واحد تطلعونه. لا تنكشف!'],doc:['💉','الدكتور','good','كل ليلة تختار واحد تنقذه (تقدر تنقذ نفسك)'],cop:['🕵️','الشرطي','good','كل ليلة تسأل الراوي عن واحد: مافيا ولا لا؟'],cit:['👤','مواطن','good','ساعد الكل تصيدون المافيا في النهار']};
+const ROLES={maf:['🔪','مافيا','bad','كل ليلة تتفقون إنتون المافيا على واحد تطلعونه. لا تنكشف!'],doc:['💉','الدكتور','good','كل ليلة تختار واحد تنقذه (تقدر تنقذ نفسك)'],cop:['🕵️','الشرطي','good','كل ليلة تسأل الراوي عن واحد: مافيا ولا لا؟'],cit:['👤','مواطن','good','ساعد الكل تصيدون المافيا في النهار']};
 let M;
 function mafRound(){
   renderMaf();if($('mafErr').textContent)return;
@@ -788,7 +850,7 @@ function mafRound(){
   const items=M.assign.map(([p,r])=>{const R0=ROLES[r];let extra='';
     if(r==='maf'&&S.maf>1)extra='<div class="t1">ربعك: <b>'+M.assign.filter(([q,rr])=>rr==='maf'&&q!==p).map(([q])=>esc(q)).join('، ')+'</b></div>';
     return{name:p,html:'<div class="emo">'+R0[0]+'</div><div class="t2 '+R0[2]+'">'+R0[1]+'</div><div class="t1">'+R0[3]+'</div>'+extra}});
-  if(nar)items.push({name:nar,html:'<div class="emo">🎙️</div><div class="t2" style="color:var(--yel)">أنت الراوي</div><div class="t1">أنت تدير اللعبة وتشوف كل الأدوار</div>'});
+  if(nar)items.push({name:nar,html:'<div class="emo">🎙️</div><div class="t2" style="color:var(--yel)">إنت الراوي</div><div class="t1">إنت تدير اللعبة وتشوف كل الأدوار</div>'});
   startReveal('🔪 المافيا',items,'الراوي يستلم 🎙️',showNar,'mafSetup');
 }
 function showNar(){
@@ -798,7 +860,7 @@ function showNar(){
   const st=['الراوي يقول: "الكل يغمض عيونه" 😴','"المافيا تفتح عيونها" وتأشر على اللي بتطلعه، بعدين تغمض'];
   if(S.doc)st.push('"الدكتور يفتح عيونه" ويأشر على اللي بينقذه، بعدين يغمض');
   if(S.cop)st.push('"الشرطي يفتح عيونه" ويأشر على واحد، والراوي يرد بإبهام 👍 مافيا أو 👎 لا');
-  st.push('"الكل يفتح عيونه" والراوي يعلن مين طلع (إلا إذا الدكتور أنقذه)','النهار: نقاش وتصويت، واللي ياخذ أكثر أصوات يطلع ويكشف دوره','تتكرر لين تطلع المافيا كلها (المواطنين فازوا) أو المافيا تساوي الباقين (المافيا فازت)');
+  st.push('"الكل يفتح عيونه" والراوي يعلن منهو طلع (إلا إدا الدكتور أنقذه)','النهار: نقاش وتصويت، واللي ياخد أكثر أصوات يطلع ويكشف دوره','تتكرر لين تطلع المافيا كلها (المواطنين فازوا) أو المافيا تساوي الباقين (المافيا فازت)');
   $('narSteps').innerHTML=st.map(s=>'<li>'+s+'</li>').join('');
   show('mafNar');
 }

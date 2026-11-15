@@ -50,7 +50,7 @@ function parseBag(spec, math) {
 const norm = s => s.replace(/[أإآ]/g, 'ا').replace(/ى/g, 'ي').replace(/ؤ/g, 'و').replace(/ئ/g, 'ي').replace(/ة/g, 'ه');
 
 /* ---------- القاموس ---------- */
-const EXTRA_WORDS = `اب ام اخ اخت ابن بنت جد جده عم خال بيت باب دار غرفه سقف جدار ارض سما شمس قمر نجم بحر نهر بر جبل رمل حجر شجر ورد زهر عشب ماء نار هوا ريح مطر برد حر ثلج يوم ليل صبح ظهر عصر مغرب فجر سنه شهر اسبوع ساعه دقيقه وقت عمر اكل شرب نوم لعب قراءه كتابه درس علم عمل شغل مال ذهب فضه حديد خشب ورق قلم كتاب دفتر لوح كرسي طاوله سرير باب شباك مفتاح قفل حبل كيس صندوق علبه كوب صحن قدر سكين ملعقه شوكه خبز رز لحم سمك دجاج بيض حليب لبن جبن زبده عسل سكر ملح فلفل زيت تمر عنب تين موز تفاح خوخ رمان ليمون بطيخ قلب راس عين اذن انف فم سن يد رجل ظهر بطن صدر كتف ركبه اصبع شعر وجه جلد دم عظم روح نفس حب ود فرح حزن خوف امل صبر شكر حمد ذكر صلاه صوم حج زكاه دين علم قران نبي رسول ملك امير شيخ رجل امراه ولد طفل صبي بنت شاب كبير صغير طويل قصير جميل حلو مر حار بارد جديد قديم سهل صعب قريب بعيد كثير قليل ابيض اسود احمر اخضر ازرق اصفر لون شكل خط نقطه دائره مربع حرف كلمه جمله سؤال جواب قصه شعر بيت قصيده غنا رقص لعبه كره ملعب فريق هدف فوز خساره حكم لاعب جري سباحه سفر طريق شارع سياره باص قطار طياره سفينه قارب جسر مدينه قريه بلد دوله سوق محل مطعم مقهى مسجد مدرسه جامعه مستشفى طبيب دواء مرض صحه قوه ضعف عقل فكر راي سر خبر صوت صوره فيلم هاتف جوال رساله بريد ورقه نور ظل باب سيف رمح درع خيمه بئر واحه نخله جمل خيل حصان كلب قط اسد نمر ذيب ثعلب ارنب فار غزال طير صقر نسر حمام بطه ديك نحله نمله فراشه دود سمكه حوت قرش اخطبوط سلحفاه ضفدع ثعبان عقرب عنكبوت زرافه فيل قرد دب كتب درس لعب اكل شرب نام قام جلس مشى جرى طار سبح قرا كتب فتح سد ضرب رمى اخذ اعطى جاء ذهب رجع دخل خرج سال قال سمع راى عرف فهم حفظ نسي حب كره ضحك بكى صاح غنى رسم بنى هدم زرع حصد طبخ غسل لبس`;
+const EXTRA_WORDS = `اب ام اخ اخت ابن بنت جد جده عم خال بيت باب دار غرفه سقف جدار ارض سما شمس قمر نجم بحر نهر بر جبل رمل حجر شجر ورد زهر عشب ماء نار هوا ريح مطر برد حر ثلج يوم ليل صبح ظهر عصر مغرب فجر سنه شهر اسبوع ساعه دقيقه وقت عمر اكل شرب نوم لعب قراءه كتابه درس علم عمل شغل مال ذهب فضه حديد خشب ورق قلم كتاب دفتر لوح كرسي طاوله سرير باب شباك مفتاح قفل حبل كيس صندوق علبه كوب صحن قدر سكين ملعقه شوكه خبز رز لحم سمك دجاج بيض حليب لبن جبن زبده عسل سكر ملح فلفل زيت تمر عنب تين موز تفاح خوخ رمان ليمون بطيخ قلب راس عين اذن انف فم سن يد رجل ظهر بطن صدر كتف ركبه اصبع شعر وجه جلد دم عظم روح نفس حب ود فرح حزن خوف امل صبر شكر حمد ذكر صلاه صوم حج زكاه دين علم قران نبي رسول ملك امير شيخ رجل امراه ولد طفل صبي بنت شاب كبير صغير طويل قصير جميل حلو مر حار بارد جديد قديم سهل صعب قريب بعيد كثير قليل ابيض اسود احمر اخضر ازرق اصفر لون شكل خط نقطه دائره مربع حرف كلمه جمله سؤال جواب قصه شعر بيت قصيده غنا رقص لعبه كره ملعب فريق هدف فوز خساره حكم لاعب جري سباحه سفر طريق شارع سياره باص قطار طياره سفينه قارب جسر مدينه قريه بلد دوله سوق محل مطعم مقهى مسجد مدرسه جامعه مستشفى طبيب دواء مرض صحه قوه ضعف عقل فكر راي سر خبر صوت صوره فيلم هاتف جوال رساله بريد ورقه نور ظل باب سيف رمح درع خيمه بئر واحه نخله جمل خيل حصان كلب قط اسد نمر ذيب ثعلب ارنب فار غزال طير صقر نسر حمام بطه ديك نحله نمله فراشه دود سمكه حوت قرش اخطبوط سلحفاه ضفدع ثعبان عقرب عنكبوت زرافه فيل قرد دب كتب درس لعب اكل شرب نام قام جلس مشى جرى طار سبح قرا كتب فتح سد ضرب رمى اخد اعطى جاء ذهب رجع دخل خرج سال قال سمع راى عرف فهم حفظ نسي حب كره ضحك بكى صاح غنى رسم بنى هدم زرع حصد طبخ غسل لبس`;
 let DICT = null, DICT_LIST = null;
 function dict() {
   if (DICT) return DICT;
@@ -251,11 +251,11 @@ function boardUI(g, me, canPlay, onSubmit, opts) {
       if (exMode) { if (!exSel.size) return; onSubmit({ kind: 'ex', idx: [...exSel] }); return; }
       const places = pend.map(x => ({ i: x.i, t: rack[x.r] })); const ev = evaluate(g, places);
       if (!ev.ok && !(ev.bad && ev.bad.length && g.mode !== 'math' && opts.allowUnknown && ev.err && !/لازم|مو فاضي|النجمة|متصلة|حرفين/.test(ev.err))) { buzz(120); preview(); return; }
-      if (!ev.ok) { if (!submit.dataset.c) { submit.dataset.c = 1; msg.textContent = '⚠️ ' + ev.err + ' — إذا متأكدين إنها كلمة صح، اضغطوا تأكيد مرة ثانية'; msg.style.color = 'var(--yel)'; return; } }
+      if (!ev.ok) { if (!submit.dataset.c) { submit.dataset.c = 1; msg.textContent = '⚠️ ' + ev.err + ' — إدا متأكدين إنها كلمة صح، اضغطوا تأكيد مرة ثانية'; msg.style.color = 'var(--yel)'; return; } }
       onSubmit({ kind: 'play', places: pend.map(x => ({ i: x.i, r: x.r })), force: !ev.ok });
     });
     const recall = btn('رجّع ↩️', 'ghost', () => { pend.length = 0; sel = -1; exMode = false; exSel.clear(); delete submit.dataset.c; drawAll(); });
-    const ex = btn('بدّل 🔄', 'ghost', () => { pend.length = 0; exMode = !exMode; exSel.clear(); ex.classList.toggle('on', exMode); msg.textContent = exMode ? 'اختار الحروف اللي تبي تبدلها واضغط تأكيد' : ''; drawAll(); });
+    const ex = btn('بدّل 🔄', 'ghost', () => { pend.length = 0; exMode = !exMode; exSel.clear(); ex.classList.toggle('on', exMode); msg.textContent = exMode ? 'اختار الحروف اللي تبغى تبدلها واضغط تأكيد' : ''; drawAll(); });
     const ps = btn('مرر ⏭️', 'ghost', () => onSubmit({ kind: 'pass' }));
     bs.append(submit, recall, ex, ps); wrap.appendChild(bs);
     const sh = btn('🔀 خربط الحروف', 'ghost small', () => { if (pend.length) return; const s2 = shuffle(rack.map((t, i) => i)); const nr = s2.map(i => rack[i]); rack.splice(0, rack.length, ...nr); if (opts.onShuffle) opts.onShuffle(s2); sel = -1; drawAll(); });
@@ -264,7 +264,7 @@ function boardUI(g, me, canPlay, onSubmit, opts) {
   return wrap;
 }
 
-/* ---------- جوال واحد ---------- */
+/* ---------- تلفون واحد ---------- */
 const xS = mkScreen('scrSetup', '🔠 سكرابل');
 const xP = mkScreen('scrabble', '🔠 سكرابل');
 let SC = null, lastHuman = -1;
@@ -277,11 +277,11 @@ function scSetup() {
   const ch2 = el('div', 'chips'); S.players.forEach(p => { const c = el('button', 'chip' + (S.scHum.includes(p) ? ' sel' : ''), p); c.onclick = () => { if (S.scHum.includes(p)) S.scHum.splice(S.scHum.indexOf(p), 1); else if (S.scHum.length + S.scBots < 4) S.scHum.push(p); save(); scSetup(); }; ch2.appendChild(c); }); box2.appendChild(ch2);
   box2.appendChild(stepper('🤖 كمبيوتر', () => S.scBots, v => { S.scBots = v; scSetup(); }, () => 0, () => Math.max(0, 4 - S.scHum.length)));
   box2.appendChild(stepper('مستوى الكمبيوتر', () => S.scLvl, v => S.scLvl = v, () => 1, () => 3, v => ['', 'سهل', 'متوسط', 'صعب'][v]));
-  box2.appendChild(el('div', 'lab', 'تبي تلعب مع ربعك كل واحد من جواله؟ سوّ غرفة أونلاين 🌐'));
+  box2.appendChild(el('div', 'lab', 'تبغى تلعب مع ربعك كل واحد من تلفونه؟ سوّ غرفة أونلاين 🌐'));
   const err = el('div', 'err', '');
   b.append(box, box2, err);
   setBtns2(xS.row, [btn('ابدأ ▶', '', () => {
-    const pl = S.scHum.map(n => ({ id: n, name: n })); if (!pl.length) pl.push({ id: 'me', name: 'أنت' });
+    const pl = S.scHum.map(n => ({ id: n, name: n })); if (!pl.length) pl.push({ id: 'me', name: 'إنت' });
     const bn = ['🤖 سالم', '🤖 فهد', '🤖 مريم']; for (let i = 0; i < S.scBots; i++) pl.push({ id: 'bot' + i, name: bn[i], bot: S.scLvl });
     if (pl.length < 2) { err.textContent = 'لازم لاعبين على الأقل (حط كمبيوتر)'; return; }
     SC = scNew(S.scMode, pl); lastHuman = -1; scTurn();
@@ -296,7 +296,7 @@ function scTurn() {
   scDraw();
   if (p.bot) setTimeout(() => { if (!$('scrabble').classList.contains('on')) return; botPlay(SC); if (window.SFX) SFX.deal(2); scTurn(); }, window.__fast ? 10 : 900);
 }
-function scPassScreen(p) { const b = xP.body; b.innerHTML = ''; const c = el('div', 'bigcard'); c.append(el('div', 'lab', 'عط الجوال لـ'), el('div', 'nm', p.name), el('div', 'lab', SC.msg || '')); b.appendChild(c); setBtns2(xP.row, [btn('أنا ' + p.name + ' ✋', '', () => { lastHuman = SC.turn; scDraw(); })]); show('scrabble'); }
+function scPassScreen(p) { const b = xP.body; b.innerHTML = ''; const c = el('div', 'bigcard'); c.append(el('div', 'lab', 'عط التلفون لـ'), el('div', 'nm', p.name), el('div', 'lab', SC.msg || '')); b.appendChild(c); setBtns2(xP.row, [btn('أني ' + p.name + ' ✋', '', () => { lastHuman = SC.turn; scDraw(); })]); show('scrabble'); }
 function scDraw() {
   const p = SC.pl[SC.turn], me = p.bot ? (SC.pl.find(x => !x.bot) || p) : p;
   const b = xP.body; b.innerHTML = '';
@@ -353,13 +353,13 @@ function makeSC(mode) {
   };
   return G;
 }
-window.ONL.register('scr', { e: '🔠', n: 'سكرابل (حروف)', d: 'كل واحد حروفه على جواله', min: 2, make: () => makeSC('ar') });
+window.ONL.register('scr', { e: '🔠', n: 'سكرابل (حروف)', d: 'كل واحد حروفه على تلفونه', min: 2, make: () => makeSC('ar') });
 window.ONL.register('scrm', { e: '🔢', n: 'سكرابل المعادلات', d: 'أرقام ومعادلات', min: 2, make: () => makeSC('math') });
 
 /* ---------- تسجيل ---------- */
 const k = GAMES.findIndex(x => x.id === 'sudoku');
 GAMES.splice(k + 1, 0, { id: 'scrabble', e: '🔠', n: 'سكرابل', d: 'حروف عربية أو أرقام ومعادلات، ضد الكمبيوتر', min: 0, t: '٢٠-٤٠ دقيقة' });
-RULES.scrabble = ['كل واحد عنده ٧ حروف (أو أرقام). بدورك تحط كلمة على اللوحة بصف واحد أو عمود واحد، وتضغط تأكيد.', 'أول كلمة لازم تمر على النجمة ★، وبعدها كل كلمة لازم تلمس اللي على اللوحة. الكلمات العربية تنقرى من اليمين لليسار ومن فوق لتحت.', 'المربعات الملونة تضاعف: ٢ح و٣ح للحرف، و٢ك و٣ك للكلمة كلها. وإذا استخدمت الحروف السبعة كلها تاخذ +٥٠!', 'سكرابل المعادلات: بدل الكلمات تسوي معادلات صحيحة، مثل 3+4=7 أو 12=3×4.', 'إذا الكلمة مو في قاموس اللعبة، يطلع لك تنبيه، وإذا متأكدين إنها صح اضغطوا تأكيد مرة ثانية.', 'تقدر تبدّل حروفك أو تمرر. تخلص اللعبة لما تخلص الحروف أو الكل يمرر، واللي عنده نقاط أكثر يفوز. العب ضد الكمبيوتر 🤖 أو أونلاين مع ربعك.'];
+RULES.scrabble = ['كل واحد عنده ٧ حروف (أو أرقام). بدورك تحط كلمة على اللوحة بصف واحد أو عمود واحد، وتضغط تأكيد.', 'أول كلمة لازم تمر على النجمة ★، وبعدها كل كلمة لازم تلمس اللي على اللوحة. الكلمات العربية تنقرى من اليمين لليسار ومن فوق لتحت.', 'المربعات الملونة تضاعف: ٢ح و٣ح للحرف، و٢ك و٣ك للكلمة كلها. وإدا استخدمت الحروف السبعة كلها تاخد +٥٠!', 'سكرابل المعادلات: بدل الكلمات تسوي معادلات صحيحة، مثل 3+4=7 أو 12=3×4.', 'إدا الكلمة مو في قاموس اللعبة، يطلع لك تنبيه، وإدا متأكدين إنها صح اضغطوا تأكيد مرة ثانية.', 'تقدر تبدّل حروفك أو تمرر. تخلص اللعبة لما تخلص الحروف أو الكل يمرر، واللي عنده نقاط أكثر يفوز. العب ضد الكمبيوتر 🤖 أو أونلاين مع ربعك.'];
 window.EXTRA.scrabble = scSetup;
 window.__sc = () => ({ SC, scNew, evaluate, commit, botPlay, botMoves, eqOk, wordOk, dict, eqList, N, CENTER });
 renderHome();
