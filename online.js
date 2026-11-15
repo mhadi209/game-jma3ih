@@ -1,6 +1,6 @@
 /* ===== تقزيرة: الأونلاين (غرفة + كود، وربعك يدخلون من المتصفح) =====
    المضيف (اللي سوى الغرفة) هو اللي يدير اللعبة، والباقين يشوفون شاشاتهم ويرسلون اختياراتهم.
-   الاتصال مباشر بين الجوالات عن طريق PeerJS (WebRTC). */
+   الاتصال مباشر بين التلفونات عن طريق PeerJS (WebRTC). */
 (function () {
 'use strict';
 const { mkScreen, setBtns2 } = window.UI;
@@ -102,7 +102,7 @@ const Net = {
 /* ---------- شاشة الأونلاين ---------- */
 const on = mkScreen('online', '🌐 أونلاين');
 on.el.querySelector('.help').onclick = () => { CUR = { id: 'online', e: '🌐', n: 'أونلاين' }; openHelp(); };
-RULES.online = ['أنت تسوي غرفة، ويطلع لك كود ورابط.', 'ترسل الرابط لربعك (واتساب مثلاً)، يفتحونه من المتصفح ويكتبون أساميهم، بدون ما ينزلون شي.', 'لما يدخلون، تختار اللعبة من جوالك (أنت المضيف)، وكل واحد يشوف شاشته على جواله.', 'لازم نت عند الكل. إذا ما اتصل أحد، جربوا تكونون على نفس الواي فاي.', 'خل التطبيق مفتوح على جوالك (لا تطلع منه) لين تخلصون، لأن جوالك هو اللي يدير الغرفة.', 'إذا أحد انقطع عنه النت أو حدّث الصفحة، يرجع لمكانه بروحه وما يتكرر اسمه.', 'تبي تطلّع أحد؟ في الغرفة اضغط على اسمه مرتين ✖، أو وانتم تلعبون اضغط زر 👥.'];
+RULES.online = ['إنت تسوي غرفة، ويطلع لك كود ورابط.', 'ترسل الرابط لربعك (واتساب مثلاً)، يفتحونه من المتصفح ويكتبون أساميهم، بدون ما ينزلون شي.', 'لما يدخلون، تختار اللعبة من تلفونك (إنت المضيف)، وكل واحد يشوف شاشته على تلفونه.', 'لازم نت عند الكل. إدا ما اتصل أحد، جربوا تكونون على نفس الواي فاي.', 'خل التطبيق مفتوح على تلفونك (لا تطلع منه) لين تخلصون، لأن تلفونك هو اللي يدير الغرفة.', 'إدا أحد انقطع عنه النت أو حدّث الصفحة، يرجع لمكانه بروحه وما يتكرر اسمه.', 'تبغى تطلّع أحد؟ في الغرفة اضغط على اسمه مرتين ✖، أو وانتم تلعبون اضغط زر 👥.'];
 let ROLE = null;   // 'host' | 'guest'
 let ME = null;     // pid
 let tagEl = null;
@@ -130,7 +130,7 @@ function renderView(v, sendAct) {
   });
   if (v.secret) { const sb = el('div', 'secretBox hid'); const inn = el('div', 'in'); inn.innerHTML = v.secret; sb.append(el('div', 'lab', '👆 اضغط عشان تشوف / تخبي'), inn); sb.onclick = () => sb.classList.toggle('hid'); c.appendChild(sb); }
   if (v.canvas) {
-    const cv = el('canvas', 'paper'); const w = Math.min(window.innerWidth - 48, 460), h = Math.round(w * 1.15), dpr = window.devicePixelRatio || 1;
+    const cv = el('canvas', 'paper'); const w = Math.min(window.innerWidth - 48, TABW(460)), h = Math.round(w * 1.15), dpr = window.devicePixelRatio || 1;
     cv.width = w * dpr; cv.height = h * dpr; cv.style.width = w + 'px'; cv.style.height = h + 'px'; c.appendChild(cv);
     drawCtx = { cv, strokes: v.canvas.strokes || [], cur: null, can: v.canvas.can, color: v.canvas.color };
     paintCv();
@@ -197,7 +197,7 @@ let hbT = null, hbLast = 0;
 function heartbeat() {
   if (!H || ROLE !== 'host') { clearInterval(hbT); return; }
   const now = Date.now();
-  // إذا جوال المضيف كان نايم (الشاشة مسكرة) لا نطلّع أحد ظلم
+  // إدا تلفون المضيف كان نايم (الشاشة مسكرة) لا نطلّع أحد ظلم
   if (hbLast && now - hbLast > 9000) H.players.forEach(p => p.seen = now);
   hbLast = now;
   H.players.forEach(p => { if (p.id === 'host' || !p.on) return; sendTo(p, { t: 'ping' }); if (p.hb && now - (p.seen || now) > 16000) hostLeave(p.conn); });
@@ -207,7 +207,7 @@ function hostMsg(conn, m) {
   if (m.t === 'hello') {
     let name = String(m.name || 'لاعب').slice(0, 16).trim() || 'لاعب';
     const cid = m.cid ? String(m.cid).slice(0, 40) : null;
-    // نفس الجهاز رجع (حدّث الصفحة أو انقطع) ← ياخذ مكانه القديم بدل ما ينضاف مرة ثانية
+    // نفس الجهاز رجع (حدّث الصفحة أو انقطع) ← ياخد مكانه القديم بدل ما ينضاف مرة ثانية
     let p = (cid && H.players.find(x => x.cid === cid)) || H.players.find(x => x.name === name && !x.on && x.id !== 'host');
     if (p) {
       if (p.on && p.conn !== conn) { Net.send(p.conn, { t: 'replaced' }); try { Net.drop(p.conn); } catch (e) { } }
@@ -267,7 +267,7 @@ function hostLobby() {
   const link = el('div', 'link', joinUrl()); c.appendChild(link);
   const r = el('div', 'row'); r.style.marginTop = '10px';
   const cp = btn('📋 انسخ الرابط', 'ghost', async () => { try { await navigator.clipboard.writeText(joinUrl()); cp.textContent = 'تم النسخ ✓'; } catch (e) { const sel = window.getSelection(), rg = document.createRange(); rg.selectNodeContents(link); sel.removeAllRanges(); sel.addRange(rg); cp.textContent = 'انسخه من فوق 👆'; } });
-  const wa = el('a', ''); wa.href = 'https://wa.me/?text=' + encodeURIComponent('تعالوا العبوا معي في تقزيرة 🎲 ادخلوا من هنا: ' + joinUrl()); wa.target = '_blank'; wa.rel = 'noopener'; const wb = el('button', 'grn', '🟢 أرسل بالواتساب'); wb.style.width = '100%'; wa.appendChild(wb); wa.style.flex = '1';
+  const wa = el('a', ''); wa.href = 'https://wa.me/?text=' + encodeURIComponent('تعالوا العبوا وياي في تقزيرة 🎲 ادخلوا من اهني: ' + joinUrl()); wa.target = '_blank'; wa.rel = 'noopener'; const wb = el('button', 'grn', '🟢 أرسل بالواتساب'); wb.style.width = '100%'; wa.appendChild(wb); wa.style.flex = '1';
   r.append(cp, wa); c.appendChild(r);
   const nm = el('div', 'row'); nm.style.marginTop = '10px'; const ni = el('input'); ni.type = 'text'; ni.value = H.players[0].name; ni.maxLength = 16; ni.placeholder = 'اسمك'; ni.oninput = () => { H.players[0].name = ni.value.trim() || 'المضيف'; S.myName = H.players[0].name; save(); }; nm.append(el('b', '', 'اسمك: '), ni); c.appendChild(nm);
   b.appendChild(c);
@@ -278,12 +278,12 @@ function hostLobby() {
     pl.appendChild(sp);
   });
   pb.appendChild(pl);
-  if (H.players.length > 1) pb.appendChild(el('div', 'lab', 'تبي تطلّع أحد؟ اضغط على اسمه مرتين ✖'));
+  if (H.players.length > 1) pb.appendChild(el('div', 'lab', 'تبغى تطلّع أحد؟ اضغط على اسمه مرتين ✖'));
   if (active().length < 2) pb.appendChild(el('div', 'lab', 'انتظر ربعك يدخلون من الرابط…'));
   b.appendChild(pb);
   const gb = el('div', 'box'); gb.appendChild(el('h2', '', 'اختار اللعبة'));
   const g = el('div', 'ogames');
-  Object.entries(GAMES_ON).forEach(([id, G2]) => { const x = el('button', ''); x.append(el('b', '', G2.e + ' ' + G2.n), el('small', '', G2.d + ' · ' + G2.min + '+ لاعبين')); x.onclick = () => { if (active().length < G2.min) { status(G2.n + ' تبي ' + G2.min + ' لاعبين على الأقل', 'bad'); return; } hostAct('host', { a: 'btn', v: id }); }; g.appendChild(x); });
+  Object.entries(GAMES_ON).forEach(([id, G2]) => { const x = el('button', ''); x.append(el('b', '', G2.e + ' ' + G2.n), el('small', '', G2.d + ' · ' + G2.min + '+ لاعبين')); x.onclick = () => { if (active().length < G2.min) { status(G2.n + ' تبغى ' + G2.min + ' لاعبين على الأقل', 'bad'); return; } hostAct('host', { a: 'btn', v: id }); }; g.appendChild(x); });
   gb.appendChild(g); b.appendChild(gb);
   if (H.players.some(x => x.score)) { const sb = el('div', 'box'); sb.appendChild(el('h2', '', 'النقاط 🏆')); sb.appendChild(resList2(scoresList())); const z = btn('تصفير النقاط', 'ghost small', () => { H.players.forEach(p => p.score = 0); hostLobby(); }); z.style.marginTop = '8px'; sb.appendChild(z); b.appendChild(sb); }
   setBtns2(on.row, [btn('سكّر الغرفة ✖', 'ghost', () => { leaveRoom(); renderHome(); show('home'); })]);
@@ -305,7 +305,7 @@ const waitTxt = (m) => 'انتظر الباقين… (' + active().filter(p => m
 function makeImp(drawMode) {
   const G3 = { phase: 'reveal' };
   G3.start = () => {
-    const pool = drawMode ? ['حيوانات 🐾', 'أكل وشرب 🍽️', 'نباتات وفواكه وخضار 🌿', 'سيارات ومواصلات 🚗', 'أماكن 📍', 'أغراض وأجهزة 🏠', 'فضاء وطبيعة 🌙', 'مهن 👨‍⚕️'].filter(c => TOPICS[c]) : Object.keys(TOPICS);
+    const pool = drawMode ? ['حيوانات 🐾', 'أكل وشرب 🍽️', 'نباتات وفواكه وخضار 🌿', 'سيارات ومواصلات 🚗', 'أماكن 📍', 'أغراض 🏠', 'أجهزة 🔌', 'فضاء وطبيعة 🌙', 'مهن 👨‍⚕️'].filter(c => TOPICS[c]) : Object.keys(TOPICS);
     [G3.cat, G3.word] = topicWord(pool);
     const ps = active(); G3.ids = ps.map(p => p.id); const n = ps.length >= 7 ? 2 : 1;
     G3.imps = shuffle(G3.ids).slice(0, n); G3.seen = {}; G3.votes = {}; G3.guess = {}; G3.phase = 'reveal';
@@ -318,8 +318,8 @@ function makeImp(drawMode) {
     const title = drawMode ? '🎨 ارسم وصيد الامبوستر' : '🕵️ الامبوستر';
     if (!G3.ids.includes(p.id)) return { title, items: [{ t: 'lab', v: 'الجولة بدأت قبل لا تدخل، انتظر الجولة الجاية 🙏' }] };
     if (G3.phase === 'reveal') {
-      const sec = isImp(p.id) ? '<div class="emo" style="font-size:50px">🤫</div><div class="t2 bad" style="font-family:Lalezar;font-size:32px">أنت الامبوستر!</div><div class="lab">الموضوع: ' + esc(G3.cat) + '</div>' : '<div class="lab">' + esc(G3.cat) + '</div><div style="font-family:Lalezar;font-size:36px;color:var(--grn)">' + esc(G3.word) + '</div><div class="desc">' + esc(descOf(G3.cat, G3.word)) + '</div>';
-      return { title, items: [{ t: 'lab', v: 'كلمتك السرية (خل جوالك بعيد عن عيون الباقين 👀)' }], secret: sec, btns: G3.seen[p.id] ? [] : [{ id: 'seen', label: 'شفت ✓ جاهز' }], status: G3.seen[p.id] ? [waitTxt(G3.seen)] : null };
+      const sec = isImp(p.id) ? '<div class="emo" style="font-size:50px">🤫</div><div class="t2 bad" style="font-family:Lalezar;font-size:32px">إنت الامبوستر!</div><div class="lab">الموضوع: ' + esc(G3.cat) + '</div>' : '<div class="lab">' + esc(G3.cat) + '</div><div style="font-family:Lalezar;font-size:36px;color:var(--grn)">' + esc(G3.word) + '</div><div class="desc">' + esc(descOf(G3.cat, G3.word)) + '</div>';
+      return { title, items: [{ t: 'lab', v: 'كلمتك السرية (خل تلفونك بعيد عن عيون الباقين 👀)' }], secret: sec, btns: G3.seen[p.id] ? [] : [{ id: 'seen', label: 'شفت ✓ جاهز' }], status: G3.seen[p.id] ? [waitTxt(G3.seen)] : null };
     }
     if (G3.phase === 'ask') {
       const [a, b] = G3.pairs[G3.k];
@@ -332,11 +332,11 @@ function makeImp(drawMode) {
     if (G3.phase === 'vote') {
       const img = drawMode ? [{ t: 'img', v: G3.img }] : [];
       if (G3.votes[p.id] !== undefined) return { title, items: img.concat([{ t: 'win good', v: 'صوّتت ✓' }]), status: [waitTxt(G3.votes)] };
-      return { title, items: img.concat([{ t: 'lab', v: 'مين تشك إنه الامبوستر؟ (تصويت سري)' }]), opts: G3.ids.filter(id => id !== p.id && P(id)).map(id => ({ id, label: nm(id) })) };
+      return { title, items: img.concat([{ t: 'lab', v: 'منهو تشك إنه الامبوستر؟ (تصويت سري)' }]), opts: G3.ids.filter(id => id !== p.id && P(id)).map(id => ({ id, label: nm(id) })) };
     }
     if (G3.phase === 'guess') {
       const pend = G3.imps.filter(id => G3.guess[id] === undefined);
-      if (isImp(p.id) && G3.guess[p.id] === undefined) return { title, items: [{ t: 'lab', v: 'أنت الامبوستر! وش كانت الكلمة؟ إذا جبتها تاخذ +١' }], opts: G3.gopts.map(w => ({ id: w, label: w })) };
+      if (isImp(p.id) && G3.guess[p.id] === undefined) return { title, items: [{ t: 'lab', v: 'إنت الامبوستر! ويش كانت الكلمة؟ إدا جبتها تاخد +١' }], opts: G3.gopts.map(w => ({ id: w, label: w })) };
       return { title, items: [{ t: 'lab', v: 'التصويت خلص… الامبوستر الحين يخمن الكلمة 🤔' }].concat(G3.tallyItems), status: [pend.length ? 'ننتظر ' + pend.map(nm).join(' و ') : 'خلصنا'] };
     }
     if (G3.phase === 'end') {
@@ -386,32 +386,32 @@ function snapshot(strokes) {
     strokes.forEach(s => { x.strokeStyle = s.c; x.beginPath(); s.pts.forEach((p, i) => i ? x.lineTo(p[0] * 460, p[1] * 529) : x.moveTo(p[0] * 460, p[1] * 529)); x.stroke(); }); return cv.toDataURL('image/jpeg', .7); } catch (e) { return ''; }
 }
 
-// 🗳️ الأغلبية / 🎯 أقرب رقم / 🎤 مين قالها
+// 🗳️ الأغلبية / 🎯 أقرب رقم / 🎤 منهو قالها
 function makeSimple(kind) {
   const G3 = {};
   G3.start = () => { G3.ids = active().map(p => p.id); G3.ans = {}; G3.phase = 'ask'; G3.pts = {}; G3.q = kind === 'major' ? draw('majority', WYR) : kind === 'closest' ? draw('closest', CLOSEST) : draw('whosaid', WHO_SAID); };
   const nm = id => (P(id) || {}).name || '؟';
-  const title = { major: '🗳️ الأغلبية', closest: '🎯 أقرب رقم', whosaid: '🎤 مين قالها؟' }[kind];
+  const title = { major: '🗳️ الأغلبية', closest: '🎯 أقرب رقم', whosaid: '🎤 منهو قالها؟' }[kind];
   G3.view = p => {
     if (!G3.ids.includes(p.id)) return { title, items: [{ t: 'lab', v: 'انتظر الجولة الجاية 🙏' }] };
     const done = G3.ans[p.id] !== undefined;
     if (G3.phase === 'ask') {
-      if (kind === 'major') return done ? { title, items: [{ t: 'win good', v: 'اخترت ✓' }], status: [waitTxt(G3.ans)] } : { title, items: [{ t: 'lab', v: 'لو خيروك… وش بتختار الأغلبية؟ اختار بالسر' }], opts: G3.q.map((t, i) => ({ id: i, label: t })) };
+      if (kind === 'major') return done ? { title, items: [{ t: 'win good', v: 'اخترت ✓' }], status: [waitTxt(G3.ans)] } : { title, items: [{ t: 'lab', v: 'لو خيروك… ويش بتختار الأغلبية؟ اختار بالسر' }], opts: G3.q.map((t, i) => ({ id: i, label: t })) };
       if (kind === 'closest') return done ? { title, items: [{ t: 'txt', v: G3.q.q }, { t: 'win good', v: 'جوابك: ' + G3.ans[p.id] }], status: [waitTxt(G3.ans)] } : { title, items: [{ t: 'txt', v: G3.q.q }], input: { kind: 'number', ph: 'تخمينك (' + G3.q.u + ')' } };
       return done ? { title, items: [{ t: 'txt', v: G3.q }, { t: 'win good', v: 'كتبت جوابك ✓' }], status: [waitTxt(G3.ans)] } : { title, items: [{ t: 'lab', v: 'اكتب جوابك بالسر' }, { t: 'txt', v: G3.q }], input: { kind: 'text', ph: 'جوابك…' } };
     }
     if (G3.phase === 'guessWho') {
       const a = G3.list[G3.k]; const mine = a.id === p.id;
-      if (mine) return { title, items: [{ t: 'lab', v: 'هذا جوابك 😏 خلهم يخمنون' }, { t: 'txt', v: '«' + a.t + '»' }], status: [waitTxt(G3.gv)] };
+      if (mine) return { title, items: [{ t: 'lab', v: 'هدا جوابك 😏 خلهم يخمنون' }, { t: 'txt', v: '«' + a.t + '»' }], status: [waitTxt(G3.gv)] };
       if (G3.gv[p.id] !== undefined) return { title, items: [{ t: 'txt', v: '«' + a.t + '»' }, { t: 'win good', v: 'خمّنت ✓' }], status: [waitTxt(G3.gv)] };
-      return { title, items: [{ t: 'lab', v: G3.q }, { t: 'lab', v: 'جواب ' + (G3.k + 1) + ' من ' + G3.list.length }, { t: 'txt', v: '«' + a.t + '»' }, { t: 'lab', v: 'مين كاتبه؟' }], opts: G3.ids.filter(id => id !== p.id && P(id)).map(id => ({ id, label: nm(id) })) };
+      return { title, items: [{ t: 'lab', v: G3.q }, { t: 'lab', v: 'جواب ' + (G3.k + 1) + ' من ' + G3.list.length }, { t: 'txt', v: '«' + a.t + '»' }, { t: 'lab', v: 'منهو كاتبه؟' }], opts: G3.ids.filter(id => id !== p.id && P(id)).map(id => ({ id, label: nm(id) })) };
     }
     if (G3.phase === 'wres') { const a = G3.list[G3.k]; return { title, items: [{ t: 'txt', v: '«' + a.t + '»' }, { t: 'lab', v: 'كاتبه' }, { t: 'nm', v: nm(a.id) }, { t: 'list', v: Object.entries(G3.gv).map(([g, t]) => [nm(g) + ' قال ' + nm(t), t === a.id ? '✅' : '❌', t === a.id]) }] }; }
     if (G3.phase === 'res') return { title, items: G3.res, scores: scoresList() };
   };
   G3.hostBtns = () => {
     if (G3.phase === 'ask') return [{ id: 'h:reveal', label: 'اكشف (حتى لو باقي أحد)', cls: 'ghost' }];
-    if (G3.phase === 'guessWho') return [{ id: 'h:wres', label: 'اكشف مين كاتبه', cls: 'ghost' }];
+    if (G3.phase === 'guessWho') return [{ id: 'h:wres', label: 'اكشف منهو كاتبه', cls: 'ghost' }];
     if (G3.phase === 'wres') return [{ id: 'h:wnext', label: G3.k < G3.list.length - 1 ? 'الجواب اللي بعده ←' : 'النتيجة 🏆', flex: 2 }];
     if (G3.phase === 'res') return [{ id: 'h:again', label: 'سؤال جديد 🔄', flex: 2 }];
     return [];
@@ -466,12 +466,12 @@ function makeBuzz() {
 }
 
 const GAMES_ON = {
-  imp: { e: '🕵️', n: 'الامبوستر', d: 'كل واحد يشوف كلمته على جواله', min: 3, make: () => makeImp(false) },
-  drw: { e: '🎨', n: 'ارسم وصيد الامبوستر', d: 'كل واحد يرسم من جواله', min: 3, make: () => makeImp(true) },
-  major: { e: '🗳️', n: 'الأغلبية', d: 'تصويت سري من الجوالات', min: 3, make: () => makeSimple('major') },
+  imp: { e: '🕵️', n: 'الامبوستر', d: 'كل واحد يشوف كلمته على تلفونه', min: 3, make: () => makeImp(false) },
+  drw: { e: '🎨', n: 'ارسم وصيد الامبوستر', d: 'كل واحد يرسم من تلفونه', min: 3, make: () => makeImp(true) },
+  major: { e: '🗳️', n: 'الأغلبية', d: 'تصويت سري من التلفونات', min: 3, make: () => makeSimple('major') },
   closest: { e: '🎯', n: 'أقرب رقم', d: 'كل واحد يكتب تخمينه', min: 2, make: () => makeSimple('closest') },
-  whosaid: { e: '🎤', n: 'مين قالها؟', d: 'اكتب جوابك وخلهم يخمنون', min: 3, make: () => makeSimple('whosaid') },
-  buzz: { e: '🔔', n: 'الجرس', d: 'كل جوال صار زر جرس', min: 2, make: makeBuzz }
+  whosaid: { e: '🎤', n: 'منهو قالها؟', d: 'اكتب جوابك وخلهم يخمنون', min: 3, make: () => makeSimple('whosaid') },
+  buzz: { e: '🔔', n: 'الجرس', d: 'كل تلفون صار زر جرس', min: 2, make: makeBuzz }
 };
 // نعدل push عشان اللوبي ينرسم صح
 push = function () { if (!H) return; if (!H.game && ROLE === 'host') { hostLobby(); H.players.forEach(p => { if (p.on && p.id !== 'host') sendTo(p, { t: 'view', v: viewFor(p) }); }); return; } H.players.forEach(p => { if (!p.on) return; const v = viewFor(p); if (p.id === 'host') renderView(JSON.parse(JSON.stringify(v)), a => hostAct('host', a)); else sendTo(p, { t: 'view', v }); }); };
@@ -516,7 +516,7 @@ function guestConnect(first) {
       else if (m.t === 'strokes' && drawCtx && !drawCtx.cur) { drawCtx.strokes = m.s; paintCv(); }
       else if (m.t === 'closed') guestLost('المضيف سكّر الغرفة');
       else if (m.t === 'kicked') guestLost(m.why === 'gone' ? 'طلعت من الغرفة. ادخل مرة ثانية 🔄' : 'المضيف طلّعك من الغرفة 👋');
-      else if (m.t === 'replaced') guestLost('دخلت الغرفة من صفحة ثانية، فهذي انقفلت ✋');
+      else if (m.t === 'replaced') guestLost('دخلت الغرفة من صفحة ثانية، فهادي انقفلت ✋');
     },
     close: () => { if (GJ === g) guestRetry(); }
   }).catch(() => { if (GJ !== g) return; if (first && !opened) { ROLE = null; GJ = null; status('ما قدرت أدخل. تأكد من الكود وإن صاحب الغرفة فاتح التطبيق، وإن النت شغال.', 'bad'); } else guestRetry(); });
@@ -536,7 +536,7 @@ window.addEventListener('pagehide', () => { if (ROLE === 'guest') { try { Net.to
 
 /* ---------- زر الأونلاين في الرئيسية ---------- */
 const box = el('div', 'onlineBox');
-box.innerHTML = '<h2>🌐 العب أونلاين مع ربعك</h2><p>سوّ غرفة وأرسل الرابط، وربعك يدخلون من المتصفح بدون ما ينزلون شي. كل واحد على جواله.</p>';
+box.innerHTML = '<h2>🌐 العب أونلاين مع ربعك</h2><p>سوّ غرفة وأرسل الرابط، وربعك يدخلون من المتصفح بدون ما ينزلون شي. كل واحد على تلفونه.</p>';
 const r = el('div', 'row'); r.append(btn('سوّ غرفة 🏠', '', () => { CUR = { id: 'online', e: '🌐', n: 'أونلاين' }; hostStart(); }), btn('ادخل غرفة 🚪', '', () => { CUR = { id: 'online', e: '🌐', n: 'أونلاين' }; guestJoin(''); }));
 box.appendChild(r);
 const homeBox = $('home').querySelector('.box'); $('home').insertBefore(box, homeBox);

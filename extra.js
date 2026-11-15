@@ -120,7 +120,7 @@ document.head.appendChild(css);
 /* =================================================================
    🎨 الرسم مع الامبوستر
    ================================================================= */
-const DRAW_CATS = ['حيوانات 🐾', 'أكل وشرب 🍽️', 'نباتات وفواكه وخضار 🌿', 'سيارات ومواصلات 🚗', 'أماكن 📍', 'أغراض وأجهزة 🏠', 'جسم الإنسان 🫀', 'فضاء وطبيعة 🌙', 'مهن 👨‍⚕️', 'ملابس وماركات 👕', 'شخصيات كرتون 📺'].filter(c => TOPICS[c]);
+const DRAW_CATS = ['حيوانات 🐾', 'أكل وشرب 🍽️', 'نباتات وفواكه وخضار 🌿', 'سيارات ومواصلات 🚗', 'أماكن 📍', 'أغراض 🏠', 'أجهزة 🔌', 'جسم الإنسان 🫀', 'فضاء وطبيعة 🌙', 'مهن 👨‍⚕️', 'ملابس وماركات 👕', 'شخصيات كرتون 📺'].filter(c => TOPICS[c]);
 const COLORS = ['#d7263d', '#1b6ca8', '#2e8b57', '#f29e0c', '#7b2cbf', '#e75a9c', '#00a6a6', '#6b4226', '#222222', '#8db600'];
 const dS = mkScreen('drawSetup', '🎨 ارسم وصيد الامبوستر');
 const dP = mkScreen('drawPlay', '🎨 الرسم');
@@ -146,7 +146,7 @@ function drawRound() {
   const imps = shuffle(S.players.map((_, i) => i)).slice(0, n);
   G = { cat, word, imps, order: S.players.slice(), round: 0, out: [], again: drawRound, setup: drawSetup, img: null };
   const items = G.order.map((p, i) => ({ name: p, html: imps.includes(i)
-    ? '<div class="emo">🤫</div><div class="t2 bad">أنت الامبوستر!</div><div class="t1">' + (S.hint ? 'الموضوع: <b>' + esc(cat) + '</b>' : 'ارسم شي عام وحاول تفهم وش يرسمون') + '</div>'
+    ? '<div class="emo">🤫</div><div class="t2 bad">إنت الامبوستر!</div><div class="t1">' + (S.hint ? 'الموضوع: <b>' + esc(cat) + '</b>' : 'ارسم شي عام وحاول تفهم ويش يرسمون') + '</div>'
     : '<div class="emo">🎨</div><div class="t1">' + esc(cat) + '</div><div class="t2 good">' + esc(word) + '</div><div class="desc">' + esc(descOf(cat, word)) + '</div><div class="t1">ارسم خط واحد يساعد ربعك، بس لا تفضحها للامبوستر!</div>' }));
   startReveal('🎨 ارسم وصيد الامبوستر', items, 'يلا نرسم 🎨', drawStart, 'drawSetup');
 }
@@ -159,7 +159,7 @@ function drawStart() {
   const b = dP.body; b.innerHTML = '';
   const info = el('div', 'sub'); info.id = 'drInfo';
   const cv = el('canvas', 'paper'); cv.id = 'drCanvas';
-  const w = Math.min(window.innerWidth - 32, 488), h = Math.round(w * 1.15);
+  const w = Math.min(window.innerWidth - 32, TABW(488)), h = Math.round(w * 1.15);
   const dpr = window.devicePixelRatio || 1; cv.width = w * dpr; cv.height = h * dpr; cv.style.width = w + 'px'; cv.style.height = h + 'px';
   b.append(info, cv);
   const pos = e => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height]; };
@@ -259,7 +259,7 @@ function sjAsk(c, l, i) {
     } else {
       card.appendChild(el('div', 'lab', 'الجواب'));
       card.appendChild(el('div', 'ans', q.a));
-      card.appendChild(el('div', 'lab', 'مين جاوب صح؟'));
+      card.appendChild(el('div', 'lab', 'منهو جاوب صح؟'));
       const done = who => {
         SG.used[c + '|' + l + '|' + i] = 1;
         if (who !== null) { SG.teams[who].s += (who === SG.turn && dbl) ? l * 2 : l; beep(1200, .15); } else beep(250, .25);
@@ -324,13 +324,13 @@ function feudDraw() {
   card.append(el('div', 'bank', 'مجموع الجولة: ' + FG.bank * FG.mult), el('div', 'strikes', '✖'.repeat(FG.strikes)));
   b.appendChild(card);
   if (FG.phase === 'pick') {
-    card.appendChild(el('div', 'lab', 'اللي يضغط الجرس أول ويجاوب أحسن، فريقه يلعب. مين بيلعب؟'));
+    card.appendChild(el('div', 'lab', 'اللي يضغط الجرس أول ويجاوب أحسن، فريقه يلعب. منهو بيلعب؟'));
     setBtns2(fP.row, FG.teams.map((t, i) => btn(t.n + ' 🎤', '', () => { FG.play = i; FG.phase = 'play'; feudDraw(); })));
   } else if (FG.phase === 'play') {
-    card.appendChild(el('div', 'lab', 'لما يقولون جواب موجود، اضغطوا عليه. إذا غلط، اضغطوا ✖'));
+    card.appendChild(el('div', 'lab', 'لما يقولون جواب موجود، اضغطوا عليه. إدا غلط، اضغطوا ✖'));
     setBtns2(fP.row, [btn('✖ غلط', 'red', () => { FG.strikes++; beep(140, .5, .3); buzz(300); if (FG.strikes >= 3) { FG.phase = 'steal'; } feudDraw(); })]);
   } else if (FG.phase === 'steal') {
-    card.appendChild(el('div', 'lab', '٣ أغلاط! فرصة ' + FG.teams[1 - FG.play].n + ' يسرقون النقاط بجواب واحد. إذا جاوبوا صح اضغطوا على الجواب.'));
+    card.appendChild(el('div', 'lab', '٣ أغلاط! فرصة ' + FG.teams[1 - FG.play].n + ' يسرقون النقاط بجواب واحد. إدا جاوبوا صح اضغطوا على الجواب.'));
     setBtns2(fP.row, [btn('ما سرقوها ❌', 'ghost', () => feudFinish(FG.play))]);
   } else {
     setBtns2(fP.row, [btn(FG.r >= S.frounds ? 'النتيجة النهائية 🏆' : 'الجولة الجاية ←', '', () => FG.r >= S.frounds ? feudEnd() : feudRound())]);
@@ -468,7 +468,7 @@ function diceScreen() {
   const b = dcS.body; b.innerHTML = '';
   const box = el('div', 'box'); const ch = el('div', 'chips');
   [4, 6, 8, 10, 12, 20].forEach(n => { const c = el('button', 'chip' + (S.dside === n ? ' sel' : ''), 'D' + n); c.onclick = () => { S.dside = n; save(); diceScreen(); }; ch.appendChild(c); });
-  box.append(el('h2', '', 'نوع النرد'), ch, stepper('كم نرد', () => S.dcount, v => { S.dcount = v; diceScreen(); }, () => 1, () => 4));
+  box.append(el('h2', '', 'نوع النرد'), ch, stepper('چم نرد', () => S.dcount, v => { S.dcount = v; diceScreen(); }, () => 1, () => 4));
   const wrap = el('div', 'dicewrap'), tot = el('div', 'total', ''); tot.id = 'dTot';
   b.append(box, wrap, tot);
   DICE = [];
@@ -505,7 +505,7 @@ function cupsScreen() {
   const stage = el('div', 'cupstage'); stage.id = 'cpStage';
   b.append(box, info, stage);
   CP = { n: S.cupsN, slots: [], ball: 0, busy: true, streak: CP ? CP.streak : 0, best: LS.get('cupsBest', 0) };
-  const W = Math.min(window.innerWidth - 32, 488), gap = W / CP.n;
+  const W = Math.min(window.innerWidth - 32, TABW(488)), gap = W / CP.n;
   stage.appendChild(el('div', 'table'));
   const ball = el('div', 'ball'); ball.id = 'cpBall'; stage.appendChild(ball);
   CP.cups = [];
@@ -524,7 +524,7 @@ async function cupsGo() {
   if (!CP) return; CP.busy = true; setBtns2(cpS.row, []);
   const ball = $('cpBall'); CP.ball = rnd(CP.n);
   ball.style.left = (CP.x(CP.slots[CP.ball]) + CP.cw / 2 - 17) + 'px'; ball.style.visibility = 'visible';
-  $('cpInfo').textContent = 'ركّز… الكورة تحت هذا الكوب 👀';
+  $('cpInfo').textContent = 'ركّز… الكورة تحت هدا الكوب 👀';
   await lift(CP.ball, true); await wait(900); await lift(CP.ball, false); ball.style.visibility = 'hidden';
   const L = S.cupsLvl, swaps = [6, 11, 18][L - 1] + rnd(3), dur = [520, 360, 240][L - 1];
   $('cpInfo').textContent = 'لا ترمش! 🔀';
@@ -545,7 +545,7 @@ async function cupPick(i) {
   const ball = $('cpBall'); ball.style.left = (CP.x(CP.slots[CP.ball]) + CP.cw / 2 - 17) + 'px'; ball.style.visibility = 'visible';
   await lift(i, true);
   if (i === CP.ball) { CP.streak++; if (CP.streak > CP.best) { CP.best = CP.streak; LS.set('cupsBest', CP.best); } beep(1200, .2); $('cpInfo').textContent = 'صح! 🎉 السلسلة: ' + CP.streak + ' · أحسن سلسلة: ' + CP.best; }
-  else { await lift(CP.ball, true); CP.streak = 0; beep(200, .4); buzz(200); $('cpInfo').textContent = 'غلط 😅 الكورة كانت هنا · أحسن سلسلة: ' + CP.best; }
+  else { await lift(CP.ball, true); CP.streak = 0; beep(200, .4); buzz(200); $('cpInfo').textContent = 'غلط 😅 الكورة كانت اهني · أحسن سلسلة: ' + CP.best; }
   setBtns2(cpS.row, [btn('مرة ثانية 🔀', '', async () => { await Promise.all(CP.cups.map((_, k) => lift(k, false))); $('cpBall').style.visibility = 'hidden'; cupsGo(); })]);
 }
 
@@ -601,7 +601,7 @@ let WH = { ang: 0, spinning: false };
 function wheelScreen() {
   S.wheelItems = S.wheelItems && S.wheelItems.length ? S.wheelItems : (S.players.length ? S.players.slice() : ['خيار ١', 'خيار ٢', 'خيار ٣']);
   const b = whS.body; b.innerHTML = '';
-  const wrap = el('div', 'wheelWrap'); const cv = el('canvas'); const sz = Math.min(window.innerWidth - 40, 400), dpr = window.devicePixelRatio || 1;
+  const wrap = el('div', 'wheelWrap'); const cv = el('canvas'); const sz = Math.min(window.innerWidth - 40, TABW(400)), dpr = window.devicePixelRatio || 1;
   cv.width = sz * dpr; cv.height = sz * dpr; cv.style.width = sz + 'px'; cv.style.height = sz + 'px'; cv.id = 'whCv';
   const ptr = el('div', 'wPtr'); wrap.append(cv, ptr); b.appendChild(wrap);
   const res = el('div', 'total', ''); res.id = 'whRes'; b.appendChild(res);
@@ -672,7 +672,7 @@ function coinScreen() {
 }
 
 /* =================================================================
-   👥 تقسيم الفرق + مين يبدأ
+   👥 تقسيم الفرق + منهو يبدأ
    ================================================================= */
 const tmS = mkScreen('teams', '👥 تقسيم الفرق');
 const TCOL = ['#c94a3b', '#2c7a6b', '#c9861f', '#5b4a9c'];
@@ -682,7 +682,7 @@ function teamsScreen() {
   const box = el('div', 'box'); box.appendChild(stepper('عدد الفرق', () => S.tcount, v => S.tcount = v, () => 2, () => Math.max(2, Math.min(4, S.players.length))));
   const out = el('div', ''); out.id = 'tmOut'; const pk = el('div', 'picker', ''); pk.id = 'tmPick';
   b.append(box, pk, out);
-  setBtns2(tmS.row, [btn('🎯 مين يبدأ؟', 'ghost', () => {
+  setBtns2(tmS.row, [btn('🎯 منهو يبدأ؟', 'ghost', () => {
     let k = 0; const n = 14 + rnd(6); const tick = () => { pk.textContent = pick(S.players); beep(700, .03); if (++k < n) setTimeout(tick, 60 + k * 12); else { pk.textContent = '👉 ' + pk.textContent; beep(1200, .15); } }; tick();
   }), btn('قسّم 🔀', '', () => {
     out.innerHTML = ''; const p = shuffle(S.players), T = [];
@@ -702,20 +702,20 @@ add({ id: 'drw', e: '🎨', n: 'ارسم وصيد الامبوستر', d: 'كل 
 add({ id: 'feud', e: '👨‍👩‍👧', n: 'فاميلي فيود', d: 'سألنا ١٠٠ شخص… خمنوا الأجوبة', min: 0, t: '٢٠ دقيقة' }, 4);
 add({ id: 'dice', e: '🎲', n: 'النرد', d: 'من D4 لين D20، 3D', min: 0, tool: 1 });
 add({ id: 'cups', e: '🥤', n: 'وين الكورة؟', d: 'تابع الكوب اللي تحته الكورة', min: 0, tool: 1 });
-add({ id: 'bottle', e: '🍾', n: 'لف الغرشة', d: 'مين يسأل مين؟', min: 2, tool: 1 });
+add({ id: 'bottle', e: '🍾', n: 'لف الغرشة', d: 'منهو يسأل منهو؟', min: 2, tool: 1 });
 add({ id: 'coin', e: '🪙', n: 'ملك ولا كتابة', d: 'اقلب العملة', min: 0, tool: 1 });
-add({ id: 'teams', e: '👥', n: 'تقسيم الفرق', d: 'قسّم الجماعة ومين يبدأ', min: 2, tool: 1 });
+add({ id: 'teams', e: '👥', n: 'تقسيم الفرق', d: 'قسّم الجماعة ومنهو يبدأ', min: 2, tool: 1 });
 add({ id: 'wheel', e: '🎡', n: 'عجلة الحظ', d: 'اكتب الخيارات ولف العجلة', min: 0, tool: 1 });
 Object.assign(RULES, {
-  drw: ['كل واحد يسحب الشاشة ويشوف الكلمة، إلا الامبوستر ما يعرفها (وإذا شغلتوا الخيار يشوف الموضوع بس).', 'بعدين الجوال يدور: كل واحد يرسم **خط واحد بس** على نفس الورقة (تحط إصبعك وترسم وترفعه). كل لاعب له لون.', 'ارسم شي يثبت إنك تعرف الكلمة، بس لا تكون واضح وايد عشان الامبوستر ما يعرفها!', 'الامبوستر يحاول يرسم شي يمشي مع رسمتكم بدون ما ينكشف.', 'إذا غلطت، اضغط ↩️ تراجع وارسم من جديد قبل لا تعطي الجوال.', 'بعد آخر جولة، أو إذا ضغطتوا 🗳️ وقفوا، يبدأ التصويت السري ونفس نقاط الامبوستر: اللي يصوت صح +١، وكل صوت غلط +١ للامبوستر، والامبوستر +١ إذا خمّن الكلمة.'].map(x => x.replace(/\*\*/g, '')),
-  sj: ['تنقسمون فريقين، وتختارون لين ٦ مواضيع (أو اضغطوا 🎲 عشوائي).', 'كل موضوع فيه ٦ أسئلة: ٢ بـ ٢٠٠ (مقدور عليها)، ٢ بـ ٤٠٠ (صعبة)، ٢ بـ ٦٠٠ (صعبة وايد).', 'الفريق اللي عليه الدور يختار سؤال من اللوحة، ويقراه واحد بصوت عالي. عندهم دقيقة يفكرون.', 'وسائل المساعدة (كل فريق مرة وحدة باللعبة): 🔄 غيّر السؤال بسؤال ثاني من نفس الموضوع والنقاط، ✖️٢ دبل يضاعف نقاط السؤال إذا جاوبتوا صح، 💡 تلميح.', 'اضغطوا "اكشف الجواب" واختاروا مين جاوب صح. إذا الفريق الثاني جاوب صح ياخذ النقاط (بدون الدبل).', 'الدور ينتقل بعد كل سؤال، واللي عنده نقاط أكثر في الأخير يفوز. الأسئلة ما تتكرر لين تخلص.'],
-  feud: ['تنقسمون فريقين. كل جولة فيها سؤال "سألنا ١٠٠ شخص" ووراه ٦ أجوبة مخفية بنقاطها.', 'بالبداية واحد من كل فريق يتواجهون، واللي يجاوب الجواب الأعلى يختار فريقه يلعب. اضغطوا على اسم الفريق اللي بيلعب.', 'الفريق يقول أجوبة: إذا الجواب موجود اضغطوا على مربعه ينكشف وتنضاف نقاطه، وإذا مو موجود اضغطوا ✖ غلط.', 'إذا كشفوا كل الأجوبة ياخذون نقاط الجولة. وإذا وصلوا ٣ أغلاط، الفريق الثاني عنده فرصة وحدة يسرق كل النقاط بجواب صح.', 'آخر جولة نقاطها دبل! واللي يجمع أكثر في الأخير يفوز.'],
-  dice: ['اختار نوع النرد: D4 أو D6 أو D8 أو D10 أو D12 أو D20، وكم نرد تبي (لين ٤).', 'اضغط "ارمي" أو اضغط على النرد نفسه، ويطلع المجموع تحت.'],
+  drw: ['كل واحد يسحب الشاشة ويشوف الكلمة، إلا الامبوستر ما يعرفها (وإدا شغلتوا الخيار يشوف الموضوع بس).', 'بعدين التلفون يدور: كل واحد يرسم **خط واحد بس** على نفس الورقة (تحط إصبعك وترسم وترفعه). كل لاعب له لون.', 'ارسم شي يثبت إنك تعرف الكلمة، بس لا تكون واضح واجد عشان الامبوستر ما يعرفها!', 'الامبوستر يحاول يرسم شي يمشي مع رسمتكم بدون ما ينكشف.', 'إدا غلطت، اضغط ↩️ تراجع وارسم من جديد قبل لا تعطي التلفون.', 'بعد آخر جولة، أو إدا ضغطتوا 🗳️ وقفوا، يبدأ التصويت السري ونفس نقاط الامبوستر: اللي يصوت صح +١، وكل صوت غلط +١ للامبوستر، والامبوستر +١ إدا خمّن الكلمة.'].map(x => x.replace(/\*\*/g, '')),
+  sj: ['تنقسمون فريقين، وتختارون لين ٦ مواضيع (أو اضغطوا 🎲 عشوائي).', 'كل موضوع فيه ٦ أسئلة: ٢ بـ ٢٠٠ (مقدور عليها)، ٢ بـ ٤٠٠ (صعبة)، ٢ بـ ٦٠٠ (صعبة واجد).', 'الفريق اللي عليه الدور يختار سؤال من اللوحة، ويقراه واحد بصوت عالي. عندهم دقيقة يفكرون.', 'وسائل المساعدة (كل فريق مرة وحدة باللعبة): 🔄 غيّر السؤال بسؤال ثاني من نفس الموضوع والنقاط، ✖️٢ دبل يضاعف نقاط السؤال إدا جاوبتوا صح، 💡 تلميح.', 'اضغطوا "اكشف الجواب" واختاروا منهو جاوب صح. إدا الفريق الثاني جاوب صح ياخد النقاط (بدون الدبل).', 'الدور ينتقل بعد كل سؤال، واللي عنده نقاط أكثر في الأخير يفوز. الأسئلة ما تتكرر لين تخلص.'],
+  feud: ['تنقسمون فريقين. كل جولة فيها سؤال "سألنا ١٠٠ شخص" ووراه ٦ أجوبة مخفية بنقاطها.', 'بالبداية واحد من كل فريق يتواجهون، واللي يجاوب الجواب الأعلى يختار فريقه يلعب. اضغطوا على اسم الفريق اللي بيلعب.', 'الفريق يقول أجوبة: إدا الجواب موجود اضغطوا على مربعه ينكشف وتنضاف نقاطه، وإدا مو موجود اضغطوا ✖ غلط.', 'إدا كشفوا كل الأجوبة ياخدون نقاط الجولة. وإدا وصلوا ٣ أغلاط، الفريق الثاني عنده فرصة وحدة يسرق كل النقاط بجواب صح.', 'آخر جولة نقاطها دبل! واللي يجمع أكثر في الأخير يفوز.'],
+  dice: ['اختار نوع النرد: D4 أو D6 أو D8 أو D10 أو D12 أو D20، وچم نرد تبغى (لين ٤).', 'اضغط "ارمي" أو اضغط على النرد نفسه، ويطلع المجموع تحت.'],
   cups: ['تشوف الكورة تحت كوب، بعدين الأكواب تتلخبط.', 'تابع الكوب بعيونك، ولما يوقفون اضغط على الكوب اللي تظن الكورة تحته.', 'كل ما جبتها صح تزيد سلسلتك. تقدر تزيد عدد الأكواب والصعوبة.'],
-  bottle: ['حطوا الجوال على الطاولة بالنص، والأسامي حوله بنفس ترتيب قعدتكم تقريباً.', 'اضغطوا لف: رأس الغرشة 🟢 يأشر على اللي يجاوب، وتحتها 🔴 على اللي يسأل. تنفع مع صراحة ولا جرأة!'],
+  bottle: ['حطوا التلفون على الطاولة بالنص، والأسامي حوله بنفس ترتيب قعدتكم تقريباً.', 'اضغطوا لف: رأس الغرشة 🟢 يأشر على اللي يجاوب، وتحتها 🔴 على اللي يسأل. تنفع مع صراحة ولا جرأة!'],
   coin: ['اضغط اقلب، والعملة تطير وتطيح على ملك أو كتابة. تنفع لما تختلفون على شي!'],
-  wheel: ['اكتب الخيارات اللي تبيها (أسامي، مطاعم، عقابات… أي شي)، أو اضغط "حط أسامي اللاعبين".', 'اضغط لف العجلة، والسهم فوق يأشر على اللي طلع.', 'إذا شغلت "شيل اللي يطلع"، الخيار يختفي بعد ما يطلع عشان ما يتكرر.'],
-  teams: ['اختار كم فريق، واضغط قسّم: اللعبة توزع اللاعبين عشوائي وبالتساوي.', 'وزر "مين يبدأ؟" يختار واحد عشوائي يبدأ اللعبة.']
+  wheel: ['اكتب الخيارات اللي تبغاها (أسامي، مطاعم، عقابات… أي شي)، أو اضغط "حط أسامي اللاعبين".', 'اضغط لف العجلة، والسهم فوق يأشر على اللي طلع.', 'إدا شغلت "شيل اللي يطلع"، الخيار يختفي بعد ما يطلع عشان ما يتكرر.'],
+  teams: ['اختار چم فريق، واضغط قسّم: اللعبة توزع اللاعبين عشوائي وبالتساوي.', 'وزر "منهو يبدأ؟" يختار واحد عشوائي يبدأ اللعبة.']
 });
 RULES.triv = RULES.triv;
 // نرد واحد يتدحرج على أي canvas (للودو)

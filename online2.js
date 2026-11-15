@@ -1,4 +1,4 @@
-/* ===== تقزيرة: باقي الألعاب أونلاين (كل واحد على جواله) ===== */
+/* ===== تقزيرة: باقي الألعاب أونلاين (كل واحد على تلفونه) ===== */
 (function () {
 'use strict';
 const O = window.ONL, R = O.renderers;
@@ -82,10 +82,10 @@ function makeHot() { const G = {};
   G.act = (p, m) => { if (m.v === 'h:next') return G.start(); if (m.v === 'h:go' && !G.end) { G.end = Date.now() + TIME('hot') * 1000; later(G, TIME('hot') * 1000 + 200, () => { }); } if (m.v === 'q') G.q = draw('truth', TRUTH); };
   return G; }
 function makeVoteQ(kind) { // wyr | ml | nhie
-  const G = {}; const T = { wyr: '🤔 لو خيروك', ml: '👉 مين أكثر واحد', nhie: '🙈 ولا مرة' }[kind];
+  const G = {}; const T = { wyr: '🤔 لو خيروك', ml: '👉 منهو أكثر واحد', nhie: '🙈 ولا مرة' }[kind];
   G.start = () => { G.q = kind === 'wyr' ? draw('wyr', WYR) : kind === 'ml' ? draw('ml', ML) : draw('nhie', NHIE); G.v = {}; G.res = false; G.ids = ids(); };
   G.view = p => {
-    const qt = kind === 'wyr' ? [{ t: 'lab', v: 'لو خيروك بين' }, { t: 'txt', v: G.q[0] }, { t: 'or', v: 'ولا' }, { t: 'txt', v: G.q[1] }] : kind === 'ml' ? [{ t: 'lab', v: 'مين أكثر واحد ممكن…' }, { t: 'txt', v: G.q + '؟' }] : [{ t: 'lab', v: 'ولا مرة…' }, { t: 'txt', v: G.q }];
+    const qt = kind === 'wyr' ? [{ t: 'lab', v: 'لو خيروك بين' }, { t: 'txt', v: G.q[0] }, { t: 'or', v: 'ولا' }, { t: 'txt', v: G.q[1] }] : kind === 'ml' ? [{ t: 'lab', v: 'منهو أكثر واحد ممكن…' }, { t: 'txt', v: G.q + '؟' }] : [{ t: 'lab', v: 'ولا مرة…' }, { t: 'txt', v: G.q }];
     if (G.res) {
       const cnt = {}; Object.values(G.v).forEach(x => cnt[x] = (cnt[x] || 0) + 1);
       let list;
@@ -111,7 +111,7 @@ function makeActing(kind) { // cha | tab
   const nextCard = () => { if (kind === 'cha') { const [c, w] = topicWord(Object.keys(TOPICS)); G.card = { c, w, d: descOf(c, w) }; } else { const t = draw('taboo', TABOO); G.card = { w: t[0], f: t.slice(1) }; } };
   G.view = p => {
     const me = p.id === G.p;
-    if (!G.end) return { title: T, items: [{ t: 'lab', v: 'الدور على' }, { t: 'nm', v: nm(G.p) }, { t: 'lab', v: me ? 'عندك ' + TIME(kind) + ' ثانية. اضغط ابدأ لما تكون جاهز' : 'استعدوا تخمنون!' }], btns: me ? [{ id: 'go', label: 'أنا جاهز ▶', flex: 2 }] : [] };
+    if (!G.end) return { title: T, items: [{ t: 'lab', v: 'الدور على' }, { t: 'nm', v: nm(G.p) }, { t: 'lab', v: me ? 'عندك ' + TIME(kind) + ' ثانية. اضغط ابدأ لما تكون جاهز' : 'استعدوا تخمنون!' }], btns: me ? [{ id: 'go', label: 'أني جاهز ▶', flex: 2 }] : [] };
     if (G.done) return { title: T, items: [{ t: 'win', v: 'خلص الوقت ⏰' }, { t: 'nm', v: nm(G.p) }, { t: 'txt', v: G.got + ' نقطة' }], scores: O.scoresList() };
     const it = [cd(left(G.end)), { t: 'lab', v: 'النقاط: ' + G.got }];
     if (me) { it.push({ t: 'txt', v: G.card.w }); if (G.card.d) it.push({ t: 'desc', v: G.card.d }); if (G.card.f) it.push({ t: 'lab', v: '🚫 ممنوع: ' + G.card.f.join(' · ') }); }
@@ -132,8 +132,8 @@ function makeG20() { const G = {};
   G.start = () => { G.p = draw('ong20', ids()); [G.c, G.w] = topicWord(Object.keys(TOPICS)); G.n = 0; G.res = null; };
   G.view = p => { const me = p.id === G.p; const it = [{ t: 'lab', v: 'اللي يعرف الشي' }, { t: 'nm', v: nm(G.p) }, { t: 'lab', v: 'الموضوع: ' + G.c }];
     if (G.res) return { title: '❓ خمن الشي', items: it.concat([{ t: 'win', v: G.res }, { t: 'txt good', v: G.w }, { t: 'desc', v: descOf(G.c, G.w) }]) };
-    if (me) it.push({ t: 'txt good', v: G.w }, { t: 'desc', v: descOf(G.c, G.w) }, { t: 'lab', v: 'جاوب على أسئلتهم بـ إيه أو لا بس' });
-    else it.push({ t: 'lab', v: 'اسألوه أسئلة جوابها إيه أو لا' });
+    if (me) it.push({ t: 'txt good', v: G.w }, { t: 'desc', v: descOf(G.c, G.w) }, { t: 'lab', v: 'جاوب على أسئلتهم بـ إي أو لا بس' });
+    else it.push({ t: 'lab', v: 'اسألوه أسئلة جوابها إي أو لا' });
     it.push({ t: 'bigLetter', v: G.n + '/20' });
     return { title: '❓ خمن الشي', items: it, btns: me ? [{ id: 'q', label: 'سؤال +1', cls: '' }, { id: 'got', label: 'جابوها ✅', cls: 'grn' }, { id: 'give', label: 'استسلموا 🏳️', cls: 'ghost' }] : [] }; };
   G.hostBtns = () => G.res ? [{ id: 'h:next', label: 'اللي بعده ←', flex: 2 }] : [];
@@ -156,7 +156,7 @@ function makeFive() { const G = {};
   return G; }
 
 /* ======================================================
-   💣 القنبلة: تنتقل من جوال لجوال
+   💣 القنبلة: تنتقل من تلفون لتلفون
    ====================================================== */
 function makeBomb() { const G = {};
   G.start = () => { G.order = shuffle(ids()); G.h = 0; G.q = draw('bomb', BOMB); G.boom = null; G.run = false; G.lost = G.lost || {}; };
@@ -177,7 +177,7 @@ function makeBomb() { const G = {};
   return G; }
 
 /* ======================================================
-   🔤 إنسان حيوان نبات (كل واحد يكتب على جواله)
+   🔤 إنسان حيوان نبات (كل واحد يكتب على تلفونه)
    ====================================================== */
 const LC = { key: null, v: {}, sent: null };
 R.letin = (it, c, send) => {
@@ -309,7 +309,7 @@ R.cbrace = (it, c, send) => {
 function makeCode(mode) { const G = {}; const T = mode === 'num' ? '🔐 الرقم السري' : '🔤 الكلمة السرية';
   G.start = () => { G.L = mode === 'num' ? Math.min(8, Math.max(3, S.cbLen || 4)) : Math.min(5, Math.max(3, S.cbLen || 4)); G.secret = mode === 'num' ? Array.from({ length: G.L }, () => rnd(10)).join('') : pick(SECRET_WORDS[G.L]); G.key = Math.random().toString(36).slice(2, 8); G.rows = {}; G.done = {}; G.rank = []; G.max = mode === 'num' ? 10 : 8; G.over = false; };
   G.view = p => { const rows = G.rows[p.id] || [], d = G.done[p.id];
-    const items = [{ t: 'lab', v: (mode === 'num' ? G.L + ' أرقام' : G.L + ' حروف') + ' · كل واحد يخمن على جواله، وأسرع واحد يفوز' }, { t: 'list', v: Object.keys(O.host().players.reduce((a, q) => (q.on && (a[q.id] = 1), a), {})).map(i => [nm(i), G.done[i] === 'win' ? '✅ (' + (G.rows[i] || []).length + ')' : G.done[i] ? '❌' : (G.rows[i] || []).length + ' محاولات', G.done[i] === 'win']) }];
+    const items = [{ t: 'lab', v: (mode === 'num' ? G.L + ' أرقام' : G.L + ' حروف') + ' · كل واحد يخمن على تلفونه، وأسرع واحد يفوز' }, { t: 'list', v: Object.keys(O.host().players.reduce((a, q) => (q.on && (a[q.id] = 1), a), {})).map(i => [nm(i), G.done[i] === 'win' ? '✅ (' + (G.rows[i] || []).length + ')' : G.done[i] ? '❌' : (G.rows[i] || []).length + ' محاولات', G.done[i] === 'win']) }];
     if (G.over) items.push({ t: 'lab', v: mode === 'num' ? 'الرقم كان' : 'الكلمة كانت' }, { t: 'txt good', v: G.secret });
     else if (d) items.push({ t: 'win ' + (d === 'win' ? 'good' : 'bad'), v: d === 'win' ? 'جبتها! 🎉 المركز ' + (G.rank.indexOf(p.id) + 1) : 'خلصت محاولاتك 😅' });
     items.push({ t: 'cbrace', key: G.key, rows, L: G.L, num: mode === 'num', can: !G.over && !d });
@@ -355,7 +355,7 @@ R.xo = (it, c, send) => { const n = it.b.filter(Boolean).length; if (n > XO_N &&
 function makeXO() { const G = {}; const L = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
   G.start = () => { const a = ids(); G.round = (G.round || 0) + 1; const pair = G.pair && on(G.pair[0]) && on(G.pair[1]) && G.round % 2 === 0 ? [G.pair[1], G.pair[0]] : shuffle(a).slice(0, 2); G.pair = pair; G.b = Array(9).fill(null); G.t = 'X'; G.w = null; G.res = null; };
   G.view = p => { const me = G.pair.indexOf(p.id), sym = me === 0 ? 'X' : me === 1 ? 'O' : null;
-    const it = [{ t: 'lab', v: '❌ ' + nm(G.pair[0]) + '  ضد  ⭕ ' + nm(G.pair[1]) }, { t: 'lab', v: G.res || (sym ? (G.t === sym ? 'دورك! أنت ' + (sym === 'X' ? '❌' : '⭕') : 'دور ' + nm(G.pair[G.t === 'X' ? 0 : 1])) : 'تتفرج 👀') }, { t: 'xo', b: G.b, w: G.w, can: !G.res && sym === G.t }];
+    const it = [{ t: 'lab', v: '❌ ' + nm(G.pair[0]) + '  ضد  ⭕ ' + nm(G.pair[1]) }, { t: 'lab', v: G.res || (sym ? (G.t === sym ? 'دورك! إنت ' + (sym === 'X' ? '❌' : '⭕') : 'دور ' + nm(G.pair[G.t === 'X' ? 0 : 1])) : 'تتفرج 👀') }, { t: 'xo', b: G.b, w: G.w, can: !G.res && sym === G.t }];
     return { title: '❌⭕ إكس أو', items: it, scores: G.res ? O.scoresList() : null }; };
   G.hostBtns = () => G.res ? [{ id: 'h:again', label: 'جولة جديدة 🔄', flex: 2 }] : [];
   G.act = (p, m) => { if (m.v === 'h:again') return G.start(); if (G.res || m.a !== 'opt') return; const me = G.pair.indexOf(p.id); if ((me === 0 ? 'X' : me === 1 ? 'O' : null) !== G.t) return; const i = +m.v; if (G.b[i]) return; G.b[i] = G.t;
@@ -483,13 +483,13 @@ function makeMafia() { const G = {}; const RN = { maf: '🔪 مافيا', doc: '
     if (G.phase === 'night') {
       const it = [{ t: 'txt', v: '🌙 الليلة ' + G.day }, myRole];
       if (!alive) return { title: T, items: it.concat([{ t: 'lab', v: 'تتفرج 👀' }]) };
-      if (r === 'maf' && !G.mv[p.id]) return { title: T, items: it.concat([{ t: 'lab', v: 'مين تطلّعون الليلة؟' }]), opts: others.filter(i => G.role[i] !== 'maf').map(i => ({ id: i, label: nm(i) })) };
-      if (r === 'doc' && !G.save) return { title: T, items: it.concat([{ t: 'lab', v: 'مين تنقذ الليلة؟ (تقدر تنقذ نفسك)' }]), opts: aliveIds().map(i => ({ id: i, label: nm(i) })) };
-      if (r === 'cop' && !G.chk) return { title: T, items: it.concat([{ t: 'lab', v: 'مين تبي تعرف عنه؟' }]), opts: others.map(i => ({ id: i, label: nm(i) })) };
+      if (r === 'maf' && !G.mv[p.id]) return { title: T, items: it.concat([{ t: 'lab', v: 'منهو تطلّعون الليلة؟' }]), opts: others.filter(i => G.role[i] !== 'maf').map(i => ({ id: i, label: nm(i) })) };
+      if (r === 'doc' && !G.save) return { title: T, items: it.concat([{ t: 'lab', v: 'منهو تنقذ الليلة؟ (تقدر تنقذ نفسك)' }]), opts: aliveIds().map(i => ({ id: i, label: nm(i) })) };
+      if (r === 'cop' && !G.chk) return { title: T, items: it.concat([{ t: 'lab', v: 'منهو تبغى تعرف عنه؟' }]), opts: others.map(i => ({ id: i, label: nm(i) })) };
       return { title: T, items: it.concat(r === 'cop' && G.chk ? [{ t: 'win', v: nm(G.chk) + (G.role[G.chk] === 'maf' ? ' مافيا! 🔪' : ' مو مافيا 👍') }] : []).concat([{ t: 'lab', v: 'غمّض عيونك… 😴 ننتظر الباقين' }]) };
     }
     if (G.phase === 'day') {
-      const it = [{ t: 'txt', v: '☀️ صباح الخير' }, { t: 'win', v: G.res }, myRole, { t: 'lab', v: 'تناقشوا وصوتوا مين تطلّعون' }];
+      const it = [{ t: 'txt', v: '☀️ صباح الخير' }, { t: 'win', v: G.res }, myRole, { t: 'lab', v: 'تناقشوا وصوتوا منهو تطلّعون' }];
       if (!alive) return { title: T, items: it.concat([{ t: 'lab', v: 'تتفرج 👀' }]) };
       if (G.dv[p.id]) return { title: T, items: it.concat([{ t: 'win good', v: 'صوّتت ✓' }]), status: ['ننتظر الباقين… (' + Object.keys(G.dv).length + ' من ' + aliveIds().length + ')'] };
       return { title: T, items: it, opts: others.map(i => ({ id: i, label: nm(i) })).concat([{ id: 'skip', label: 'ما أطلّع أحد', cls: 'ghost' }]) };
@@ -519,7 +519,7 @@ function makeSJ() { const G = {};
   G.join = p => { if (G.team[p.id] === undefined) G.team[p.id] = Object.values(G.team).filter(x => x === 0).length <= Object.values(G.team).filter(x => x === 1).length ? 0 : 1; };
   G.view = p => { const t = G.team[p.id]; const head = [{ t: 'list', v: [[tn(0) + ': ' + members(0), G.sc[0], G.turn === 0], [tn(1) + ': ' + members(1), G.sc[1], G.turn === 1]] }];
     if (G.over) return { title: '🧠 سين جيم', items: head.concat([{ t: 'win good', v: G.sc[0] === G.sc[1] ? 'تعادل 🤝' : '🏆 ' + tn(G.sc[0] > G.sc[1] ? 0 : 1) }]), scores: O.scoresList() };
-    if (!G.q) return { title: '🧠 سين جيم', items: head.concat([{ t: 'lab', v: 'أنت في ' + tn(t) }, { t: 'lab', v: 'دور ' + tn(G.turn) + ': اختاروا سؤال' }, { t: 'sjB', cats: G.cats, used: G.used, can: t === G.turn }]) };
+    if (!G.q) return { title: '🧠 سين جيم', items: head.concat([{ t: 'lab', v: 'إنت في ' + tn(t) }, { t: 'lab', v: 'دور ' + tn(G.turn) + ': اختاروا سؤال' }, { t: 'sjB', cats: G.cats, used: G.used, can: t === G.turn }]) };
     const q = G.q, it = head.concat([{ t: 'lab', v: G.cats[q.ci] + ' · ' + q.l + ' نقطة' + (q.dbl ? ' · دبل ✖️٢' : '') }, { t: 'txt', v: q.q.q }]);
     if (q.hint) it.push({ t: 'hintx', v: '💡 ' + q.q.h });
     if (q.rev) it.push({ t: 'lab', v: 'الجواب' }, { t: 'ans', v: q.q.a });
@@ -545,7 +545,7 @@ function makeFeud() { const G = {};
   G.start = () => { const a = shuffle(ids()); G.team = {}; a.forEach((id, i) => G.team[id] = i % 2); G.sc = [0, 0]; G.r = 0; G.round(); };
   G.round = () => { G.r++; G.q = draw('feud', FEUD); G.open = G.q.a.map(() => false); G.bank = 0; G.x = 0; G.play = null; G.phase = 'pick'; };
   const tn = t => t ? '🔵 الأزرق' : '🔴 الأحمر';
-  G.view = p => { const it = [{ t: 'list', v: [[tn(0), G.sc[0], G.play === 0], [tn(1), G.sc[1], G.play === 1]] }, { t: 'lab', v: 'أنت في ' + tn(G.team[p.id]) + ' · الجولة ' + G.r }, { t: 'lab', v: 'سألنا ١٠٠ شخص:' }, { t: 'txt', v: G.q.q + '؟' }, { t: 'feudB', a: G.q.a.map((a, i) => G.open[i] || G.phase === 'end' ? a : null) }, { t: 'bank', v: 'مجموع الجولة: ' + G.bank }, { t: 'strikes', v: '✖'.repeat(G.x) }];
+  G.view = p => { const it = [{ t: 'list', v: [[tn(0), G.sc[0], G.play === 0], [tn(1), G.sc[1], G.play === 1]] }, { t: 'lab', v: 'إنت في ' + tn(G.team[p.id]) + ' · الجولة ' + G.r }, { t: 'lab', v: 'سألنا ١٠٠ شخص:' }, { t: 'txt', v: G.q.q + '؟' }, { t: 'feudB', a: G.q.a.map((a, i) => G.open[i] || G.phase === 'end' ? a : null) }, { t: 'bank', v: 'مجموع الجولة: ' + G.bank }, { t: 'strikes', v: '✖'.repeat(G.x) }];
     it.push({ t: 'lab', v: G.phase === 'pick' ? 'قولوا أجوبتكم بصوت عالي! المضيف يختار الفريق اللي بيلعب' : G.phase === 'steal' ? 'فرصة ' + tn(1 - G.play) + ' يسرقون!' : G.phase === 'end' ? '' : 'دور ' + tn(G.play) });
     if (p.id === 'host' && (G.phase === 'play' || G.phase === 'steal')) it.push({ t: 'lab', v: '👇 اضغط على الجواب اللي قالوه' }, { t: 'hb', b: G.q.a.map((a, i) => G.open[i] ? null : { id: 'h:o' + i, label: (i + 1) + '. ' + a.t + ' (' + a.p + ')' }).filter(Boolean) });
     return { title: '👨‍👩‍👧 فاميلي فيود', items: it, scores: G.phase === 'end' ? O.scoresList() : null }; };
@@ -565,7 +565,7 @@ R.strikes = (it, c) => c.appendChild(el('div', 'strikes', it.v));
 R.or = (it, c) => c.appendChild(el('div', 'or', it.v));
 
 /* ======================================================
-   🔄 الكلام المعكوس أونلاين (الصوت ينتقل بين الجوالات)
+   🔄 الكلام المعكوس أونلاين (الصوت ينتقل بين التلفونات)
    ====================================================== */
 function bufTo(buf, rate) { // نصغر الصوت عشان ينرسل بسرعة
   const src = buf.getChannelData(0), ratio = buf.sampleRate / rate, n = Math.floor(src.length / ratio), out = new Float32Array(n);
@@ -590,9 +590,9 @@ function makeRev() { const G = {};
   G.start = () => { const a = ids(); G.A = draw('onrev', a); G.B = pick(a.filter(x => x !== G.A)) || G.A; [G.c, G.w] = topicWord(Object.keys(TOPICS)); G.audio = null; G.res = null; G.rev = false; };
   G.view = p => { const T = '🔄 الكلام المعكوس', it = [{ t: 'lab', v: nm(G.A) + ' يسجّل 🎙️ و ' + nm(G.B) + ' يخمّن 🤔' }, { t: 'lab', v: 'الموضوع: ' + G.c }];
     if (G.rev) return { title: T, items: it.concat([{ t: 'lab', v: 'الكلمة' }, { t: 'txt good', v: G.w }, { t: 'win', v: G.res || '' }, { t: 'recO', audio: G.audio, normal: true }]), scores: O.scoresList() };
-    if (p.id === G.A && !G.audio) return { title: T, items: it.concat([{ t: 'lab', v: 'كلمتك السرية:' }, { t: 'txt good', v: G.w }, { t: 'lab', v: 'سجّل نفسك وأنت تقولها بوضوح، وبعدين أرسل' }, { t: 'recO', rec: true, send: true }]) };
+    if (p.id === G.A && !G.audio) return { title: T, items: it.concat([{ t: 'lab', v: 'كلمتك السرية:' }, { t: 'txt good', v: G.w }, { t: 'lab', v: 'سجّل نفسك وإنت تقولها بوضوح، وبعدين أرسل' }, { t: 'recO', rec: true, send: true }]) };
     if (p.id === G.B && G.audio) return { title: T, items: it.concat([{ t: 'lab', v: '١) اسمع صوت ' + nm(G.A) + ' معكوس' }, { t: 'recO', audio: G.audio }, { t: 'lab', v: '٢) قلّده وسجّل، واسمع تقليدك معكوس' }, { t: 'recO', rec: true }, { t: 'lab', v: '٣) قول تخمينك بصوت عالي!' }]) };
-    if (G.audio) return { title: T, items: it.concat([{ t: 'lab', v: nm(G.B) + ' يحاول يخمن… اسمعوا معه:' }, { t: 'recO', audio: G.audio }]) };
+    if (G.audio) return { title: T, items: it.concat([{ t: 'lab', v: nm(G.B) + ' يحاول يخمن… اسمعوا وياه:' }, { t: 'recO', audio: G.audio }]) };
     return { title: T, items: it.concat([{ t: 'lab', v: nm(G.A) + ' يسجّل…' }]) }; };
   G.hostBtns = () => G.rev ? [{ id: 'h:next', label: 'اللي بعده ←', flex: 2 }] : G.audio ? [{ id: 'h:yes', label: 'خمنها ✅', cls: 'grn' }, { id: 'h:no', label: 'ما خمنها ❌', cls: 'ghost' }] : [];
   G.act = (p, m) => { if (m.v === 'h:next') return G.start(); if (m.a === 'audio' && p.id === G.A && !G.audio && /^data:audio\/wav;base64,/.test(m.v) && m.v.length < 3e6) { G.audio = m.v; return; }
@@ -601,31 +601,31 @@ function makeRev() { const G = {};
 
 /* ---------- تسجيل كل الألعاب الأونلاين ---------- */
 const reg = (id, e, n, d, min, make) => O.register(id, { e, n, d, min, make });
-reg('tod', '🔥', 'صراحة ولا جرأة', 'اللي عليه الدور يختار من جواله', 2, makeTod);
+reg('tod', '🔥', 'صراحة ولا جرأة', 'اللي عليه الدور يختار من تلفونه', 2, makeTod);
 reg('hot', '🪑', 'الكرسي الساخن', 'الكل يسأل واحد', 3, makeHot);
-reg('wyr', '🤔', 'لو خيروك', 'كل واحد يختار من جواله', 2, () => makeVoteQ('wyr'));
-reg('ml', '👉', 'مين أكثر واحد', 'تصويت سري على بعض', 3, () => makeVoteQ('ml'));
+reg('wyr', '🤔', 'لو خيروك', 'كل واحد يختار من تلفونه', 2, () => makeVoteQ('wyr'));
+reg('ml', '👉', 'منهو أكثر واحد', 'تصويت سري على بعض', 3, () => makeVoteQ('ml'));
 reg('nhie', '🙈', 'ولا مرة', 'سويتها ولا لا؟', 2, () => makeVoteQ('nhie'));
-reg('cha', '🎭', 'تمثيل بدون كلام', 'الكلمة تطلع على جوال الممثل', 2, () => makeActing('cha'));
-reg('tab', '🚫', 'الكلمة الممنوعة', 'الكارت على جوال اللي يوصف', 2, () => makeActing('tab'));
+reg('cha', '🎭', 'تمثيل بدون كلام', 'الكلمة تطلع على تلفون الممثل', 2, () => makeActing('cha'));
+reg('tab', '🚫', 'الكلمة الممنوعة', 'الكارت على تلفون اللي يوصف', 2, () => makeActing('tab'));
 reg('g20', '❓', 'خمن الشي', '٢٠ سؤال', 2, makeG20);
 reg('five', '⏱️', '٥ ثواني', 'والباقين يحكمون', 3, makeFive);
-reg('bomb', '💣', 'القنبلة', 'تنتقل من جوال لجوال!', 2, makeBomb);
-reg('let', '🔤', 'إنسان حيوان نبات', 'كل واحد يكتب على جواله وتنصحح بروحها', 2, makeLetters);
-reg('triv', '⚡', 'مسابقة سريعة', 'أسرع جواب ياخذ نقاط أكثر', 2, () => makeQuiz('triv'));
+reg('bomb', '💣', 'القنبلة', 'تنتقل من تلفون لتلفون!', 2, makeBomb);
+reg('let', '🔤', 'إنسان حيوان نبات', 'كل واحد يكتب على تلفونه وتنصحح بروحها', 2, makeLetters);
+reg('triv', '⚡', 'مسابقة سريعة', 'أسرع جواب ياخد نقاط أكثر', 2, () => makeQuiz('triv'));
 reg('flags', '🚩', 'خمن الدولة', 'أعلام وإيموجي، أسرع واحد', 2, () => makeQuiz('flags'));
 reg('mil', '💰', 'من سيبقى للمليون', 'اللي يغلط يطلع', 2, () => makeQuiz('mil'));
 reg('scrr', '🔀', 'الحروف المخربطة', 'أول واحد يكتبها صح', 2, makeScr);
 reg('chain', '🔗', 'سلسلة الكلمات', 'كل واحد يكتب بدوره', 2, makeChain);
-reg('num', '🔐', 'الرقم السري', 'سباق: مين يكشفه أول', 2, () => makeCode('num'));
+reg('num', '🔐', 'الرقم السري', 'سباق: منهو يكشفه أول', 2, () => makeCode('num'));
 reg('word', '🔤', 'الكلمة السرية', 'سباق وردل بالعربي', 2, () => makeCode('word'));
 reg('sudoku', '🔢', 'سودوكو', 'سباق على نفس اللغز', 2, makeSudoku);
 reg('xo', '❌', 'إكس أو', 'اثنين يلعبون والباقي يتفرج', 2, makeXO);
-reg('uno', '🃏', 'أونو', 'كل واحد ورقه على جواله', 2, makeUno);
+reg('uno', '🃏', 'أونو', 'كل واحد ورقه على تلفونه', 2, makeUno);
 reg('ludo', '🎲', 'لودو', 'لين ٤ لاعبين', 2, makeLudo);
 reg('mafia', '🔪', 'المافيا', 'التطبيق هو الراوي!', 4, makeMafia);
 reg('sj', '🧠', 'سين جيم', 'فريقين، والمضيف يحكم', 2, makeSJ);
 reg('feud', '👨‍👩‍👧', 'فاميلي فيود', 'المضيف يكشف الأجوبة', 2, makeFeud);
-reg('rev', '🔄', 'الكلام المعكوس', 'الصوت ينتقل بين الجوالات', 2, makeRev);
+reg('rev', '🔄', 'الكلام المعكوس', 'الصوت ينتقل بين التلفونات', 2, makeRev);
 window.__on2 = () => ({ scoreC });
 })();

@@ -1,4 +1,4 @@
-/* ===== تقزيرة: سودوكو (لحالك، ضد الكمبيوتر، أو سباق أونلاين) ===== */
+/* ===== تقزيرة: سودوكو (بروحك، ضد الكمبيوتر، أو سباق أونلاين) ===== */
 (function () {
 'use strict';
 const { mkScreen, setBtns2 } = window.UI;
@@ -78,8 +78,8 @@ function sdSetup() {
   const box = el('div', 'box'); box.appendChild(el('h2', '', 'الصعوبة'));
   const ch = el('div', 'chips'); LEVELS.forEach(([n], i) => { const c = el('button', 'chip' + (S.sdLvl === i ? ' sel' : ''), n); c.onclick = () => { S.sdLvl = i; save(); sdSetup(); }; ch.appendChild(c); }); box.appendChild(ch);
   const box2 = el('div', 'box'); box2.appendChild(el('h2', '', 'طريقة اللعب'));
-  const ch2 = el('div', 'chips'); [['solo', '🙋 لحالي'], ['bot', '🤖 سباق ضد الكمبيوتر']].forEach(([k, n]) => { const c = el('button', 'chip' + (S.sdMode === k ? ' sel' : ''), n); c.onclick = () => { S.sdMode = k; save(); sdSetup(); }; ch2.appendChild(c); }); box2.appendChild(ch2);
-  box2.appendChild(el('div', 'lab', 'تبي تتسابق مع ربعك؟ سوّ غرفة أونلاين واختار سودوكو 🌐'));
+  const ch2 = el('div', 'chips'); [['solo', '🙋 بروحي'], ['bot', '🤖 سباق ضد الكمبيوتر']].forEach(([k, n]) => { const c = el('button', 'chip' + (S.sdMode === k ? ' sel' : ''), n); c.onclick = () => { S.sdMode = k; save(); sdSetup(); }; ch2.appendChild(c); }); box2.appendChild(ch2);
+  box2.appendChild(el('div', 'lab', 'تبغى تتسابق مع ربعك؟ سوّ غرفة أونلاين واختار سودوكو 🌐'));
   const best = LS.get('sdBest', {}); const bb = el('div', 'box'); bb.appendChild(el('h2', '', 'أحسن وقت 🏆')); LEVELS.forEach(([n], i) => { const r = el('div', 'setrow'); r.append(el('b', '', n), el('span', '', best[i] ? fmtT(best[i]) : '—')); bb.appendChild(r); });
   b.append(box, box2, bb);
   setBtns2(sS.row, [btn('ابدأ ▶', '', () => sdStart(makePuzzle(S.sdLvl), S.sdMode))]);
@@ -102,7 +102,7 @@ function sdRace() {
   const r = $('sdRace'); if (!r) return; r.innerHTML = '';
   const total = SD.pz.p.filter(v => !v).length;
   const row = (n, v, cls) => { const d = el('div', 'rr' + (cls ? ' ' + cls : '')); const bar = el('div', 'bar'), i = el('i'); i.style.width = Math.round(v / total * 100) + '%'; bar.appendChild(i); d.append(el('span', '', n), bar, el('span', '', v + '/' + total)); r.appendChild(d); };
-  row('أنت', filledCount());
+  row('إنت', filledCount());
   if (SD.mode === 'bot') row('🤖 الكمبيوتر', SD.bot, 'bot');
   SD.others.forEach(o => row(o.name, o.v, 'bot'));
 }
@@ -166,8 +166,8 @@ window.SUDOKU = { makePuzzle, sdStart, setOthers: o => { if (SD) { SD.others = o
 
 /* ---------- تسجيل ---------- */
 const k = GAMES.findIndex(x => x.id === 'xo');
-GAMES.splice(k, 0, { id: 'sudoku', e: '🔢', n: 'سودوكو', d: '٤ مستويات، لحالك أو سباق ضد الكمبيوتر', min: 0, t: '١٠-٣٠ دقيقة' });
-RULES.sudoku = ['عبّي المربعات بأرقام من ١ لين ٩، بحيث كل صف وكل عمود وكل مربع ٣×٣ ما يتكرر فيه رقم.', 'اضغط على المربع وبعدين على الرقم تحت. الأرقام الغلط تطلع حمرا، وبعد ٣ أغلاط تخسر.', '✏️ الملاحظات: تكتب أرقام صغيرة كاحتمالات. 💡 التلميح يحل لك مربع (بس ما ينحسب لك أحسن وقت).', 'سباق ضد الكمبيوتر: الكمبيوتر يحل نفس اللغز، والشريط يوريك وين وصل. خلّص قبله!', 'وأونلاين: كل واحد يحل نفس اللغز على جواله، وأول واحد يخلص يفوز.'];
+GAMES.splice(k, 0, { id: 'sudoku', e: '🔢', n: 'سودوكو', d: '٤ مستويات، بروحك أو سباق ضد الكمبيوتر', min: 0, t: '١٠-٣٠ دقيقة' });
+RULES.sudoku = ['عبّي المربعات بأرقام من ١ لين ٩، بحيث كل صف وكل عمود وكل مربع ٣×٣ ما يتكرر فيه رقم.', 'اضغط على المربع وبعدين على الرقم تحت. الأرقام الغلط تطلع حمرا، وبعد ٣ أغلاط تخسر.', '✏️ الملاحظات: تكتب أرقام صغيرة كاحتمالات. 💡 التلميح يحل لك مربع (بس ما ينحسب لك أحسن وقت).', 'سباق ضد الكمبيوتر: الكمبيوتر يحل نفس اللغز، والشريط يوريك وين وصل. خلّص قبله!', 'وأونلاين: كل واحد يحل نفس اللغز على تلفونه، وأول واحد يخلص يفوز.'];
 window.EXTRA.sudoku = sdSetup;
 renderHome();
 })();

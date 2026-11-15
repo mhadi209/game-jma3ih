@@ -1,4 +1,4 @@
-/* ===== تقزيرة: بار الكذابين (جوال واحد مع كمبيوتر + أونلاين) =====
+/* ===== تقزيرة: بار الكذابين (تلفون واحد مع كمبيوتر + أونلاين) =====
    ورق اللعبة: ٦ شايب، ٦ بنت، ٦ إكة، و٢ جوكر. الطاولة تختار ورقة، وكل واحد ينزل ١-٣ أوراق ويقول إنها منها.
    اللي بعده يصدق وينزل، أو يقول "كذاب!". اللي يخسر يسحب سلك من قنبلته 💣، وآخر واحد يبقى يفوز. */
 (function () {
@@ -158,7 +158,7 @@ function pcard(c, cls) { const d = el('div', 'pcard ' + (c || 'back') + (cls ? '
 const minis = n => '<span class="cnt"><span class="mini"></span>' + n + '</span>';
 const wires = p => '<span class="wires">' + Array.from({ length: 6 }, (_, i) => '<i' + (i < p ? ' class="cut"' : '') + '></i>').join('') + '</span>';
 
-/* ---------- جوال واحد ---------- */
+/* ---------- تلفون واحد ---------- */
 const lS = mkScreen('liarsSetup', '🃏 بار الكذابين');
 const lP = mkScreen('liars', '🃏 بار الكذابين');
 let LB = null, picked = [], lastHuman = -1;
@@ -166,7 +166,7 @@ function liarsSetup() {
   S.lbBots = S.lbBots === undefined ? (S.players.length >= 2 ? 0 : 2) : S.lbBots;
   S.lbHum = S.lbHum || S.players.slice(0, 4);
   const b = lS.body; b.innerHTML = '';
-  const box = el('div', 'box'); box.appendChild(el('h2', '', 'مين بيلعب؟ (لين ٤)'));
+  const box = el('div', 'box'); box.appendChild(el('h2', '', 'منهو بيلعب؟ (لين ٤)'));
   const ch = el('div', 'chips'); S.players.forEach(p => { const c = el('button', 'chip' + (S.lbHum.includes(p) ? ' sel' : ''), p); c.onclick = () => { if (S.lbHum.includes(p)) S.lbHum.splice(S.lbHum.indexOf(p), 1); else if (S.lbHum.length + S.lbBots < 4) S.lbHum.push(p); else buzz(80); save(); liarsSetup(); }; ch.appendChild(c); });
   if (!S.players.length) ch.appendChild(el('div', 'lab', 'ما فيه لاعبين بالرئيسية، العب ضد الكمبيوتر'));
   box.appendChild(ch);
@@ -178,7 +178,7 @@ function liarsSetup() {
     if (total < 2) { err.textContent = 'لازم لاعبين على الأقل (حتى لو كمبيوتر)'; return; }
     const pl = hum.map(n => ({ id: n, name: n })); const bn = ['🤖 سالم', '🤖 فهد', '🤖 مريم', '🤖 دانة'];
     for (let i = 0; i < S.lbBots; i++) pl.push({ id: 'bot' + i, name: bn[i], bot: true });
-    if (!hum.length) pl.unshift({ id: 'me', name: 'أنت' });
+    if (!hum.length) pl.unshift({ id: 'me', name: 'إنت' });
     LB = lbNew(shuffle(pl)); lastHuman = -1; picked = []; liarsTurn();
   })]);
   show('liarsSetup');
@@ -194,8 +194,8 @@ function liarsTurn() {
 }
 function liarsPass(p) {
   const b = lP.body; b.innerHTML = ''; const c = el('div', 'bigcard');
-  c.append(el('div', 'lab', 'عط الجوال لـ'), el('div', 'nm', p.name), el('div', 'lab', 'وخل الباقين ما يشوفون ورقك 🤫'), el('div', 'lab', LB.msg));
-  b.appendChild(c); setBtns2(lP.row, [btn('أنا ' + p.name + '، وريني ورقي 👀', '', () => { lastHuman = LB.turn; liarsDraw(); })]);
+  c.append(el('div', 'lab', 'عط التلفون لـ'), el('div', 'nm', p.name), el('div', 'lab', 'وخل الباقين ما يشوفون ورقك 🤫'), el('div', 'lab', LB.msg));
+  b.appendChild(c); setBtns2(lP.row, [btn('أني ' + p.name + '، وريني ورقي 👀', '', () => { lastHuman = LB.turn; liarsDraw(); })]);
   show('liars');
 }
 function tableBox(viewer) {
@@ -314,12 +314,12 @@ function makeLB() {
   };
   return G;
 }
-window.ONL.register('lb', { e: '🃏', n: 'بار الكذابين', d: 'كل واحد ورقه على جواله', min: 2, make: makeLB });
+window.ONL.register('lb', { e: '🃏', n: 'بار الكذابين', d: 'كل واحد ورقه على تلفونه', min: 2, make: makeLB });
 
 /* ---------- تسجيل ---------- */
 const k = GAMES.findIndex(x => x.id === 'uno');
 GAMES.splice(k + 1, 0, { id: 'lb', e: '🃏', n: 'بار الكذابين', d: 'نزّل ورقك واكذب… أو اكشف الكذاب', min: 0, t: '١٥ دقيقة' });
-RULES.lb = ['فيه ٢٠ ورقة: ٦ شايب (K)، ٦ بنت (Q)، ٦ إكة (A)، و٢ جوكر (الجوكر ينحسب أي ورقة). كل واحد ياخذ ٥ أوراق.', 'كل جولة تطلع "ورقة الطاولة"، مثلاً الشايب.', 'بدورك تنزّل ١ لين ٣ أوراق مقلوبة وتقول إنها كلها شياب. تقدر تقول الصدق… أو تكذب 😏', 'اللي بعدك يا يصدقك وينزّل ورقه، يا يقول "كذاب! 🫵" وتنكشف الأوراق.', 'إذا كنت تكذب أنت تخسر، وإذا كنت صادق اللي اتهمك يخسر. الخسران يسحب سلك من قنبلته 💣 (٦ أسلاك، واحد منها ينفجر).', 'إذا انفجرت قنبلتك تطلع. آخر واحد يبقى يفوز. تقدر تلعب ضد الكمبيوتر 🤖 أو أونلاين وكل واحد ورقه على جواله.'];
+RULES.lb = ['فيه ٢٠ ورقة: ٦ شايب (K)، ٦ بنت (Q)، ٦ إكة (A)، و٢ جوكر (الجوكر ينحسب أي ورقة). كل واحد ياخد ٥ أوراق.', 'كل جولة تطلع "ورقة الطاولة"، مثلاً الشايب.', 'بدورك تنزّل ١ لين ٣ أوراق مقلوبة وتقول إنها كلها شياب. تقدر تقول الصدق… أو تكذب 😏', 'اللي بعدك يا يصدقك وينزّل ورقه، يا يقول "كذاب! 🫵" وتنكشف الأوراق.', 'إدا كنت تكذب إنت تخسر، وإدا كنت صادق اللي اتهمك يخسر. الخسران يسحب سلك من قنبلته 💣 (٦ أسلاك، واحد منها ينفجر).', 'إدا انفجرت قنبلتك تطلع. آخر واحد يبقى يفوز. تقدر تلعب ضد الكمبيوتر 🤖 أو أونلاين وكل واحد ورقه على تلفونه.'];
 window.EXTRA.lb = liarsSetup;
 window.__lb = () => ({ LB, lbNew, lbPlay, lbCall, lbAfter, lbBot, isOk });
 renderHome();
