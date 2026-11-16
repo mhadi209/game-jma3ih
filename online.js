@@ -359,7 +359,7 @@ function makeImp(drawMode) {
     const cnt = {}; Object.values(G3.votes).forEach(t => cnt[t] = (cnt[t] || 0) + 1);
     Object.entries(G3.votes).forEach(([v, t]) => { if (isImp(v)) return; if (isImp(t)) G3.pts[v] = (G3.pts[v] || 0) + 1; else G3.imps.forEach(i => G3.pts[i] = (G3.pts[i] || 0) + 1); });
     G3.tallyItems = [{ t: 'lab', v: 'الأصوات' }, { t: 'list', v: G3.ids.filter(id => P(id)).map(id => [nm(id) + (isImp(id) ? ' 🤫' : ''), cnt[id] || 0, false]).sort((a, b) => b[1] - a[1]) }];
-    G3.gopts = shuffle([G3.word, ...shuffle(TOPICS[G3.cat].filter(w => w !== G3.word)).slice(0, 5)]);
+    G3.gopts = shuffle([G3.word, ...nearWords(G3.cat, G3.word, 5)]);
     G3.phase = 'guess'; if (G3.imps.every(id => !P(id) || !P(id).on)) finish();
   };
   const finish = () => { if (G3.phase === 'end') return; Object.entries(G3.pts).forEach(([id, v]) => { const pp = P(id); if (pp) pp.score += v; }); G3.phase = 'end'; };

@@ -107,6 +107,7 @@ function settingsScreen() {
   const clr = btn('صفّر الأسئلة اللي انلعبت (ترجع من جديد)', 'ghost', () => { Object.keys(localStorage).filter(k => k.startsWith('u_')).forEach(k => { try { localStorage.removeItem(k); } catch (e) { } }); clr.textContent = 'تم ✓'; });
   clr.style.width = '100%'; b2.appendChild(clr);
   if (window.SFX_VOL_UI) b.appendChild(window.SFX_VOL_UI());
+  if (window.EASY_UI) b.appendChild(window.EASY_UI());
   b.append(box, b2); setBtns2(stS.row, []); show('settings');
 }
 
@@ -394,7 +395,7 @@ function milStart() {
   c.appendChild(o); setBtns2(mlS.row, []); show('million');
 }
 function milPick(lvl) {
-  if (lvl >= 10) { const q = draw('milhard', MIL_HARD); return { q: q[0], r: q[1], w: q.slice(2) }; }
+  if (lvl >= milHardFrom()) { const q = draw('milhard', MIL_HARD); return { q: q[0], r: q[1], w: q.slice(2) }; }
   const q = draw('triv', TRIVIA); return { q: q[0], r: q[1], w: q.slice(2) };
 }
 function milQ() {

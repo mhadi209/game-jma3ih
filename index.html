@@ -365,6 +365,7 @@ button:disabled{opacity:.75}
 <script src="more_topics.js"></script>
 <script src="more_topics2.js"></script>
 <script src="more_topics3.js"></script>
+<script src="prune.js"></script>
 <script src="more_q.js"></script>
 <script src="more_sj.js"></script>
 <script>
@@ -609,7 +610,7 @@ function impGuess(k){
   const imps=impNames(),p=imps[k];
   const c=$('voteCard');c.innerHTML='';$('voteTitle').textContent='🎯 دور الامبوستر';$('voteSub').textContent='';
   c.append(el('div','lab','عط التلفون لـ'),el('div','nm',p),el('div','lab','إنت الامبوستر! ويش كانت الكلمة؟ إدا جبتها صح تاخد +١'));
-  const opts=shuffle([G.word,...shuffle(TOPICS[G.cat].filter(w=>w!==G.word)).slice(0,5)]);
+  const opts=shuffle([G.word,...nearWords(G.cat,G.word,5)]);
   const o=el('div','opts');o.style.gridTemplateColumns='1fr 1fr';
   opts.forEach(w=>o.appendChild(btn(w,'',()=>{
     o.querySelectorAll('button').forEach(x=>{x.disabled=true;if(x.textContent===G.word)x.className='ok'});
@@ -743,14 +744,24 @@ function trivNext(){
 /* ===== GUESS (20 QUESTIONS) ===== */
 let GQ;
 function startG20(){GQ={q:turnQueue()};gs('❓ خمن الشي','واحد يعرف الكلمة، والباقين عندهم ٢٠ سؤال جوابها إي أو لا');g20Turn()}
-function g20Turn(){
-  const p=GQ.q(),[c,w]=topicWord(S.tcats);GQ.n=0;GQ.c=c;const add=card();
+// زر تغيير الكلمة أو الموضوع (للي يعرف الكلمة، قبل لا تبدأ الجولة)
+function chgRow(cur,again){
+  const box=el('div','chgRow');box.style.cssText='width:100%;display:flex;flex-wrap:wrap;gap:6px;justify-content:center';
+  const b1=btn('كلمة ثانية 🔄','ghost small',()=>again(cur)),b2=btn('موضوع ثاني 📂','ghost small',()=>{
+    if(box.querySelector('.chips')){box.querySelector('.chips').remove();return}
+    const ch=el('div','chips');ch.style.width='100%';const list=(S.tcats&&S.tcats.length>1?S.tcats:Object.keys(TOPICS)).filter(x=>TOPICS[x]&&x!==cur);
+    list.forEach(x=>{const c=el('button','chip',x);c.onclick=()=>again(x);ch.appendChild(c)});box.appendChild(ch)});
+  box.append(b1,b2);return box;
+}
+function g20Turn(p0,cat){
+  const p=typeof p0==='string'?p0:GQ.q(),[c,w]=cat&&TOPICS[cat]?[cat,draw('w_'+cat,TOPICS[cat])]:topicWord(S.tcats);GQ.n=0;GQ.c=c;const add=card();
   add('lab','اللي يعرف الكلمة');add('nm',p);add('lab','الموضوع: '+c);
   const h=add('','');const hb=el('button','ghost hold','اضغط مطوّل عشان تشوف الكلمة 👀');hb.style.width='100%';h.appendChild(hb);const wd=add('hidden','');wd.append(el('div','txt good',w),el('div','desc',descOf(c,w)));
   hb.addEventListener('pointerdown',e=>{e.preventDefault();wd.classList.remove('hidden')});['pointerup','pointerleave','pointercancel'].forEach(ev=>hb.addEventListener(ev,()=>wd.classList.add('hidden')));
   hb.oncontextmenu=e=>e.preventDefault();
+  const chg=chgRow(c,x=>g20Turn(p,x));$('gsCard').appendChild(chg);
   const cnt=add('timer','0 / 20');
-  setBtns('gsBtns',[btn('استسلموا 🏳️','ghost',()=>g20End(w,false)),btn('سؤال +1','',function(){if(GQ.n>=20)return;GQ.n++;cnt.textContent=GQ.n+' / 20';beep(800);if(GQ.n>=20){this.disabled=true;this.textContent='آخر سؤال!'}},1.3),btn('جابوها ✅','grn',()=>g20End(w,true))]);
+  setBtns('gsBtns',[btn('استسلموا 🏳️','ghost',()=>g20End(w,false)),btn('سؤال +1','',function(){if(GQ.n>=20)return;chg.remove();GQ.n++;cnt.textContent=GQ.n+' / 20';beep(800);if(GQ.n>=20){this.disabled=true;this.textContent='آخر سؤال!'}},1.3),btn('جابوها ✅','grn',()=>g20End(w,true))]);
 }
 function g20End(w,won){const add=card();add('txt',won?'جابوها في '+GQ.n+' سؤال 🎉':'ما جابوها 😅');add('lab','الكلمة كانت');add('nm',w);add('desc',descOf(GQ.c,w));setBtns('gsBtns',[btn('اللي بعده ←','',g20Turn)])}
 
@@ -807,13 +818,14 @@ function recRow(get,set){
   r.append(bRec,bRev,bNor);upd();return r;
 }
 function startRev(){RV={q:turnQueue(),scores:{}};S.players.forEach(p=>RV.scores[p]=0);gs('🔄 الكلام المعكوس','واحد يسجل كلمة، والثاني يسمعها معكوسة ويقلدها ويخمنها');revA()}
-function revA(){
-  stopRec();const A=RV.q(),B=pick(S.players.filter(p=>p!==A)),[c,w]=topicWord(S.tcats);
+function revA(A0,B0,cat){
+  stopRec();const A=typeof A0==='string'?A0:RV.q(),B=typeof B0==='string'?B0:pick(S.players.filter(p=>p!==A)),[c,w]=cat&&TOPICS[cat]?[cat,draw('w_'+cat,TOPICS[cat])]:topicWord(S.tcats);
   Object.assign(RV,{A,B,c,w,bufA:null,bufB:null});
   const add=card();add('step','الخطوة ١ من ٢');add('lab','عط التلفون لـ');add('nm',A);add('lab','الموضوع: '+c);
   const hb=el('button','ghost hold','اضغط مطوّل عشان تشوف كلمتك 👀');hb.style.width='100%';$('gsCard').appendChild(hb);
   const wd=add('hidden','');wd.append(el('div','txt good',w),el('div','desc',descOf(c,w)));
   hb.addEventListener('pointerdown',e=>{e.preventDefault();wd.classList.remove('hidden')});['pointerup','pointerleave','pointercancel'].forEach(ev=>hb.addEventListener(ev,()=>wd.classList.add('hidden')));hb.oncontextmenu=e=>e.preventDefault();
+  $('gsCard').appendChild(chgRow(c,x=>revA(A,B,x)));
   add('lab','سجّل نفسك وإنت تقول الكلمة بوضوح');
   $('gsCard').appendChild(recRow(()=>RV.bufA,b=>{RV.bufA=b;nb.disabled=false}));add('err','').id='micErr';
   scores(RV.scores);const nb=btn('خلصت، عط التلفون لـ '+B+' ←','',revB);nb.disabled=true;setBtns('gsBtns',[nb]);
@@ -901,5 +913,6 @@ if('serviceWorker' in navigator&&window.isSecureContext&&location.protocol!=='fi
 <script src="scrabble.js"></script>
 <script src="sfx.js"></script>
 <script src="online2.js"></script>
+<script src="fib.js"></script>
 </body>
 </html>

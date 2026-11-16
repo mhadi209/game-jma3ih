@@ -213,7 +213,7 @@ function sjSetup() {
 }
 function sjStart() {
   const cats = S.sjcats.slice(), cells = {};
-  cats.forEach(c => { cells[c] = {}; [200, 400, 600].forEach(l => { const a = draw('sj_' + c + '_' + l, SJ[c][l]); let b2 = draw('sj_' + c + '_' + l, SJ[c][l]); cells[c][l] = [a, b2]; }); });
+  cats.forEach(c => { cells[c] = {}; [200, 400, 600].forEach(l => { const a = sjPickQ(c, l, 0); let b2 = sjPickQ(c, l, 1); cells[c][l] = [a, b2]; }); });
   SG = { cats, cells, used: {}, turn: 0, teams: teamNames().map(n => ({ n, s: 0, life: { swap: 1, dbl: 1, hint: 1 } })) };
   sjBoard();
 }
@@ -250,7 +250,7 @@ function sjAsk(c, l, i) {
     if (!revealed) {
       const tm = el('div', 'timer'); tm.id = 'sjT'; card.appendChild(tm); countdownTimer(TIME('sj'), 'sjT', () => {});
       const life = el('div', 'life');
-      const bs = btn('🔄 غيّر', 'ghost', () => { if (!t.life.swap) return; t.life.swap = 0; q = draw('sj_' + c + '_' + l, SJ[c][l]); render(); });
+      const bs = btn('🔄 غيّر', 'ghost', () => { if (!t.life.swap) return; t.life.swap = 0; q = sjPickQ(c, l, 1); render(); });
       const bd = btn('✖️٢ دبل', 'ghost', () => { if (!t.life.dbl) return; t.life.dbl = 0; dbl = true; render(); });
       const bh = btn('💡 تلميح', 'ghost', () => { if (!t.life.hint) return; t.life.hint = 0; hint = true; render(); });
       bs.disabled = !t.life.swap; bd.disabled = !t.life.dbl || dbl; bh.disabled = !t.life.hint || hint;

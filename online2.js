@@ -129,15 +129,16 @@ function makeActing(kind) { // cha | tab
   };
   return G; }
 function makeG20() { const G = {};
-  G.start = () => { G.p = draw('ong20', ids()); [G.c, G.w] = topicWord(Object.keys(TOPICS)); G.n = 0; G.res = null; };
+  G.start = () => { G.p = draw('ong20', ids()); [G.c, G.w] = topicWord(Object.keys(TOPICS)); G.n = 0; G.res = null; G.pickc = false; };
   G.view = p => { const me = p.id === G.p; const it = [{ t: 'lab', v: 'اللي يعرف الشي' }, { t: 'nm', v: nm(G.p) }, { t: 'lab', v: 'الموضوع: ' + G.c }];
     if (G.res) return { title: '❓ خمن الشي', items: it.concat([{ t: 'win', v: G.res }, { t: 'txt good', v: G.w }, { t: 'desc', v: descOf(G.c, G.w) }]) };
     if (me) it.push({ t: 'txt good', v: G.w }, { t: 'desc', v: descOf(G.c, G.w) }, { t: 'lab', v: 'جاوب على أسئلتهم بـ إي أو لا بس' });
     else it.push({ t: 'lab', v: 'اسألوه أسئلة جوابها إي أو لا' });
     it.push({ t: 'bigLetter', v: G.n + '/20' });
-    return { title: '❓ خمن الشي', items: it, btns: me ? [{ id: 'q', label: 'سؤال +1', cls: '' }, { id: 'got', label: 'جابوها ✅', cls: 'grn' }, { id: 'give', label: 'استسلموا 🏳️', cls: 'ghost' }] : [] }; };
+    if (me && G.pickc) return { title: '❓ خمن الشي', items: [{ t: 'lab', v: 'اختار الموضوع' }], opts: Object.keys(TOPICS).map(c => ({ id: 'c:' + c, label: c })) };
+    return { title: '❓ خمن الشي', items: it, btns: me ? (G.n === 0 ? [{ id: 'chgw', label: 'كلمة ثانية 🔄', cls: 'ghost' }, { id: 'chgc', label: 'موضوع ثاني 📂', cls: 'ghost' }] : []).concat([{ id: 'q', label: 'سؤال +1', cls: '' }, { id: 'got', label: 'جابوها ✅', cls: 'grn' }, { id: 'give', label: 'استسلموا 🏳️', cls: 'ghost' }]) : [] }; };
   G.hostBtns = () => G.res ? [{ id: 'h:next', label: 'اللي بعده ←', flex: 2 }] : [];
-  G.act = (p, m) => { if (m.v === 'h:next') return G.start(); if (p.id !== G.p || G.res) return; if (m.v === 'q' && G.n < 20) G.n++; if (m.v === 'got') { G.res = 'جابوها في ' + G.n + ' سؤال 🎉'; } if (m.v === 'give' || G.n >= 20 && m.v === 'q') G.res = 'ما جابوها 😅'; };
+  G.act = (p, m) => { if (m.v === 'h:next') return G.start(); if (p.id !== G.p || G.res) return; if (G.n === 0) { if (m.v === 'chgw') { G.w = draw('w_' + G.c, TOPICS[G.c]); return; } if (m.v === 'chgc') { G.pickc = true; return; } if (m.a === 'opt' && String(m.v).startsWith('c:') && TOPICS[String(m.v).slice(2)]) { G.c = String(m.v).slice(2); G.w = draw('w_' + G.c, TOPICS[G.c]); G.pickc = false; return; } } if (m.v === 'q' && G.n < 20) G.n++; if (m.v === 'got') { G.res = 'جابوها في ' + G.n + ' سؤال 🎉'; } if (m.v === 'give' || G.n >= 20 && m.v === 'q') G.res = 'ما جابوها 😅'; };
   return G; }
 function makeFive() { const G = {};
   G.start = () => { G.p = draw('onfive', ids()); G.q = draw('five', FIVE_SEC); G.end = 0; G.done = false; G.v = {}; G.res = null; };
@@ -229,7 +230,7 @@ function makeQuiz(kind) { // triv | flags | mil
   const total = kind === 'mil' ? 15 : 10, secs = kind === 'flags' ? TIME('flag') : 20;
   const newQ = () => {
     if (kind === 'flags') { const mode = Math.random() < .55 ? 'flag' : 'emoji'; let shown, right, pool; if (mode === 'flag') { const f = draw('flags', FLAGS); shown = flagEmoji(f.code); right = f.name; pool = FLAGS.map(x => x.name); } else { const f = draw('emojic', EMOJI_COUNTRIES); shown = f.e; right = f.name; pool = FLAGS.map(x => x.name).concat(EMOJI_COUNTRIES.map(x => x.name)); } const opts = shuffle([right, ...shuffle([...new Set(pool)].filter(x => x !== right)).slice(0, 3)]); return { q: mode === 'flag' ? 'علم أي دولة؟' : 'أي دولة؟', show: shown, cls: mode === 'flag' ? 'flagBig' : 'emojiBig', opts, r: opts.indexOf(right) }; }
-    const q = kind === 'mil' && G.k >= 10 ? draw('milhard', MIL_HARD) : draw('triv', TRIVIA); const opts = shuffle(q.slice(1)); return { q: q[0], opts, r: opts.indexOf(q[1]) };
+    const q = kind === 'mil' && G.k >= milHardFrom() ? draw('milhard', MIL_HARD) : draw('triv', TRIVIA); const opts = shuffle(q.slice(1)); return { q: q[0], opts, r: opts.indexOf(q[1]) };
   };
   G.start = () => { G.k = 0; G.alive = {}; ids().forEach(i => G.alive[i] = true); G.pts = {}; G.next(); };
   G.next = () => { G.Q = newQ(); G.ans = {}; G.t0 = Date.now(); G.end = G.t0 + secs * 1000; G.reveal = false; const k = G.k; later(G, secs * 1000 + 300, () => { if (G.k === k && !G.reveal) G.doReveal(); }); };
@@ -513,7 +514,7 @@ function makeMafia() { const G = {}; const RN = { maf: '🔪 مافيا', doc: '
    ====================================================== */
 R.sjB = (it, c, send) => { const b = el('div', 'sjB'); it.cats.forEach((cat, ci) => { const r = el('div', 'r'); r.appendChild(el('b', '', cat)); [200, 200, 400, 400, 600, 600].forEach((l, k) => { const used = it.used[ci + '|' + l + '|' + (k % 2)]; const x = btn(String(l), l === 200 ? 'grn' : l === 400 ? 'yel' : 'red', () => send({ a: 'opt', v: ci + '|' + l + '|' + (k % 2) })); x.disabled = used || !it.can; r.appendChild(x); }); b.appendChild(r); }); c.appendChild(b); };
 function makeSJ() { const G = {};
-  G.start = () => { const a = shuffle(ids()); G.team = {}; a.forEach((id, i) => G.team[id] = i % 2); const cats = []; while (cats.length < 6) { const c = draw('sjcats', Object.keys(SJ)); if (!cats.includes(c)) cats.push(c); } G.cats = cats; G.cells = {}; cats.forEach((c, ci) => [200, 400, 600].forEach(l => { G.cells[ci + '|' + l + '|0'] = draw('sj_' + c + '_' + l, SJ[c][l]); G.cells[ci + '|' + l + '|1'] = draw('sj_' + c + '_' + l, SJ[c][l]); })); G.used = {}; G.turn = 0; G.sc = [0, 0]; G.life = [{ swap: 1, dbl: 1, hint: 1 }, { swap: 1, dbl: 1, hint: 1 }]; G.q = null; G.over = false; };
+  G.start = () => { const a = shuffle(ids()); G.team = {}; a.forEach((id, i) => G.team[id] = i % 2); const cats = []; while (cats.length < 6) { const c = draw('sjcats', Object.keys(SJ)); if (!cats.includes(c)) cats.push(c); } G.cats = cats; G.cells = {}; cats.forEach((c, ci) => [200, 400, 600].forEach(l => { G.cells[ci + '|' + l + '|0'] = sjPickQ(c, l, 0); G.cells[ci + '|' + l + '|1'] = sjPickQ(c, l, 1); })); G.used = {}; G.turn = 0; G.sc = [0, 0]; G.life = [{ swap: 1, dbl: 1, hint: 1 }, { swap: 1, dbl: 1, hint: 1 }]; G.q = null; G.over = false; };
   const tn = t => t ? 'الفريق الأزرق 🔵' : 'الفريق الأحمر 🔴';
   const members = t => Object.keys(G.team).filter(i => G.team[i] === t).map(nm).join('، ');
   G.join = p => { if (G.team[p.id] === undefined) G.team[p.id] = Object.values(G.team).filter(x => x === 0).length <= Object.values(G.team).filter(x => x === 1).length ? 0 : 1; };
@@ -531,7 +532,7 @@ function makeSJ() { const G = {};
     if (m.v === 'h:again') return G.start(); if (m.v === 'h:end') { G.over = true; return; }
     if (!G.q) { if (m.a === 'opt' && t === G.turn && !G.used[m.v] && G.cells[m.v]) { const [ci, l] = m.v.split('|').map(Number); G.q = { key: m.v, ci, l, q: G.cells[m.v], end: Date.now() + TIME('sj') * 1000 }; } return; }
     const q = G.q;
-    if (!q.rev && t === G.turn) { if (m.v === 'swap' && G.life[t].swap) { G.life[t].swap = 0; q.q = draw('sj_' + G.cats[q.ci] + '_' + q.l, SJ[G.cats[q.ci]][q.l]); } if (m.v === 'dbl' && G.life[t].dbl) { G.life[t].dbl = 0; q.dbl = true; } if (m.v === 'hint' && G.life[t].hint) { G.life[t].hint = 0; q.hint = true; } }
+    if (!q.rev && t === G.turn) { if (m.v === 'swap' && G.life[t].swap) { G.life[t].swap = 0; q.q = sjPickQ(G.cats[q.ci], q.l, 1); } if (m.v === 'dbl' && G.life[t].dbl) { G.life[t].dbl = 0; q.dbl = true; } if (m.v === 'hint' && G.life[t].hint) { G.life[t].hint = 0; q.hint = true; } }
     if (m.v === 'h:rev') q.rev = true;
     if (q.rev && /^h:(t0|t1|none)$/.test(m.v)) { const w = m.v === 'h:t0' ? 0 : m.v === 'h:t1' ? 1 : -1; if (w >= 0) { const pts = (w === G.turn && q.dbl) ? q.l * 2 : q.l; G.sc[w] += pts; Object.keys(G.team).forEach(i => { if (G.team[i] === w) addScore(i, Math.round(pts / 200)); }); } G.used[q.key] = 1; G.q = null; G.turn = 1 - G.turn; if (Object.keys(G.cells).every(k => G.used[k])) G.over = true; }
   };
@@ -587,15 +588,16 @@ R.recO = (it, c, send) => {
   c.appendChild(box);
 };
 function makeRev() { const G = {};
-  G.start = () => { const a = ids(); G.A = draw('onrev', a); G.B = pick(a.filter(x => x !== G.A)) || G.A; [G.c, G.w] = topicWord(Object.keys(TOPICS)); G.audio = null; G.res = null; G.rev = false; };
+  G.start = () => { const a = ids(); G.A = draw('onrev', a); G.B = pick(a.filter(x => x !== G.A)) || G.A; [G.c, G.w] = topicWord(Object.keys(TOPICS)); G.audio = null; G.res = null; G.rev = false; G.pickc = false; };
   G.view = p => { const T = '🔄 الكلام المعكوس', it = [{ t: 'lab', v: nm(G.A) + ' يسجّل 🎙️ و ' + nm(G.B) + ' يخمّن 🤔' }, { t: 'lab', v: 'الموضوع: ' + G.c }];
     if (G.rev) return { title: T, items: it.concat([{ t: 'lab', v: 'الكلمة' }, { t: 'txt good', v: G.w }, { t: 'win', v: G.res || '' }, { t: 'recO', audio: G.audio, normal: true }]), scores: O.scoresList() };
-    if (p.id === G.A && !G.audio) return { title: T, items: it.concat([{ t: 'lab', v: 'كلمتك السرية:' }, { t: 'txt good', v: G.w }, { t: 'lab', v: 'سجّل نفسك وإنت تقولها بوضوح، وبعدين أرسل' }, { t: 'recO', rec: true, send: true }]) };
+    if (p.id === G.A && !G.audio && G.pickc) return { title: T, items: [{ t: 'lab', v: 'اختار الموضوع' }], opts: Object.keys(TOPICS).map(c => ({ id: 'c:' + c, label: c })) };
+    if (p.id === G.A && !G.audio) return { title: T, btns: [{ id: 'chgw', label: 'كلمة ثانية 🔄', cls: 'ghost' }, { id: 'chgc', label: 'موضوع ثاني 📂', cls: 'ghost' }], items: it.concat([{ t: 'lab', v: 'كلمتك السرية:' }, { t: 'txt good', v: G.w }, { t: 'lab', v: 'سجّل نفسك وإنت تقولها بوضوح، وبعدين أرسل' }, { t: 'recO', rec: true, send: true }]) };
     if (p.id === G.B && G.audio) return { title: T, items: it.concat([{ t: 'lab', v: '١) اسمع صوت ' + nm(G.A) + ' معكوس' }, { t: 'recO', audio: G.audio }, { t: 'lab', v: '٢) قلّده وسجّل، واسمع تقليدك معكوس' }, { t: 'recO', rec: true }, { t: 'lab', v: '٣) قول تخمينك بصوت عالي!' }]) };
     if (G.audio) return { title: T, items: it.concat([{ t: 'lab', v: nm(G.B) + ' يحاول يخمن… اسمعوا وياه:' }, { t: 'recO', audio: G.audio }]) };
     return { title: T, items: it.concat([{ t: 'lab', v: nm(G.A) + ' يسجّل…' }]) }; };
   G.hostBtns = () => G.rev ? [{ id: 'h:next', label: 'اللي بعده ←', flex: 2 }] : G.audio ? [{ id: 'h:yes', label: 'خمنها ✅', cls: 'grn' }, { id: 'h:no', label: 'ما خمنها ❌', cls: 'ghost' }] : [];
-  G.act = (p, m) => { if (m.v === 'h:next') return G.start(); if (m.a === 'audio' && p.id === G.A && !G.audio && /^data:audio\/wav;base64,/.test(m.v) && m.v.length < 3e6) { G.audio = m.v; return; }
+  G.act = (p, m) => { if (m.v === 'h:next') return G.start(); if (p.id === G.A && !G.audio) { if (m.v === 'chgw') { G.w = draw('w_' + G.c, TOPICS[G.c]); return; } if (m.v === 'chgc') { G.pickc = true; return; } if (m.a === 'opt' && String(m.v).startsWith('c:') && TOPICS[String(m.v).slice(2)]) { G.c = String(m.v).slice(2); G.w = draw('w_' + G.c, TOPICS[G.c]); G.pickc = false; return; } } if (m.a === 'audio' && p.id === G.A && !G.audio && /^data:audio\/wav;base64,/.test(m.v) && m.v.length < 3e6) { G.audio = m.v; return; }
     if (m.v === 'h:yes' && G.audio && !G.rev) { G.rev = true; G.res = '🎉 ' + nm(G.B) + ' خمنها!'; addScore(G.A, 1); addScore(G.B, 1); } if (m.v === 'h:no' && G.audio && !G.rev) { G.rev = true; G.res = 'ما خمنها 😅'; } };
   return G; }
 
