@@ -203,6 +203,18 @@ button:disabled{opacity:.75}
  .scWrap{width:min(96vw,680px)!important}.sct{font-size:34px!important}
  .ludoWrap{width:min(94vw,680px)!important}
 }
+/* تابلت بالعرض: الشاشة قصيرة، فنصغّر اللوحات على قد الطول */
+@media (min-width:700px) and (orientation:landscape){
+ .sdGrid,.sdPad,.sdTools,.race{width:min(94vw,620px,calc(100vh - 340px))!important}
+ .sdPad button{min-width:0}
+ .ludoWrap{width:min(94vw,680px,calc(100vh - 300px))!important}
+ .scWrap{width:min(96vw,680px,calc(100vh - 330px))!important}
+ .xo{width:min(480px,calc(100vh - 320px))!important}.xoO{width:min(420px,calc(100vh - 320px))!important}
+ .stage{height:calc(100vh - 270px);min-height:300px}
+ .bigcard{min-height:0}
+ .cover .q{font-size:110px;width:160px;height:160px}
+ .bomb{font-size:120px}
+}
 @media (min-width:1000px){
  .screen{max-width:980px}
  .bottom>*{max-width:924px}
