@@ -366,6 +366,7 @@ button:disabled{opacity:.75}
 <script src="more_topics2.js"></script>
 <script src="more_topics3.js"></script>
 <script src="prune.js"></script>
+<script src="topics_final.js"></script>
 <script src="more_q.js"></script>
 <script src="more_sj.js"></script>
 <script>
@@ -422,6 +423,7 @@ S=Object.assign(S,LS.get('jm_s',{}));
 const OLD_TOPICS={'حيوانات 🦁':'حيوانات 🐾','طيور 🦅':'حيوانات 🐾','كائنات بحرية 🐠':'حيوانات 🐾','حشرات 🐜':'حيوانات 🐾','أكلات 🍛':'أكل وشرب 🍽️','حلويات 🍰':'أكل وشرب 🍽️','مشروبات 🥤':'أكل وشرب 🍽️','مطاعم وماركات أكل 🍔':'أكل وشرب 🍽️','نباتات 🌵':'نباتات وفواكه وخضار 🌿','فواكه وخضار 🍉':'نباتات وفواكه وخضار 🌿','دول 🌍':'دول ومدن 🌍','مدن 🏙️':'دول ومدن 🌍','سيارات 🚗':'سيارات ومواصلات 🚗','مواصلات 🚌':'سيارات ومواصلات 🚗','تواصل اجتماعي 📱':'تطبيقات ومواقع 📱','تطبيقات 📲':'تطبيقات ومواقع 📱','رياضات ⚽':'رياضة وكورة ⚽','أندية كورة ⚽':'رياضة وكورة ⚽','لاعبين كورة 🌟':'رياضة وكورة ⚽','ألعاب فيديو 🎮':'ألعاب 🎮','ألعاب شعبية وجمعات 🎲':'ألعاب 🎮','ملابس 👕':'ملابس وماركات 👕','ماركات 👜':'ملابس وماركات 👕','أغراض البيت 🏠':'أغراض 🏠','أجهزة إلكترونية 💻':'أجهزة 🔌','أدوات وعدة 🔧':'أغراض 🏠','أدوات مدرسية ✏️':'أغراض 🏠','أغراض وأجهزة 🏠':'أغراض 🏠','تراث خليجي 🏺':'تراث بحريني 🏺'};
 const fixCats=a=>{const r=[...new Set(a.map(c=>OLD_TOPICS[c]||c).filter(c=>TOPICS[c]))];return r.length?r:Object.keys(TOPICS)};
 S.cats=fixCats(S.cats);S.tcats=fixCats(S.tcats);
+if(S.topicsV!==window.TOPICS_VER){S.cats=Object.keys(TOPICS);S.tcats=Object.keys(TOPICS);S.topicsV=window.TOPICS_VER}
 const save=()=>LS.set('jm_s',S);
 function applyTheme(){document.body.classList.toggle('dark',!!S.dark);const t=$('themeBtn');if(t)t.textContent=S.dark?'☀️':'🌙';const m=document.querySelector('meta[name=theme-color]');if(m)m.content=S.dark?'#1c1611':'#efe1c1'}
 
